@@ -33,11 +33,11 @@ export const raspadinhaService = {
                 data: premiosArray,
                 error: response.error || null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao listar prêmios:", error);
             return {
                 data: [],
-                error: error.response?.data?.message || "Erro ao listar prêmios",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao listar prêmios",
             };
         }
     },
@@ -52,11 +52,11 @@ export const raspadinhaService = {
                 data: response.data as Prize,
                 error: null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao criar prêmio:", error);
             return {
                 data: {} as Prize,
-                error: error.response?.data?.message || "Erro ao criar prêmio",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao criar prêmio",
             };
         }
     },
@@ -70,11 +70,11 @@ export const raspadinhaService = {
                 data: true,
                 error: null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao deletar prêmio:", error);
             return {
                 data: false,
-                error: error.response?.data?.message || "Erro ao deletar prêmio",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao deletar prêmio",
             };
         }
     },
@@ -89,11 +89,11 @@ export const raspadinhaService = {
                 data: response.data as Prize,
                 error: null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao atualizar prêmio:", error);
             return {
                 data: {} as Prize,
-                error: error.response?.data?.message || "Erro ao atualizar prêmio",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao atualizar prêmio",
             };
         }
     },
@@ -123,11 +123,11 @@ export const raspadinhaService = {
                 data: raspadinhasArray,
                 error: response.error || null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao listar raspadinhas:", error);
             return {
                 data: [],
-                error: error.response?.data?.message || "Erro ao listar raspadinhas",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao listar raspadinhas",
             };
         }
     },
@@ -142,11 +142,11 @@ export const raspadinhaService = {
                 data: response.data as Raspadinha,
                 error: null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao criar raspadinha:", error);
             return {
                 data: {} as Raspadinha,
-                error: error.response?.data?.message || "Erro ao criar raspadinha",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao criar raspadinha",
             };
         }
     },
@@ -160,11 +160,11 @@ export const raspadinhaService = {
                 data: true,
                 error: null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao deletar raspadinha:", error);
             return {
                 data: false,
-                error: error.response?.data?.message || "Erro ao deletar raspadinha",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao deletar raspadinha",
             };
         }
     },
@@ -180,11 +180,11 @@ export const raspadinhaService = {
                 data: response.data as PlayRaspadinhaResult,
                 error: response.error || null,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro ao jogar raspadinha:", error);
             return {
                 data: {} as PlayRaspadinhaResult,
-                error: error.response?.data?.message || "Erro ao jogar raspadinha",
+                error: (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao jogar raspadinha",
             };
         }
     },

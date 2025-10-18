@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/api";
-import type { Rifa, Reward, Package } from "@/types";
+import type { Rifa, Reward } from "@/types";
 
 // Tipos da API
 interface ActionResponse {
@@ -43,10 +43,6 @@ interface CreateActionPayload {
         id: number;
         quantity: number;
     }>;
-}
-
-interface DeleteActionPayload {
-    id: number;
 }
 
 interface AddRewardPayload {

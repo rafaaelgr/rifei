@@ -29,13 +29,23 @@ interface RifaRecente {
     status: "ativa" | "pausada" | "finalizada";
 }
 
+interface ActionResponse {
+    id: number;
+    title?: string;
+    description?: string;
+    finished?: boolean;
+    ticketsPrice?: number;
+    blocked?: number[];
+    numberTickets?: number;
+}
+
 // Este serviço pode precisar ser ajustado conforme a API real retorna os dados
 export const dashboardService = {
     // Buscar estatísticas do dashboard
     async buscarEstatisticas(): Promise<{ data: DashboardStats | null; error?: string }> {
         try {
             // Como não há endpoint específico, vamos buscar das rifas e calcular
-            const rifasResponse = await apiRequest<any[]>("/actions", {
+            const rifasResponse = await apiRequest<ActionResponse[]>("/actions", {
                 method: "GET",
             });
 
@@ -51,12 +61,12 @@ export const dashboardService = {
             // Calcular estatísticas baseado nas rifas
             const stats: DashboardStats = {
                 totalRifas: rifas.length,
-                rifasAtivas: rifas.filter((r: any) => !r.finished).length,
-                totalVendas: rifas.reduce((acc: number, r: any) => acc + (r.blocked?.length || 0), 0),
+                rifasAtivas: rifas.filter((r) => !r.finished).length,
+                totalVendas: rifas.reduce((acc, r) => acc + (r.blocked?.length || 0), 0),
                 vendasHoje: 0, // Não disponível na API atual
-                totalCotasVendidas: rifas.reduce((acc: number, r: any) => acc + (r.blocked?.length || 0), 0),
-                faturamentoTotal: rifas.reduce((acc: number, r: any) =>
-                    acc + ((r.blocked?.length || 0) * r.ticketsPrice), 0
+                totalCotasVendidas: rifas.reduce((acc, r) => acc + (r.blocked?.length || 0), 0),
+                faturamentoTotal: rifas.reduce((acc, r) =>
+                    acc + ((r.blocked?.length || 0) * (r.ticketsPrice || 0)), 0
                 ),
                 faturamentoMes: 0, // Precisaria de mais informações da API
                 faturamentoHoje: 0, // Precisaria de mais informações da API
@@ -80,7 +90,7 @@ export const dashboardService = {
 
     // Buscar rifas recentes
     async buscarRifasRecentes(): Promise<{ data: RifaRecente[]; error?: string }> {
-        const response = await apiRequest<any[]>("/actions", {
+        const response = await apiRequest<ActionResponse[]>("/actions", {
             method: "GET",
         });
 
@@ -88,11 +98,11 @@ export const dashboardService = {
             return { error: response.error || "Erro ao buscar rifas recentes", data: [] };
         }
 
-        const rifasRecentes: RifaRecente[] = response.data.slice(0, 4).map((rifa: any) => ({
+        const rifasRecentes: RifaRecente[] = response.data.slice(0, 4).map((rifa) => ({
             id: rifa.id.toString(),
-            titulo: rifa.title,
+            titulo: rifa.title || "",
             cotasVendidas: rifa.blocked?.length || 0,
-            totalCotas: rifa.numberTickets,
+            totalCotas: rifa.numberTickets || 0,
             status: rifa.finished ? "finalizada" : "ativa",
         }));
 
