@@ -1,0 +1,858 @@
+type: collection.insomnia.rest/5.0
+name: Casebre
+meta:
+  id: wrk_5cddfe594de14a588d4d0600bd4bc6d0
+  created: 1759359873496
+  modified: 1759359873496
+  description: ""
+collection:
+  - url: https://api.nuvende.com.br/api/v2/cobranca/webhooks/aec90db7-8598-49e8-b884-18d2cabc1b48
+    name: partners/auth/login
+    meta:
+      id: req_d1d8592a33d74cd4a0802895b2ac4ed2
+      created: 1760152041146
+      modified: 1760671969468
+      isPrivate: false
+      description: ""
+      sortKey: -1760671151572
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"webhook": "https://192.0.0.0/admin/webhook/pix",
+                        "eventos": ["pagamento"],
+                        "autorizacao": {
+                            "tipo": "none",
+                            "valor": "none"
+                        }
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.6.1
+        id: pair_0bb73841088f4a508304dd102f16788f
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYXBpLm51dmVuZGUuY29tLmJyL2FwaS92Mi9jb2JyYW5jYS9jb2IvNjM0MjMyMTM3OTIyNTE0OTQ0IiwiaWF0IjoxNzYwNjcxOTMwLCJleHAiOjE3NjA2NzU1MzAsIm5iZiI6MTc2MDY3MTkzMCwianRpIjoiNzlXRlVVT1pHVGJmV0VLUCIsInN1YiI6IjliNWNhNGZkLTM5YjYtNDlmMy1iZmM3LTdhY2JkYWYxNWMyZSIsInBydiI6ImRiZTdiZGM3ZDBjMjkyOGMzYTAxOGM3N2M3NTMyZGViZjMzOTAwNzUiLCJ1dWlkIjoiNTUwNTg0MjgtNjI5NC00MTMyLTlhMjktMjI5MjAyMGJhZjZiIiwicGFydG5lcl9pZCI6IjY1ZWI0OGY0LTY4NjMtNGM0MS04M2Q3LTRkNThjYTIyNzQ3MyIsImNsaWVudF9pZCI6IjliNWNhNGZkLTM5YjYtNDlmMy1iZmM3LTdhY2JkYWYxNWMyZSIsInNjb3BlcyI6WyJjb2Iud3JpdGUiLCJjb2IucmVhZCJdLCJsb2dfcmVxdWVzdHMiOjB9.vjf7jYyEtwa397bk2s6KFDV4Xu00AFQJ4u-PXoQnzt0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: https://api.nuvende.com.br/api/v2/cobranca/webhooks/aec90db7-8598-49e8-b884-18d2cabc1b48
+    name: partners/auth/login
+    meta:
+      id: req_3dcc528289b74071a421e87814ef4ed2
+      created: 1760671963457
+      modified: 1760807178116
+      isPrivate: false
+      description: ""
+      sortKey: -1760433097462
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"webhook": "https://192.0.0.0/admin/webhook/pix",
+                        "eventos": ["pagamento"],
+                        "autorizacao": {
+                            "tipo": "none",
+                            "valor": "none"
+                        }
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.6.1
+        id: pair_0bb73841088f4a508304dd102f16788f
+    authentication:
+      type: basic
+      useISO88591: false
+      disabled: false
+      username: 6bad85f9-aedb-423a-ad7f-5ab2a0e3f8b0
+      password: lOECd2f2cYRvSI5CjUzbZuoK9m4n1tKh
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - name: User
+    meta:
+      id: fld_84e810329f794ba69f1bfd60025a3806
+      created: 1712422904089
+      modified: 1712422904089
+      sortKey: -1712422904089
+      description: ""
+    children:
+      - url: "{{url}}/create-account"
+        name: Create account
+        meta:
+          id: req_1fdf34cf717e4c479d7ef1b9337c02bb
+          created: 1712422939433
+          modified: 1760216665549
+          isPrivate: false
+          description: ""
+          sortKey: -1712422939434
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email":"joaoptadiello@gmail.com",
+            	"name":"theon roda",
+            	"instagram":"@__tadielloo",
+            	"cpf":"03862873022",
+            	"whatsapp":"(54)99687-5511",
+            	"password":"casa2009"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/8.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/login"
+        name: Login
+        meta:
+          id: req_cc49ca05148044199a99e13919782fbe
+          created: 1714620571428
+          modified: 1760810342703
+          isPrivate: false
+          description: ""
+          sortKey: -1714620571428
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"cpf":"03862873022",
+            	"password":"casa2009"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/9.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/security-code"
+        name: Create code for change password
+        meta:
+          id: req_b2fe2c844c5f418c828a92d488afe9e4
+          created: 1714620701046
+          modified: 1714623752784
+          isPrivate: false
+          description: ""
+          sortKey: -1714620701046
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/9.1.0
+            id: pair_92188cae6db645219d4259dbf821bab8
+          - id: pair_2bb4a03ed1fe4598b243fc63cb9cfef6
+            name: Set-Cookie
+            value: token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZmEyN2QzZC0yYzVmLTRlMmUtOTY1NC05NjA4ZWVmM2IzMzQiLCJjcGYiOiIwMzg2Mjg3MzA5OSIsImlhdCI6MTcxNDYyMzQ3OCwiZXhwIjoxNzE0NjI0Mzc4fQ.YS9VYSMYE7RjwdWd3TYtNfxP5v_Gcqo4IFonbTN_DrNmHVwVLfoPQCaXvbmQqP35yde5VFB_grZm-ad7g7aAQ6PthOc6XwJ7F2LUtsxRnOYbyoeTc9wf2qlDiFBOzST1L7pWc7YfQuvOK8S_MhYiUO_JzIfkkqqQlhtLec4h52zeuiIjYRd9OzihwVqkFe-YWqbnb7W6tF-9TOAIgZ03YIwScwvP1yoG5jHAkTnAEy8SubPRBlpXDRFbJoGdPP3Ec7Sd7eSY4PkZNSSJVmlYXaon5HjazkGWP1lrs88NJV29OVoSZ5WDxTMO0pN6c3G9zAopfDWBLitwO8JWKsvhUV5DmrNSJXtxwYunU0GF5-BBhWiYbMgAifKd53QB3Ldwqf7aNR_iquGzT2810-SKx42eQWq6pDpH8geHzopKHvmgdizm93GUmDxebJfHv3LZnK5v6cjv3iwoAvdEITHgETG59ezx_1JW5_TCH_7pkKwwOp0pRYvuK3hEPPqnSWfZfECVFbOd33wqxz-3BvzkrkEfAWgNrezK1t41kncQnq0wisWp24rvRPBtybiihFeomUrVX9u9UH7fcQQicvQMgR1WXMQ-InMrurKuTpuuK6mjBJ2H9YvGhstynLo4uKzp-cnZ-z5PFdjIUqWsXxc_spdjll1k6a3bWgMU5_xK-ho;
+              Max-Age=900; Path=/; Expires=Thu, 02 May 2024 04:32:58 GMT;
+              HttpOnly; Secure; SameSite=None
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/validate-code"
+        name: Validate code
+        meta:
+          id: req_cac265e972974f188799f37dfa6b5457
+          created: 1714623699842
+          modified: 1714624268108
+          isPrivate: false
+          description: ""
+          sortKey: -1714623699842
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"code":"562021"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_bb8ff631b6cd4ba4a171de35c575ecc6
+          - name: User-Agent
+            value: insomnia/9.1.0
+            id: pair_3d518156dfaa49a4bf49b63e5d16edc9
+          - id: pair_be5a5db243d64f009d1578bba3a6b955
+            name: Set-Cookie
+            value: token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZmEyN2QzZC0yYzVmLTRlMmUtOTY1NC05NjA4ZWVmM2IzMzQiLCJjcGYiOiIwMzg2Mjg3MzA5OSIsImlhdCI6MTcxNDYyMzQ3OCwiZXhwIjoxNzE0NjI0Mzc4fQ.YS9VYSMYE7RjwdWd3TYtNfxP5v_Gcqo4IFonbTN_DrNmHVwVLfoPQCaXvbmQqP35yde5VFB_grZm-ad7g7aAQ6PthOc6XwJ7F2LUtsxRnOYbyoeTc9wf2qlDiFBOzST1L7pWc7YfQuvOK8S_MhYiUO_JzIfkkqqQlhtLec4h52zeuiIjYRd9OzihwVqkFe-YWqbnb7W6tF-9TOAIgZ03YIwScwvP1yoG5jHAkTnAEy8SubPRBlpXDRFbJoGdPP3Ec7Sd7eSY4PkZNSSJVmlYXaon5HjazkGWP1lrs88NJV29OVoSZ5WDxTMO0pN6c3G9zAopfDWBLitwO8JWKsvhUV5DmrNSJXtxwYunU0GF5-BBhWiYbMgAifKd53QB3Ldwqf7aNR_iquGzT2810-SKx42eQWq6pDpH8geHzopKHvmgdizm93GUmDxebJfHv3LZnK5v6cjv3iwoAvdEITHgETG59ezx_1JW5_TCH_7pkKwwOp0pRYvuK3hEPPqnSWfZfECVFbOd33wqxz-3BvzkrkEfAWgNrezK1t41kncQnq0wisWp24rvRPBtybiihFeomUrVX9u9UH7fcQQicvQMgR1WXMQ-InMrurKuTpuuK6mjBJ2H9YvGhstynLo4uKzp-cnZ-z5PFdjIUqWsXxc_spdjll1k6a3bWgMU5_xK-ho;
+              Max-Age=900; Path=/; Expires=Thu, 02 May 2024 04:32:58 GMT;
+              HttpOnly; Secure; SameSite=None
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/change-password"
+        name: New Request
+        meta:
+          id: req_3acb55b31abb4661963c985181cfd39a
+          created: 1714624943667
+          modified: 1759359902389
+          isPrivate: false
+          description: ""
+          sortKey: -1714624943667
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"password":"casa2008"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_00632f8f00a8401e87542e002d5f4c8b
+          - name: User-Agent
+            value: insomnia/9.1.0
+            id: pair_5e52a451d21f4231a73f065798b04b91
+          - id: pair_3fdd619110334503ad5385cf86b53d50
+            name: Set-Cookie
+            value: token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZmEyN2QzZC0yYzVmLTRlMmUtOTY1NC05NjA4ZWVmM2IzMzQiLCJjcGYiOiIwMzg2Mjg3MzA5OSIsImlhdCI6MTcxNDYyNTAyMCwiZXhwIjoxNzE0NjI1OTIwfQ.Cli0N0Bt2pjl5tidVOsXXmSEQUo_XRmMPcK8LdnSup08PeREGv0wysyiCZpPhslwNbvOn84edLp7rFvXxYDzu2f-neY8OuQ_XnpKqM_dBQl6JGFi1P8_eBPWra2CWFfO-x5r-MSoB_gdB2z-JeJTx3p6t7gmTErhxhuZnBWULtPYwh3zhuqRnoteGEJOClkQRApaOcpub5jY6Vc_oAC4zXQcucldqjKPTBwBlilvPiTNJbsbspCNpgCffUMs3nt6ok4QdI43I0An2rGm_awN54USHcYhQUuRLXEdnNEHK556VN68TyJNLd5ao-wcF8NBdg_0c6m60Fhz8Pgf08HJNqIleuOvop03U_9KatcHSt0D6kKAD8YBu6gV3OUML3exxARALfhEzuZsCcd2iS-51OPLfv2vFm6WMFwhWGaAV2KzEEIX614p_3BajLHbe0RBYJSwVP1JykxDCI8E3Swm2pkEe7B10HAoDxWCn4ngOk9uhywL3a_EBI21SJ8q2iaRuvDQv6RxI9IBmzGORqtsV8u1af789_19YE5vH9uX9z_xuoHgZ5oSAIT_hiaqF-70nSzS7wC4irHMBdgCCkLjLx2ByADmWyezDgdUBKeE1SGE7D-6M1cMT1u3WaSvbYmCCVDdrm5Ui91dzO5oAB7xLvIh0iqY_mQVM2VKICUk0r4;
+              Max-Age=900; Path=/; Expires=Thu, 02 May 2024 04:58:40 GMT;
+              HttpOnly; Secure; SameSite=None
+            description: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Actions
+    meta:
+      id: fld_6afa38c328774bae9bb79667c7198ac7
+      created: 1712432699730
+      modified: 1760811540588
+      sortKey: -1712432699730
+      description: ""
+    children:
+      - name: GET
+        meta:
+          id: fld_42979df4eee748c5a6e234bed5e897ad
+          created: 1714363153721
+          modified: 1714363170500
+          sortKey: -1712432702279
+          description: ""
+        children:
+          - url: "{{url}}/fetch-action/1"
+            name: Get action by id
+            meta:
+              id: req_126e5d3c115b4ea5a6376900c5daff9c
+              created: 1713974151723
+              modified: 1714363165964
+              isPrivate: false
+              description: ""
+              sortKey: -1714363165924
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/8.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/actions"
+            name: Get All actions
+            meta:
+              id: req_6ac586c197f3423ab1c50dd49e574fc0
+              created: 1714363093700
+              modified: 1760191494048
+              isPrivate: false
+              description: ""
+              sortKey: -1714363166024
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/9.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/action/12"
+            name: Get action info
+            meta:
+              id: req_2fcdb363b5044681a03e14e1ce8db225
+              created: 1714363241089
+              modified: 1714363331325
+              isPrivate: false
+              description: ""
+              sortKey: -1714363241089
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/9.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/get-top-client/14"
+            name: Top client
+            meta:
+              id: req_d9d991be22af437ba4c3c0c024f6fbcd
+              created: 1759628735592
+              modified: 1760204471284
+              isPrivate: false
+              description: ""
+              sortKey: -1714363241189
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/11.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/rewards/6"
+            name: Get rewards/:id
+            meta:
+              id: req_170d44497ea84cfa8e67992e3f8bad04
+              created: 1760195043352
+              modified: 1760195574752
+              isPrivate: false
+              description: ""
+              sortKey: -1760195043352
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/11.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: POST
+        meta:
+          id: fld_11ae2dde24b64928b6ae03befc574a61
+          created: 1714363185478
+          modified: 1714364142957
+          sortKey: -1714363185478
+          description: ""
+        children:
+          - url: "{{url}}/create-action"
+            name: Create action
+            meta:
+              id: req_b0b869164075404a81dcc7eaac366968
+              created: 1712432702179
+              modified: 1760811561504
+              isPrivate: false
+              description: ""
+              sortKey: -1714363191664
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"title":"TESTE 2", 
+                	"description":"Teste de descrição", 
+                	"finished":false, 
+                	"ticketsPrice":0.1,
+                	"minPrice":0.1,
+                	"mainAction":true,
+                	"numberTickets":1000,
+                	"image":"acao-universo-paralelo.png",
+                	"blocked":[],
+                	"raspadinhaId": 1,
+                	"packages":[
+                		{
+                			"id":1,
+                			"quantity":10,
+                			"raspadinha": 1
+                		}
+                	]
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/8.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/unlock-number"
+            name: Unlock number
+            meta:
+              id: req_b2a275f9103644ae8e1476ce5322e7ca
+              created: 1714025592380
+              modified: 1759373155689
+              isPrivate: false
+              description: ""
+              sortKey: -1714363191564
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"id":4,
+                	"number":5
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/9.0.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/add-reward-action"
+            name: Add reward
+            meta:
+              id: req_e1c276ea8fb041eca11d03163e1dd804
+              created: 1760194066213
+              modified: 1760196765649
+              isPrivate: false
+              description: ""
+              sortKey: -1760194066213
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"raffleId": 14,
+                  "number": 5,
+                  "rewardType": "NUMBER",
+                  "name": "TESTE REWARD",
+                  "description": "TEST DESC",
+                  "image": "z.string().optional()"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/11.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: DELETE
+        meta:
+          id: fld_d6ea45b1b663404d8cd736d978d4d397
+          created: 1714363221184
+          modified: 1714363221184
+          sortKey: -1714363221184
+          description: ""
+        children:
+          - url: "{{url}}/delete-action"
+            name: Delete action
+            meta:
+              id: req_5d2c5de0b5de4a51925fcd19e419a72c
+              created: 1713583103292
+              modified: 1760196346236
+              isPrivate: false
+              description: ""
+              sortKey: -1714363226194
+            method: DELETE
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"id":12
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/8.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{url}}/rewards/fa102659-aebe-4b1e-af6c-cedc113be7b6"
+            name: Delete rewards/:id
+            meta:
+              id: req_5c20ee8426e34ffba8ffd5bf66c79501
+              created: 1760195587126
+              modified: 1760195906144
+              isPrivate: false
+              description: ""
+              sortKey: -1714363226294
+            method: DELETE
+            headers:
+              - name: User-Agent
+                value: insomnia/11.6.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+  - name: Payment
+    meta:
+      id: fld_efc5f4746b684ee29bee0ff522822c3f
+      created: 1713743319007
+      modified: 1760811586562
+      sortKey: -1713743319007
+      description: ""
+    children:
+      - url: "{{url}}/webhook/pix"
+        name: Webhook pix
+        meta:
+          id: req_b71f37a6564d4f098e85c76422cdeaf7
+          created: 1713743321866
+          modified: 1760811613431
+          isPrivate: false
+          description: ""
+          sortKey: -1713743321866
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "txid": "00000000634818006798700544",
+            	"Status":"EFETIVADO"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/8.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/buy-ticket"
+        name: Buy ticket
+        meta:
+          id: req_1e4e67096607493b8ab1d306bc2b1d26
+          created: 1713746930964
+          modified: 1760811603508
+          isPrivate: false
+          description: ""
+          sortKey: -1713746930964
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"action_id":1,
+            	"cpf":"03862873022",
+            	"amount":10
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/8.6.1
+        authentication:
+          type: bearer
+          token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYXBpLm51dmVuZGUuY29tLmJyL2FwaS92Mi9jb2JyYW5jYS9jb2IvNjM0MjMyMTM3OTIyNTE0OTQ0IiwiaWF0IjoxNzYwNjcxOTMwLCJleHAiOjE3NjA2NzU1MzAsIm5iZiI6MTc2MDY3MTkzMCwianRpIjoiNzlXRlVVT1pHVGJmV0VLUCIsInN1YiI6IjliNWNhNGZkLTM5YjYtNDlmMy1iZmM3LTdhY2JkYWYxNWMyZSIsInBydiI6ImRiZTdiZGM3ZDBjMjkyOGMzYTAxOGM3N2M3NTMyZGViZjMzOTAwNzUiLCJ1dWlkIjoiNTUwNTg0MjgtNjI5NC00MTMyLTlhMjktMjI5MjAyMGJhZjZiIiwicGFydG5lcl9pZCI6IjY1ZWI0OGY0LTY4NjMtNGM0MS04M2Q3LTRkNThjYTIyNzQ3MyIsImNsaWVudF9pZCI6IjliNWNhNGZkLTM5YjYtNDlmMy1iZmM3LTdhY2JkYWYxNWMyZSIsInNjb3BlcyI6WyJjb2Iud3JpdGUiLCJjb2IucmVhZCJdLCJsb2dfcmVxdWVzdHMiOjB9.vjf7jYyEtwa397bk2s6KFDV4Xu00AFQJ4u-PXoQnzt0
+          disabled: true
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/sale/1"
+        name: Get sale status
+        meta:
+          id: req_295f4fc2ee0e4c159e4285113a5d6d08
+          created: 1714102383295
+          modified: 1759362551496
+          isPrivate: false
+          description: ""
+          sortKey: -1714102383295
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/9.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: ADMIN
+    meta:
+      id: fld_77df999477394915afd8763b78a0c5db
+      created: 1760671151472
+      modified: 1760795617897
+      sortKey: -1760671151472
+      description: ""
+    children:
+      - url: "{{url}}/admin/get-sales/14"
+        name: GET SALES
+        meta:
+          id: req_64887d1b7e114252ac848d0c59a6ecdb
+          created: 1760671163802
+          modified: 1760671751315
+          isPrivate: false
+          description: ""
+          sortKey: -1760671163802
+        method: GET
+        parameters:
+          - id: pair_33269a63d990496abb05bd3a0352b57b
+            name: page
+            value: "1"
+            description: ""
+            disabled: false
+          - id: pair_dda495806abd40159036a7fc6cdfea04
+            name: limit
+            value: "10"
+            description: ""
+            disabled: false
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: RASPADINHA
+    meta:
+      id: fld_309fe305d0c14c3e91b58104b16342f7
+      created: 1760810438545
+      modified: 1760810438545
+      sortKey: -1760810438545
+      description: ""
+    children:
+      - url: "{{url}}/play-raspadinha"
+        name: PLAY
+        meta:
+          id: req_a4260c1d74f34fd5afba3794e12c77b8
+          created: 1760807184887
+          modified: 1760811800725
+          isPrivate: false
+          description: ""
+          sortKey: -1760810441755
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"raspadinhaId": 1,
+            	"clientSeed": "MINHA-SEED-TEST"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/admin/prizes"
+        name: CREATE PRIZE
+        meta:
+          id: req_562e39a79e244973b7868e9e62c5756d
+          created: 1760810782179
+          modified: 1760810963726
+          isPrivate: false
+          description: ""
+          sortKey: -1760810782179
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	 "name":"teste 4",
+                "description": "teste 4",
+                "value": 100,
+               "type": "PIX",
+                "image": "https://localhost.png",
+                "active": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{url}}/admin/raspadinha"
+        name: CREATE RASPADINHA
+        meta:
+          id: req_3ab58c02186b4adda8257fe31696c769
+          created: 1760810980063
+          modified: 1760811524124
+          isPrivate: false
+          description: ""
+          sortKey: -1760810611967
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	 "name":"teste raspadinha",
+                "description": "teste",
+                "totalCards": 10000,
+                "rewards": [
+            				{
+            	        "prizeId": 1,
+                    "rangeFrom": 0,
+                    "rangeTo": 9200,
+                    "quantity": 1
+            				},
+            				{
+            	        "prizeId": 2,
+                    "rangeFrom": 9201,
+                    "rangeTo": 9500,
+                    "quantity": 1
+            				},
+            				{
+            	        "prizeId": 3,
+                    "rangeFrom": 9501,
+                    "rangeTo": 9900,
+                    "quantity": 1
+            				},
+            							{
+            	        "prizeId": 4,
+                    "rangeFrom": 9901,
+                    "rangeTo": 9999,
+                    "quantity": 1
+            				}
+            		]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_f3df89228d1044479ecbfc561cf2f784
+    created: 1712422890976
+    modified: 1760811451517
+  cookies:
+    - key: PHPSESSID
+      value: 6uhj6lbftb3tlbt6ai7bbdo1lo
+      domain: pieripremios.com
+      path: /
+      secure: true
+      hostOnly: true
+      creation: 2024-04-21T03:48:09.781Z
+      lastAccessed: 2024-04-21T03:48:09.781Z
+      id: 9d12d2ff-f16b-45c8-810b-9f5828a76060
+    - key: token
+      value: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzYjliNGM0OS02YmRmLTQzNmMtODNlMS0xYjU2NDM3ODU0OGMiLCJjcGYiOiIwMzg2Mjg3MzAyMiIsImlhdCI6MTc2MDgxMTQ1MSwiZXhwIjoxNzYwODEyMzUxfQ.PoyambEPXXUlVTf8Rajc6D8TyD1Lx32wEE95hdMIciF_wdrS0o8yDWLiP9GWPxl6Ej9RFaA1H2sFkvYw8DHvE0tCQX7v-Pu6hwFT-yMsPQ6HHCt0iDJ1C05h_H-Dcgp7ecBhE_MedAs_yCrxPjC-pJ60ze6a9LS6f8FQLy9v-WhnBALAOwL-9LubUvrGbupAniNPZ2E_TUIJ63OdcD4pRSVXwutgSgNKljN4yLW45tonIhnyG0RVocVEG4Fit56fzdTcRiH2E_YWfcfHB86fKREZozjk_Gh_UdZhqirlKQPpMLrWMyYRn0KR-g8UkSm3ueL8unXpfym6icr0vqIT7V8tKAMCqP-QKEUd29FNAVa0-jhNevSOwV4qrdBxaex8yxBe91AJjj251IBSyAK9eLukzuwHuaneWfRwFQHqkUZqchUHE9eF7WkEN3FjjfvGJbqARTKQ0gLetiaf6Kia2CqZtlAhsDX-QC5LemZaIt367vy9UXa_aOOznSpMH4DzoPuwDdsStTDRTwHMPff6fXtbSxDmkh2nAmr7a3fNGzmxgxNboknSzqTV6Ask90UR_poHEegSQOslEItIU2Ej1O6NZrx74KuBBBhDVLIVbCs31b7iiHENJBKwMMybivh9TfC3RuopgKFbOKYUuVvOv0Q2SEflmDNcZn4YiN_QS_4
+      maxAge: 3600
+      domain: localhost
+      path: /
+      secure: true
+      httpOnly: true
+      hostOnly: true
+      creation: 2024-05-02T03:31:29.316Z
+      lastAccessed: 2025-10-18T18:17:31.517Z
+      sameSite: none
+      id: 9741177c-97ba-484d-babe-ad986c86e879
+environments:
+  name: Base Environment
+  meta:
+    id: env_7f1a56e007304c6bbed8f692a094c43d
+    created: 1712422890975
+    modified: 1759361870738
+    isPrivate: false
+  data:
+    url: localhost:3001
+    prod: https://casebre-api/create-action
