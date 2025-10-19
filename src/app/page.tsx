@@ -23,14 +23,7 @@ export default function Home() {
   const [instagram, setInstagram] = useState("");
   const [passwordRegister, setPasswordRegister] = useState("");
 
-  const { login, register, isLoading: authLoading, error: authError, clearError, user } = useAuth();
-
-  // Redirecionar se já estiver logado
-  useEffect(() => {
-    if (user) {
-      router.push("/admin");
-    }
-  }, [user, router]);
+  const { login, register, isLoading: authLoading, error: authError, clearError } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +37,7 @@ export default function Home() {
       }
       // Limpar campos após sucesso
       handleClearFields();
-      router.push("/admin");
+      router.push("/rifa/1");
     } catch (err) {
       console.error("Erro ao processar:", err);
     }

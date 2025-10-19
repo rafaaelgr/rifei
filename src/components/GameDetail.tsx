@@ -259,6 +259,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             {rifa.title}
                         </motion.h1>
 
+                        <motion.p variants={itemVariants} className="text-gray-500 text-xs text-center mb-2">{rifa.description}</motion.p>
+
                         <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-6">
                             <span className="text-gray-500 text-sm">ID: {rifa.id}</span>
                             <motion.button
