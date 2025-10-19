@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTicketAlt, FaTrophy, FaSignOutAlt, FaUser, FaEnvelope, FaPhone, FaIdCard, FaInstagram } from "react-icons/fa";
+import { FaTimes, FaTicketAlt, FaSignOutAlt, FaEnvelope, FaIdCard, FaInstagram, FaReceipt } from "react-icons/fa";
 import { useAuth } from "@/contexts/AuthContext";
+import { vendasService } from "@/services/vendas.service";
+import { Order } from "@/types";
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -12,6 +14,28 @@ interface UserProfileModalProps {
 
 export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) => {
     const { user, logout } = useAuth();
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loadingOrders, setLoadingOrders] = useState(false);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            if (!isOpen) return;
+
+            setLoadingOrders(true);
+            try {
+                const result = await vendasService.obterPedidos();
+                if (result.data) {
+                    setOrders(result.data);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar pedidos:", error);
+            } finally {
+                setLoadingOrders(false);
+            }
+        };
+
+        fetchOrders();
+    }, [isOpen]);
 
     const handleLogout = () => {
         logout();
@@ -19,33 +43,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     };
 
     if (!user) return null;
-
-    const stats = [
-        {
-            icon: FaTicketAlt,
-            label: "Total de Cotas",
-            value: user.totalTickets,
-            color: "from-blue-500 to-blue-600",
-            bgColor: "bg-blue-50",
-            textColor: "text-blue-600",
-        },
-        {
-            icon: FaTicketAlt,
-            label: "Cotas Ativas",
-            value: user.activeTickets,
-            color: "from-red-500 to-red-600",
-            bgColor: "bg-red-50",
-            textColor: "text-red-600",
-        },
-        {
-            icon: FaTrophy,
-            label: "Prêmios Ganhos",
-            value: user.wonPrizes,
-            color: "from-green-500 to-green-600",
-            bgColor: "bg-green-50",
-            textColor: "text-green-600",
-        },
-    ];
 
     return (
         <AnimatePresence>
@@ -109,27 +106,78 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                             </div>
 
                             <div className="px-6 pb-6 space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-800">Estatísticas</h3>
-                                <div className="grid grid-cols-1 gap-3">
-                                    {stats.map((stat, index) => (
-                                        <motion.div
-                                            key={index}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            className={`${stat.bgColor} rounded-xl p-4 flex items-center justify-between`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center`}>
-                                                    <stat.icon className="text-white" />
+                                <h3 className="text-lg font-semibold text-gray-800">Meus Pedidos</h3>
+
+                                <div className="space-y-3 max-h-96 overflow-y-auto">
+                                    {loadingOrders ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+                                        </div>
+                                    ) : orders.length === 0 ? (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <FaReceipt className="mx-auto text-4xl mb-2 opacity-50" />
+                                            <p>Nenhum pedido encontrado</p>
+                                        </div>
+                                    ) : (
+                                        orders.map((order, index) => (
+                                            <motion.div
+                                                key={order.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.1 }}
+                                                className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+                                            >
+                                                <div className="space-y-3">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <h4 className="font-semibold text-gray-800 text-sm line-clamp-2">
+                                                            {order.title}
+                                                        </h4>
+                                                        <span
+                                                            className="px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                                                            style={{
+                                                                backgroundColor: order.statusColor === "green" ? "#dcfce7" : order.statusColor === "#EC7F00" ? "#fff7ed" : "#fee2e2",
+                                                                color: order.statusColor === "green" ? "#16a34a" : order.statusColor === "#EC7F00" ? "#ea580c" : "#dc2626",
+                                                            }}
+                                                        >
+                                                            {order.status}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between text-sm">
+                                                        <div className="flex items-center gap-2 text-gray-600">
+                                                            <FaTicketAlt className="text-red-500" />
+                                                            <span className="font-medium">{order.coupon} cotas</span>
+                                                        </div>
+                                                        <span className="font-bold text-green-600">
+                                                            R$ {order.price.toFixed(2)}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="text-xs text-gray-500">
+                                                        {order.date}
+                                                    </div>
+
+                                                    {order.numbers.length > 0 && (
+                                                        <div className="pt-2 border-t border-gray-100">
+                                                            <p className="text-xs text-gray-600 mb-2 font-medium">
+                                                                Números: ({order.numbers.length})
+                                                            </p>
+                                                            <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
+                                                                {order.numbers.map((number, idx) => (
+                                                                    <span
+                                                                        key={idx}
+                                                                        className="px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-700"
+                                                                    >
+                                                                        {number}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <span className="text-gray-700 font-medium">{stat.label}</span>
-                                            </div>
-                                            <span className={`text-2xl font-bold ${stat.textColor}`}>
-                                                {stat.value}
-                                            </span>
-                                        </motion.div>
-                                    ))}
+                                            </motion.div>
+                                        ))
+                                    )}
                                 </div>
 
                                 <div className="pt-4 space-y-3">

@@ -95,20 +95,20 @@ export const Header = () => {
                         transition={{ delay: 0.4, duration: 0.5 }}
                         className="flex items-center gap-3"
                     >
-                        {isAuthenticated && user ? (
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                className="flex items-center gap-2 bg-red-600/20 border text-sm border-red-500/30 rounded-full px-3 py-2"
-                            >
-                                <motion.div
-                                    animate={{ scale: [1, 1.2, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="w-4 h-4 bg-red-500 rounded-full"
-                                ></motion.div>
-                                <span className="text-black font-semibold uppercase">
-                                    {user.totalTickets} cotas
-                                </span>
-                            </motion.div>
+                        {isAuthenticated && user ? (<></>
+                            // <motion.div
+                            //     whileHover={{ scale: 1.05 }}
+                            //     className="flex items-center gap-2 bg-red-600/20 border text-sm border-red-500/30 rounded-full px-3 py-2"
+                            // >
+                            //     <motion.div
+                            //         animate={{ scale: [1, 1.2, 1] }}
+                            //         transition={{ duration: 2, repeat: Infinity }}
+                            //         className="w-4 h-4 bg-red-500 rounded-full"
+                            //     ></motion.div>
+                            //     <span className="text-black font-semibold uppercase">
+                            //         {user.totalTickets} cotas
+                            //     </span>
+                            // </motion.div>
                         ) : (
                             <motion.button
                                 whileHover={{ scale: 1.05 }}

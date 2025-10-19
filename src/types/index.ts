@@ -115,3 +115,14 @@ export interface DashboardStats {
     ticketMedio: number;
     taxaConversao: number;
 }
+
+export interface Order {
+    id: number;
+    title: string;
+    coupon: string;
+    status: string;
+    statusColor: string;
+    price: number;
+    date: string;
+    numbers: string[];
+}

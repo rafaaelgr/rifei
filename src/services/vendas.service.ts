@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/api";
+import { Order } from "@/types";
 
 interface BuyTicketPayload {
     action_id: number;
@@ -75,6 +76,19 @@ export const vendasService = {
         }
 
         return { success: true, data: response.data };
+    },
+
+    // GET /orders - Obter pedidos do usuário
+    async obterPedidos() {
+        const response = await apiRequest<Order[]>("/orders", {
+            method: "GET",
+        });
+
+        if (response.error || !response.data) {
+            return { error: response.error || "Erro ao obter pedidos", data: null };
+        }
+
+        return { data: response.data };
     },
 };
 
