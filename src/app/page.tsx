@@ -11,11 +11,9 @@ export default function Home() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
 
-  // Campos de Login
   const [cpfLogin, setCpfLogin] = useState("");
   const [password, setPassword] = useState("");
 
-  // Campos de Registro
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
@@ -35,11 +33,9 @@ export default function Home() {
         router.push("/rifa/1");
       } else {
         await register(name, email, cpf, whatsapp, instagram, passwordRegister);
-        // Após registro, fazer login automático
         await login(cpf, passwordRegister);
         router.push("/rifa/1");
       }
-      // Limpar campos após sucesso
       handleClearFields();
     } catch (err) {
       console.error("Erro ao processar:", err);
@@ -93,7 +89,6 @@ export default function Home() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Campos de Login */}
           {isLogin ? (
             <>
               <div>

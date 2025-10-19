@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTicketAlt, FaSignOutAlt, FaEnvelope, FaIdCard, FaInstagram, FaReceipt } from "react-icons/fa";
+import { FaTimes, FaTicketAlt, FaSignOutAlt, FaEnvelope, FaIdCard, FaInstagram, FaReceipt, FaUser } from "react-icons/fa";
 import { useAuth } from "@/contexts/AuthContext";
 import { vendasService } from "@/services/vendas.service";
 import { Order } from "@/types";
@@ -12,10 +12,13 @@ interface UserProfileModalProps {
     onClose: () => void;
 }
 
+type TabType = "profile" | "orders";
+
 export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) => {
     const { user, logout } = useAuth();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
+    const [activeTab, setActiveTab] = useState<TabType>("profile");
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -42,6 +45,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
         onClose();
     };
 
+    const getStatusBadgeStyles = (statusColor: string) => {
+        if (statusColor === "green") {
+            return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+        }
+        if (statusColor === "#EC7F00") {
+            return "bg-orange-50 text-orange-700 border border-orange-200";
+        }
+        return "bg-red-50 text-red-700 border border-red-200";
+    };
+
     if (!user) return null;
 
     return (
@@ -53,28 +66,33 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
                     />
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            transition={{ type: "spring", duration: 0.5 }}
-                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                            className="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden relative"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="relative bg-gradient-to-br from-red-500 to-red-600 p-6">
+                            {/* Header minimalista */}
+                            <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 px-6 pt-6 pb-20">
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+                                    className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-slate-600 hover:text-slate-900 transition-all shadow-sm hover:shadow"
                                     aria-label="Fechar modal"
                                 >
-                                    <FaTimes size={20} />
+                                    <FaTimes size={14} />
                                 </button>
-                                <div className="flex items-center gap-4">
+
+                                <div className="flex flex-col items-center text-center">
                                     <motion.div
-                                        whileHover={{ scale: 1.05, rotate: 5 }}
-                                        className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl font-bold shadow-lg"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: 0.1, type: "spring" }}
+                                        className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-3"
                                     >
                                         {user.avatar ? (
                                             <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
@@ -82,126 +100,202 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                                             user.name.charAt(0).toUpperCase()
                                         )}
                                     </motion.div>
-                                    <h2 className="text-2xl uppercase font-bold text-white">{user.name}</h2>
+                                    <h2 className="text-xl font-bold text-slate-900">{user.name}</h2>
+                                    <p className="text-sm text-slate-500 mt-1">{user.email}</p>
                                 </div>
                             </div>
 
-                            <div className="px-6 mt-4 mb-6">
-                                <div className="bg-white rounded-xl shadow-lg p-4 space-y-3">
-                                    <div className="flex items-center gap-3 text-sm">
-                                        <FaEnvelope className="text-gray-400" />
-                                        <span className="text-gray-700">{user.email}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-sm">
-                                        <FaIdCard className="text-gray-400" />
-                                        <span className="text-gray-700">{user.cpf}</span>
-                                    </div>
-                                    {user.instagram && (
-                                        <div className="flex items-center gap-3 text-sm">
-                                            <FaInstagram className="text-gray-400" />
-                                            <span className="text-gray-700">{user.instagram}</span>
-                                        </div>
-                                    )}
+                            {/* Tabs */}
+                            <div className="relative -mt-12 px-6 mb-6">
+                                <div className="bg-white rounded-2xl shadow-lg p-1.5 flex gap-1">
+                                    <button
+                                        onClick={() => setActiveTab("profile")}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${activeTab === "profile"
+                                                ? "bg-slate-900 text-white shadow-sm"
+                                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                            }`}
+                                    >
+                                        <FaUser size={14} />
+                                        Perfil
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab("orders")}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${activeTab === "orders"
+                                                ? "bg-slate-900 text-white shadow-sm"
+                                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                            }`}
+                                    >
+                                        <FaReceipt size={14} />
+                                        Pedidos
+                                        {orders.length > 0 && (
+                                            <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold ${activeTab === "orders" ? "bg-white text-slate-900" : "bg-slate-200 text-slate-700"
+                                                }`}>
+                                                {orders.length}
+                                            </span>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
 
-                            <div className="px-6 pb-6 space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-800">Meus Pedidos</h3>
-
-                                <div className="space-y-3 max-h-96 overflow-y-auto">
-                                    {loadingOrders ? (
-                                        <div className="flex items-center justify-center py-8">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-                                        </div>
-                                    ) : orders.length === 0 ? (
-                                        <div className="text-center py-8 text-gray-500">
-                                            <FaReceipt className="mx-auto text-4xl mb-2 opacity-50" />
-                                            <p>Nenhum pedido encontrado</p>
-                                        </div>
-                                    ) : (
-                                        orders.map((order, index) => (
-                                            <motion.div
-                                                key={order.id}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
-                                            >
-                                                <div className="space-y-3">
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <h4 className="font-semibold text-gray-800 text-sm line-clamp-2">
-                                                            {order.title}
-                                                        </h4>
-                                                        <span
-                                                            className="px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                                                            style={{
-                                                                backgroundColor: order.statusColor === "green" ? "#dcfce7" : order.statusColor === "#EC7F00" ? "#fff7ed" : "#fee2e2",
-                                                                color: order.statusColor === "green" ? "#16a34a" : order.statusColor === "#EC7F00" ? "#ea580c" : "#dc2626",
-                                                            }}
-                                                        >
-                                                            {order.status}
-                                                        </span>
+                            {/* Conteúdo */}
+                            <div className="px-6 pb-6">
+                                <AnimatePresence mode="wait">
+                                    {activeTab === "profile" ? (
+                                        <motion.div
+                                            key="profile"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="space-y-4"
+                                        >
+                                            {/* Informações do perfil */}
+                                            <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
+                                                <div className="flex items-center gap-3 group">
+                                                    <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-slate-300 transition-colors">
+                                                        <FaEnvelope size={16} />
                                                     </div>
-
-                                                    <div className="flex items-center justify-between text-sm">
-                                                        <div className="flex items-center gap-2 text-gray-600">
-                                                            <FaTicketAlt className="text-red-500" />
-                                                            <span className="font-medium">{order.coupon} cotas</span>
-                                                        </div>
-                                                        <span className="font-bold text-green-600">
-                                                            R$ {order.price.toFixed(2)}
-                                                        </span>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs text-slate-500 font-medium">Email</p>
+                                                        <p className="text-sm text-slate-900 truncate">{user.email}</p>
                                                     </div>
-
-                                                    <div className="text-xs text-gray-500">
-                                                        {order.date}
-                                                    </div>
-
-                                                    {order.numbers.length > 0 && (
-                                                        <div className="pt-2 border-t border-gray-100">
-                                                            <p className="text-xs text-gray-600 mb-2 font-medium">
-                                                                Números: ({order.numbers.length})
-                                                            </p>
-                                                            <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
-                                                                {order.numbers.map((number, idx) => (
-                                                                    <span
-                                                                        key={idx}
-                                                                        className="px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-700"
-                                                                    >
-                                                                        {number}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
                                                 </div>
-                                            </motion.div>
-                                        ))
-                                    )}
-                                </div>
 
-                                <div className="pt-4 space-y-3">
-                                    {/* <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3 rounded-lg font-semibold hover:bg-red-100 transition-colors"
-                                    >
-                                        <FaUser />
-                                        Editar Perfil
-                                    </motion.button> */}
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        onClick={handleLogout}
-                                        className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3 rounded-lg font-semibold hover:bg-red-100 transition-colors"
-                                    >
-                                        <FaSignOutAlt />
-                                        Sair
-                                    </motion.button>
-                                </div>
+                                                <div className="flex items-center gap-3 group">
+                                                    <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-slate-300 transition-colors">
+                                                        <FaIdCard size={16} />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs text-slate-500 font-medium">CPF</p>
+                                                        <p className="text-sm text-slate-900">{user.cpf}</p>
+                                                    </div>
+                                                </div>
+
+                                                {user.instagram && (
+                                                    <div className="flex items-center gap-3 group">
+                                                        <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-slate-300 transition-colors">
+                                                            <FaInstagram size={16} />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs text-slate-500 font-medium">Instagram</p>
+                                                            <p className="text-sm text-slate-900">{user.instagram}</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Botão de logout */}
+                                            <motion.button
+                                                whileHover={{ scale: 1.01 }}
+                                                whileTap={{ scale: 0.99 }}
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 py-3.5 px-4 rounded-xl font-semibold hover:bg-red-100 transition-colors border border-red-100"
+                                            >
+                                                <FaSignOutAlt size={16} />
+                                                Sair da conta
+                                            </motion.button>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="orders"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="space-y-3"
+                                        >
+                                            <div className="max-h-[400px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                                                {loadingOrders ? (
+                                                    <div className="flex items-center justify-center py-12">
+                                                        <div className="relative">
+                                                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-red-600"></div>
+                                                        </div>
+                                                    </div>
+                                                ) : orders.length === 0 ? (
+                                                    <div className="text-center py-12">
+                                                        <div className="w-16 h-16 mx-auto bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
+                                                            <FaReceipt className="text-slate-400 text-2xl" />
+                                                        </div>
+                                                        <p className="text-slate-600 font-medium mb-1">Nenhum pedido ainda</p>
+                                                        <p className="text-sm text-slate-400">Seus pedidos aparecerão aqui</p>
+                                                    </div>
+                                                ) : (
+                                                    orders.map((order, index) => (
+                                                        <motion.div
+                                                            key={order.id}
+                                                            initial={{ opacity: 0, y: 20 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: index * 0.05 }}
+                                                            className="bg-slate-50 rounded-2xl p-4 hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200"
+                                                        >
+                                                            <div className="space-y-3">
+                                                                <div className="flex items-start justify-between gap-3">
+                                                                    <h4 className="font-semibold text-slate-900 text-sm line-clamp-2 flex-1">
+                                                                        {order.title}
+                                                                    </h4>
+                                                                    <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap ${getStatusBadgeStyles(order.statusColor)}`}>
+                                                                        {order.status}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-2 text-slate-600">
+                                                                        <FaTicketAlt className="text-red-500" size={14} />
+                                                                        <span className="text-sm font-medium">{order.coupon} {order.coupon === "1" ? "cota" : "cotas"}</span>
+                                                                    </div>
+                                                                    <span className="font-bold text-emerald-600 text-sm">
+                                                                        R$ {order.price.toFixed(2)}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="text-xs text-slate-500">
+                                                                    {order.date}
+                                                                </div>
+
+                                                                {order.numbers.length > 0 && (
+                                                                    <div className="pt-3 border-t border-slate-200">
+                                                                        <p className="text-xs text-slate-600 mb-2 font-medium">
+                                                                            Números sorteados ({order.numbers.length})
+                                                                        </p>
+                                                                        <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                                                                            {order.numbers.map((number, idx) => (
+                                                                                <span
+                                                                                    key={idx}
+                                                                                    className="px-2.5 py-1 bg-white rounded-lg text-xs font-mono font-semibold text-slate-700 border border-slate-200"
+                                                                                >
+                                                                                    {number}
+                                                                                </span>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </motion.div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </motion.div>
                     </div>
+
+                    <style jsx global>{`
+                        .custom-scrollbar::-webkit-scrollbar {
+                            width: 6px;
+                        }
+                        .custom-scrollbar::-webkit-scrollbar-track {
+                            background: transparent;
+                        }
+                        .custom-scrollbar::-webkit-scrollbar-thumb {
+                            background: #cbd5e1;
+                            border-radius: 3px;
+                        }
+                        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                            background: #94a3b8;
+                        }
+                    `}</style>
                 </>
             )}
         </AnimatePresence>
