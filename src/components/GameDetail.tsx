@@ -276,7 +276,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             </motion.button>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-8">
+                        {/* <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-8">
                             {socialIcons.map(({ Icon, label }, index) => (
                                 <motion.div
                                     key={label}
@@ -292,7 +292,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     <Icon />
                                 </motion.div>
                             ))}
-                        </motion.div>
+                        </motion.div> */}
 
                         <motion.p variants={itemVariants} className="text-gray-500 text-base text-center">
                             Por apenas
@@ -566,7 +566,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             )}
                                         </motion.button>
 
-                                        <motion.button
+                                        {/* <motion.button
                                             onClick={() => setActiveTab("rankings")}
                                             whileHover={{ y: -2 }}
                                             whileTap={{ scale: 0.98 }}
@@ -590,7 +590,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                                 />
                                             )}
-                                        </motion.button>
+                                        </motion.button> */}
                                     </div>
                                 </div>
 
