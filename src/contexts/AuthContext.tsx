@@ -138,9 +138,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 throw new Error(result.error || "Erro ao criar conta");
             }
 
-            // A API pode retornar em dois formatos diferentes
+            // A API pode retornar em diferentes formatos
             // Formato 1: { token, user: {...} }
             // Formato 2: { distinctId, event, properties: {...} }
+            // Formato 3: { name, email, cpf, whatsapp, instagram, password }
             const responseData = result.data as any;
 
             let userData: User;
@@ -167,6 +168,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     cpf: responseData.user.cpf,
                     whatsapp: responseData.user.whatsapp,
                     instagram: responseData.user.instagram,
+                    totalTickets: 0,
+                    activeTickets: 0,
+                    wonPrizes: 0,
+                };
+            } else if (responseData.name && responseData.email && responseData.cpf) {
+                // Formato direto - a resposta retorna os dados do usuário diretamente
+                userData = {
+                    id: responseData.cpf,
+                    name: responseData.name,
+                    email: responseData.email,
+                    cpf: responseData.cpf,
+                    whatsapp: responseData.whatsapp || whatsapp,
+                    instagram: responseData.instagram || instagram,
                     totalTickets: 0,
                     activeTickets: 0,
                     wonPrizes: 0,

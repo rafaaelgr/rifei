@@ -32,12 +32,15 @@ export default function Home() {
     try {
       if (isLogin) {
         await login(cpfLogin, password);
+        router.push("/rifa/1");
       } else {
         await register(name, email, cpf, whatsapp, instagram, passwordRegister);
+        // Após registro, fazer login automático
+        await login(cpf, passwordRegister);
+        router.push("/rifa/1");
       }
       // Limpar campos após sucesso
       handleClearFields();
-      router.push("/rifa/1");
     } catch (err) {
       console.error("Erro ao processar:", err);
     }

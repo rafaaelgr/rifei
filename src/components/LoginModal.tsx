@@ -36,10 +36,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 await login(cpfLogin, password);
             } else {
                 await register(name, email, cpf, whatsapp, instagram, passwordRegister);
+                // Após registro, fazer login automático
+                await login(cpf, passwordRegister);
             }
-            onClose();
             // Limpar campos após sucesso
             handleClearFields();
+            onClose();
         } catch (err) {
             // Erro já está sendo tratado no AuthContext
             console.error("Erro ao processar:", err);
