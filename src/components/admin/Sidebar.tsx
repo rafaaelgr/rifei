@@ -10,8 +10,7 @@ import {
     FaChartLine,
     FaUsers,
     FaCog,
-    FaSignOutAlt,
-    FaGift
+    FaSignOutAlt
 } from "react-icons/fa";
 
 interface NavItem {
@@ -23,7 +22,6 @@ interface NavItem {
 const navItems: NavItem[] = [
     { label: "Dashboard", href: "/admin", icon: FaHome },
     { label: "Rifas", href: "/admin/rifas", icon: FaTicketAlt },
-    { label: "Raspadinhas", href: "/admin/raspadinha", icon: FaGift },
     // { label: "Financeiro", href: "/admin/financeiro", icon: FaChartLine },
     { label: "Clientes", href: "/admin/clientes", icon: FaUsers },
     { label: "Configurações", href: "/admin/configuracoes", icon: FaCog },

@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaImage, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
+import { FaSave, FaArrowLeft, FaImage, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import { rifasService } from "@/services/rifas.service";
-import { raspadinhaService } from "@/services/raspadinha.service";
 import type { CreateActionPayload } from "@/services/rifas.service";
-import type { Raspadinha } from "@/types";
 
 export default function NovaRifaPage() {
     const router = useRouter();
@@ -37,12 +35,10 @@ export default function NovaRifaPage() {
 
     const [numerosBloqueados, setNumerosBloqueados] = useState<string>("");
 
-    // Efeito para validar e carregar a imagem quando a URL mudar
     useEffect(() => {
         const loadImage = () => {
             const url = formData.imagemPrincipal.trim();
 
-            // Reset estados
             setImageLoaded(false);
             setImageError(false);
 
