@@ -37,7 +37,6 @@ interface CreateActionPayload {
     mainAction: boolean;
     numberTickets: number;
     image: string;
-    raspadinhaId: number;
     blocked?: number[];
     packages?: Array<{
         id: number;

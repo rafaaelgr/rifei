@@ -15,8 +15,6 @@ export default function NovaRifaPage() {
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [raspadinhas, setRaspadinhas] = useState<Raspadinha[]>([]);
-    const [loadingRaspadinhas, setLoadingRaspadinhas] = useState(true);
 
     const [formData, setFormData] = useState({
         titulo: "",
@@ -27,7 +25,6 @@ export default function NovaRifaPage() {
         dataInicio: "",
         dataFim: "",
         status: "ativa",
-        raspadinhaId: "",
     });
 
     const [promocoes, setPromocoes] = useState([
@@ -39,19 +36,6 @@ export default function NovaRifaPage() {
     ]);
 
     const [numerosBloqueados, setNumerosBloqueados] = useState<string>("");
-
-    // Carregar raspadinhas disponíveis
-    useEffect(() => {
-        const loadRaspadinhas = async () => {
-            setLoadingRaspadinhas(true);
-            const result = await raspadinhaService.listarRaspadinhas();
-            if (!result.error && result.data) {
-                setRaspadinhas(result.data);
-            }
-            setLoadingRaspadinhas(false);
-        };
-        loadRaspadinhas();
-    }, []);
 
     // Efeito para validar e carregar a imagem quando a URL mudar
     useEffect(() => {
@@ -149,12 +133,6 @@ export default function NovaRifaPage() {
                 return;
             }
 
-            if (!formData.raspadinhaId) {
-                alert("Por favor, selecione uma raspadinha");
-                setLoading(false);
-                return;
-            }
-
             if (!formData.preco || Number(formData.preco) <= 0) {
                 alert("O preço deve ser maior que zero");
                 setLoading(false);
@@ -184,7 +162,6 @@ export default function NovaRifaPage() {
                 mainAction: true,
                 numberTickets: Number(formData.totalCotas),
                 image: formData.imagemPrincipal || "default-image.png",
-                raspadinhaId: Number(formData.raspadinhaId),
                 blocked: blockedNumbers,
                 packages: promocoes
                     .filter((p) => p.quantidade && p.preco)
@@ -300,39 +277,6 @@ export default function NovaRifaPage() {
                                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors resize-none"
                                         placeholder="Descreva os detalhes da rifa..."
                                     />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="raspadinhaId" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Raspadinha *
-                                    </label>
-                                    {loadingRaspadinhas ? (
-                                        <div className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-gray-50 flex items-center gap-2 text-gray-500">
-                                            <FaSpinner className="animate-spin" />
-                                            <span>Carregando raspadinhas...</span>
-                                        </div>
-                                    ) : raspadinhas.length === 0 ? (
-                                        <div className="w-full px-4 py-3 border-2 border-yellow-300 rounded-xl bg-yellow-50 text-yellow-800 flex items-center gap-2">
-                                            <FaExclamationTriangle />
-                                            <span>Nenhuma raspadinha disponível. Crie uma primeiro.</span>
-                                        </div>
-                                    ) : (
-                                        <select
-                                            id="raspadinhaId"
-                                            name="raspadinhaId"
-                                            value={formData.raspadinhaId}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
-                                        >
-                                            <option value="">Selecione uma raspadinha</option>
-                                            {raspadinhas.map((raspadinha) => (
-                                                <option key={raspadinha.id} value={raspadinha.id}>
-                                                    {raspadinha.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

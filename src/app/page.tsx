@@ -1,11 +1,11 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { FaEnvelope, FaLock, FaUser, FaPhone, FaIdCard, FaInstagram } from "react-icons/fa";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { FaEnvelope, FaLock, FaUser, FaPhone, FaIdCard, FaInstagram } from "react-icons/fa";
 
 export default function Home() {
   const router = useRouter();
