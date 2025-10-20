@@ -44,6 +44,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [cpf, setCpf] = useState("");
     const [cpfError, setCpfError] = useState("");
     const [copied, setCopied] = useState(false);
+    const [timeRemaining, setTimeRemaining] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    });
+    const [progressPercentage, setProgressPercentage] = useState(0);
+    const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
+    const [showAllTickets, setShowAllTickets] = useState(false);
 
     // Verificação de segurança
     if (!rifa) {
@@ -91,21 +100,59 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setTotalValue(calculateTotal(quantity));
     }, [quantity, rifa]);
 
+    // Calcular countdown e progresso
+    useEffect(() => {
+        const calculateTimeRemaining = () => {
+            if (!rifa.closure) return;
+
+            const now = new Date().getTime();
+            const endTime = new Date(rifa.closure).getTime();
+            const difference = endTime - now;
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                setTimeRemaining({ days, hours, minutes, seconds });
+
+                // Calcular progresso (assumindo 7 dias de campanha)
+                const totalCampaignTime = 7 * 24 * 60 * 60 * 1000; // 7 dias
+                const elapsed = totalCampaignTime - difference;
+                const progress = Math.min((elapsed / totalCampaignTime) * 100, 100);
+                setProgressPercentage(progress);
+            } else {
+                setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+                setProgressPercentage(100);
+            }
+        };
+
+        calculateTimeRemaining();
+        const interval = setInterval(calculateTimeRemaining, 1000);
+
+        return () => clearInterval(interval);
+    }, [rifa.closure]);
+
     const handleIncrement = () => {
         setQuantity(prev => prev + 1);
+        setSelectedPackage(null);
     };
 
     const handleDecrement = () => {
         setQuantity(prev => Math.max(1, prev - 1));
+        setSelectedPackage(null);
     };
 
     const handleQuickSelect = (value: number) => {
-        setQuantity(prev => prev + value);
+        setQuantity(value);
+        setSelectedPackage(value);
     };
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value) || 1;
         setQuantity(Math.max(1, value));
+        setSelectedPackage(null);
     };
 
     const handleParticipar = () => {
@@ -359,6 +406,119 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             )}
                         </motion.div>
 
+                        {/* Seção Encerra Em */}
+                        {!rifa.closure && (
+                            <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
+                                <div
+                                    className="bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden"
+                                >
+                                    {/* Padrão de fundo diagonal */}
+                                    <div
+                                        className="absolute inset-0 opacity-20"
+                                        style={{
+                                            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)'
+                                        }}
+                                    />
+
+                                    <div className="relative z-10">
+                                        {/* Título */}
+                                        <motion.h2
+                                            initial={{ scale: 0.9 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
+                                            className="text-center text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4"
+                                        >
+                                            🔥 Chance em dobro 🔥
+                                        </motion.h2>
+
+                                        {/* Countdown */}
+                                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 mb-4">
+                                            <p className="text-center text-white/90 text-xs sm:text-sm font-semibold mb-2 uppercase tracking-wider">
+                                                Encerra em
+                                            </p>
+                                            <div className="flex items-center justify-center gap-2 sm:gap-3">
+                                                {timeRemaining.days > 0 && (
+                                                    <>
+                                                        <div className="text-center">
+                                                            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
+                                                                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
+                                                                    {String(timeRemaining.days).padStart(2, '0')}
+                                                                </span>
+                                                            </div>
+                                                            <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">dias</span>
+                                                        </div>
+                                                        <span className="text-2xl sm:text-3xl font-bold text-white">:</span>
+                                                    </>
+                                                )}
+                                                <div className="text-center">
+                                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
+                                                        <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
+                                                            {String(timeRemaining.hours).padStart(2, '0')}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">horas</span>
+                                                </div>
+                                                <span className="text-2xl sm:text-3xl font-bold text-white">:</span>
+                                                <div className="text-center">
+                                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
+                                                        <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
+                                                            {String(timeRemaining.minutes).padStart(2, '0')}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">min</span>
+                                                </div>
+                                                <span className="text-2xl sm:text-3xl font-bold text-white">:</span>
+                                                <div className="text-center">
+                                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
+                                                        <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
+                                                            {String(timeRemaining.seconds).padStart(2, '0')}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">seg</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Barra de progresso */}
+                                            <div className="mt-4">
+                                                <div className="bg-white/20 rounded-full h-3 sm:h-4 overflow-hidden">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${progressPercentage}%` }}
+                                                        transition={{ duration: 1, ease: "easeOut" }}
+                                                        className="bg-gradient-to-r from-white via-yellow-200 to-white h-full rounded-full relative"
+                                                    >
+                                                        <motion.div
+                                                            animate={{ x: [-20, 200] }}
+                                                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                                                        />
+                                                    </motion.div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Texto promocional */}
+                                        <p className="text-center text-white text-base sm:text-lg md:text-xl font-bold mb-2">
+                                            Compre agora e ganhe o dobro!
+                                        </p>
+
+                                        {/* Data de validade */}
+                                        {rifa.closure && (
+                                            <p className="text-center text-white/80 text-xs sm:text-sm">
+                                                Válido até {new Date(rifa.closure).toLocaleDateString('pt-BR', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
                         <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                             <div
                                 className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-3 sm:mb-4"
@@ -389,10 +549,10 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
                                     {[
                                         { qty: 100, popular: false },
+                                        { qty: 250, popular: false },
                                         { qty: 500, popular: true },
-                                        { qty: 200, popular: false },
                                         { qty: 1000, popular: false },
-                                        { qty: 300, popular: false },
+                                        { qty: 2000, popular: false },
                                         { qty: 5000, popular: false },
                                     ].map((item, index) => (
                                         <motion.button
@@ -403,12 +563,14 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             transition={{ delay: 1.3 + index * 0.05 }}
                                             whileHover={{ scale: 1.05, y: -3 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className={`relative ${item.popular
-                                                ? "bg-white border-2 border-teal-500"
-                                                : "bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-400"
+                                            className={`relative ${selectedPackage === item.qty
+                                                ? "bg-gradient-to-br from-teal-500 to-teal-600 border-2 border-teal-700 shadow-lg shadow-teal-500/50"
+                                                : item.popular
+                                                    ? "bg-white border-2 border-teal-500"
+                                                    : "bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-400"
                                                 } rounded-xl sm:rounded-2xl p-2 xs:p-3 sm:p-4 transition-all`}
                                         >
-                                            {item.popular && (
+                                            {item.popular && selectedPackage !== item.qty && (
                                                 <motion.div
                                                     initial={{ scale: 0, y: 10 }}
                                                     animate={{ scale: 1, y: 0 }}
@@ -420,8 +582,70 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                     </span>
                                                 </motion.div>
                                             )}
-                                            <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-0.5 xs:mb-1">+{item.qty}</div>
-                                            <div className="text-[10px] xs:text-xs text-gray-500 uppercase tracking-wide">Selecionar</div>
+
+                                            {/* Badge de seleção */}
+                                            {selectedPackage === item.qty && (
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    className="absolute -top-2 -right-2 w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg"
+                                                >
+                                                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </motion.div>
+                                            )}
+
+                                            <div className={`text-xl xs:text-2xl sm:text-3xl font-bold mb-0.5 xs:mb-1 ${selectedPackage === item.qty ? "text-white" : "text-gray-900"
+                                                }`}>
+                                                {item.qty}
+                                            </div>
+
+                                            <div className={`text-[10px] xs:text-xs uppercase tracking-wide mb-1 ${selectedPackage === item.qty ? "text-white/90" : "text-gray-500"
+                                                }`}>
+                                                Cotas
+                                            </div>
+
+                                            {/* Ícone raspadinha + 2x */}
+                                            <div className="flex items-center justify-center gap-1 mt-1">
+                                                <motion.div
+                                                    animate={{
+                                                        scale: [1, 1.1, 1],
+                                                        rotate: [0, -3, 3, 0]
+                                                    }}
+                                                    transition={{
+                                                        duration: 2,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                    className={`flex items-center gap-0.5 xs:gap-1 px-1.5 xs:px-2 py-0.5 xs:py-1 rounded-md shadow-md ${selectedPackage === item.qty
+                                                        ? "bg-gradient-to-br from-yellow-400 to-yellow-500"
+                                                        : "bg-gradient-to-br from-yellow-400 to-orange-500"
+                                                        }`}
+                                                >
+                                                    {/* Ícone de ticket/bilhete de raspadinha */}
+                                                    <svg
+                                                        className="w-3 h-3 xs:w-4 xs:h-4 text-white drop-shadow-md"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path d="M20 3H4c-1.1 0-2 .9-2 2v2c1.1 0 2 .9 2 2s-.9 2-2 2v2c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-2c-1.1 0-2-.9-2-2s.9-2 2-2V5c0-1.1-.9-2-2-2zm-1 9H5V6h14v6zm-7 6l-4 4h10l-4-4z" />
+                                                    </svg>
+                                                    <motion.span
+                                                        animate={{
+                                                            scale: [1, 1.15, 1]
+                                                        }}
+                                                        transition={{
+                                                            duration: 1.5,
+                                                            repeat: Infinity,
+                                                            ease: "easeInOut"
+                                                        }}
+                                                        className="text-[10px] xs:text-xs font-black text-white drop-shadow-md"
+                                                    >
+                                                        2x raspadinhas
+                                                    </motion.span>
+                                                </motion.div>
+                                            </div>
                                         </motion.button>
                                     ))}
                                 </div>
@@ -430,67 +654,345 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 1.6 }}
-                                    className="flex items-center gap-2 sm:gap-3"
+                                    className="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-3"
                                 >
-                                    <motion.button
-                                        onClick={handleDecrement}
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        className="w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg sm:rounded-xl flex items-center justify-center transition-all"
-                                        aria-label="Diminuir quantidade"
-                                    >
-                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                        </svg>
-                                    </motion.button>
+                                    {/* Controles de quantidade */}
+                                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                                        <motion.button
+                                            onClick={handleDecrement}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            className="w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg sm:rounded-xl flex items-center justify-center transition-all"
+                                            aria-label="Diminuir quantidade"
+                                        >
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                            </svg>
+                                        </motion.button>
 
-                                    <input
-                                        type="number"
-                                        value={quantity}
-                                        onChange={handleQuantityChange}
-                                        className="flex-1 h-10 xs:h-11 sm:h-12 text-center text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:border-red-500 transition-colors"
-                                    />
+                                        <input
+                                            type="number"
+                                            value={quantity}
+                                            onChange={handleQuantityChange}
+                                            className="w-20 xs:w-24 sm:w-28 h-10 xs:h-11 sm:h-12 text-center text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:border-red-500 transition-colors"
+                                        />
 
+                                        <motion.button
+                                            onClick={handleIncrement}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            className="w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg sm:rounded-xl flex items-center justify-center transition-all"
+                                            aria-label="Aumentar quantidade"
+                                        >
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </motion.button>
+                                    </div>
+
+                                    {/* Botão Participar */}
                                     <motion.button
-                                        onClick={handleIncrement}
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        className="w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg sm:rounded-xl flex items-center justify-center transition-all"
-                                        aria-label="Aumentar quantidade"
+                                        onClick={handleParticipar}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="flex-1 bg-green-700 hover:bg-green-500 text-white text-xs xs:text-sm sm:text-base font-bold h-10 xs:h-11 sm:h-12 px-3 xs:px-4
+                                        rounded-lg sm:rounded-xl transition-all cursor-pointer shadow-lg shadow-green-500/25 
+                                        flex items-center justify-between gap-2"
                                     >
-                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                        </svg>
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            <span className="hidden xs:inline">Participar</span>
+                                            <span className="xs:hidden">PAGAR</span>
+                                        </div>
+                                        <motion.div
+                                            whileHover={{ scale: 1.05 }}
+                                            className="bg-green-400 px-2 xs:px-3 py-1 rounded-full text-black text-xs xs:text-sm font-bold flex-shrink-0"
+                                        >
+                                            R$ {(totalValue || 0).toFixed(2).replace(".", ",")}
+                                        </motion.div>
                                     </motion.button>
                                 </motion.div>
                             </motion.div>
                         </motion.div>
 
-                        <motion.button
-                            onClick={handleParticipar}
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full mt-4 sm:mt-5 md:mt-6 bg-green-700 hover:bg-green-500 text-white text-sm xs:text-base sm:text-lg font-bold p-3 xs:p-4 sm:p-5 
-                            rounded-xl sm:rounded-2xl transition-all cursor-pointer shadow-lg shadow-green-500/25 
-                            flex items-center justify-between gap-2"
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1.5 }}
+                            className="bg-gradient-to-br mt-5 from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4"
                         >
-                            <div className="flex items-center gap-1.5 xs:gap-2">
-                                <svg className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <div className="text-left">
-                                    <div className="text-xs xs:text-sm sm:text-base md:text-lg">Participar do Sorteio</div>
-                                    <div className="text-[10px] xs:text-xs text-green-200">{quantity} cotas</div>
+                            <div className="flex items-start gap-2 mb-2">
+                                <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-xs sm:text-sm font-bold text-gray-900 mb-1">🎁 Ganhe Raspadinhas Bônus!</h4>
+                                    <p className="text-[10px] sm:text-xs text-gray-700 leading-relaxed">
+                                        Quanto mais cotas você comprar, mais raspadinhas você ganha:
+                                    </p>
                                 </div>
                             </div>
-                            <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                className="p-1.5 xs:p-2 bg-green-400 px-2 xs:px-3 sm:px-5 rounded-full text-black text-xs xs:text-sm sm:text-base flex-shrink-0"
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
+                                {[
+                                    { cotas: 100, raspadinhas: 2 },
+                                    { cotas: 250, raspadinhas: 4 },
+                                    { cotas: 500, raspadinhas: 8 },
+                                    { cotas: 1000, raspadinhas: 16 },
+                                    { cotas: 2000, raspadinhas: 32 },
+                                    { cotas: 5000, raspadinhas: 80 },
+                                ].map((item, index) => (
+                                    <div
+                                        key={item.cotas}
+                                        className="bg-white rounded-lg p-1.5 sm:p-2 border border-yellow-200 flex items-center justify-between gap-1"
+                                    >
+                                        <span className="text-[10px] sm:text-xs font-bold text-gray-700">
+                                            {item.cotas} cotas
+                                        </span>
+                                        <div className="flex items-center gap-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 px-1.5 py-0.5 rounded">
+                                            <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M20 3H4c-1.1 0-2 .9-2 2v2c1.1 0 2 .9 2 2s-.9 2-2 2v2c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-2c-1.1 0-2-.9-2-2s.9-2 2-2V5c0-1.1-.9-2-2-2zm-1 9H5V6h14v6zm-7 6l-4 4h10l-4-4z" />
+                                            </svg>
+                                            <span className="text-[10px] sm:text-xs font-black text-white">
+                                                {item.raspadinhas}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        {/* Planos de Cotas Normais */}
+                        <motion.div variants={itemVariants} className="mt-4 sm:mt-6">
+                            <div
+                                className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-2.5 sm:p-3 mb-2 sm:mb-3"
                             >
-                                R$ {(totalValue || 0).toFixed(2).replace(".", ",")}
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <h2 className="text-sm sm:text-base font-bold text-white">Planos Básicos</h2>
+                                </div>
+                            </div>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.3 }}
+                                className="bg-white rounded-xl p-2.5 sm:p-3 border-2 border-gray-200"
+                            >
+                                <p className="text-center text-gray-600 text-xs sm:text-sm mb-3">
+                                    Planos sem raspadinhas bônus
+                                </p>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                                    {[
+                                        { qty: 5 },
+                                        { qty: 10 },
+                                        { qty: 25 },
+                                        { qty: 50 },
+                                    ].map((item, index) => (
+                                        <motion.button
+                                            key={item.qty}
+                                            onClick={() => handleQuickSelect(item.qty)}
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 1.4 + index * 0.05 }}
+                                            whileHover={{ scale: 1.05, y: -3 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className={`relative ${selectedPackage === item.qty
+                                                ? "bg-gradient-to-br from-teal-500 to-teal-600 border-2 border-teal-700 shadow-lg shadow-teal-500/50"
+                                                : "bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-400"
+                                                } rounded-xl p-2.5 sm:p-3 transition-all`}
+                                        >
+                                            {/* Badge de seleção */}
+                                            {selectedPackage === item.qty && (
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg"
+                                                >
+                                                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </motion.div>
+                                            )}
+
+                                            <div className={`text-xl sm:text-2xl font-bold mb-1 ${selectedPackage === item.qty ? "text-white" : "text-gray-900"
+                                                }`}>
+                                                {item.qty}
+                                            </div>
+
+                                            <div className={`text-[10px] sm:text-xs uppercase tracking-wide ${selectedPackage === item.qty ? "text-white/90" : "text-gray-500"
+                                                }`}>
+                                                Cotas
+                                            </div>
+                                        </motion.button>
+                                    ))}
+                                </div>
+
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 1.7 }}
+                                    className="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-3 mt-3"
+                                >
+                                    {/* Controles de quantidade */}
+                                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                                        <motion.button
+                                            onClick={handleDecrement}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            className="w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg sm:rounded-xl flex items-center justify-center transition-all"
+                                            aria-label="Diminuir quantidade"
+                                        >
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                            </svg>
+                                        </motion.button>
+
+                                        <input
+                                            type="number"
+                                            value={quantity}
+                                            onChange={handleQuantityChange}
+                                            className="w-20 xs:w-24 sm:w-28 h-10 xs:h-11 sm:h-12 text-center text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 bg-gray-50 border-2 border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:border-red-500 transition-colors"
+                                        />
+
+                                        <motion.button
+                                            onClick={handleIncrement}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            className="w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg sm:rounded-xl flex items-center justify-center transition-all"
+                                            aria-label="Aumentar quantidade"
+                                        >
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </motion.button>
+                                    </div>
+
+                                    {/* Botão Participar */}
+                                    <motion.button
+                                        onClick={handleParticipar}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="flex-1 bg-green-700 hover:bg-green-500 text-white text-xs xs:text-sm sm:text-base font-bold h-10 xs:h-11 sm:h-12 px-3 xs:px-4
+                                        rounded-lg sm:rounded-xl transition-all cursor-pointer shadow-lg shadow-green-500/25 
+                                        flex items-center justify-between gap-2"
+                                    >
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            <span className="hidden xs:inline">Participar</span>
+                                            <span className="xs:hidden">PAGAR</span>
+                                        </div>
+                                        <motion.div
+                                            whileHover={{ scale: 1.05 }}
+                                            className="bg-green-400 px-2 xs:px-3 py-1 rounded-full text-black text-xs xs:text-sm font-bold flex-shrink-0"
+                                        >
+                                            R$ {(totalValue || 0).toFixed(2).replace(".", ",")}
+                                        </motion.div>
+                                    </motion.button>
+                                </motion.div>
                             </motion.div>
-                        </motion.button>
+                        </motion.div>
+
+                        {/* Seção Bilhetes Premiados */}
+                        <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
+                            <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-2.5 sm:p-3 mb-2 sm:mb-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg sm:text-xl">🎉</span>
+                                    <h2 className="text-sm sm:text-base font-bold text-white">Bilhetes Premiados, achou ganhou!</h2>
+                                </div>
+                            </div>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.2 }}
+                                className="bg-white rounded-xl p-2.5 sm:p-3 border-2 border-gray-200"
+                            >
+                                {/* Grade de bilhetes premiados */}
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5 mb-2.5">
+                                    {[
+                                        { value: 10000, number: "9858777" },
+                                        { value: 10000, number: "3008825" },
+                                        { value: 10000, number: "2170316" },
+                                        { value: 1000, number: "6212144" },
+                                        { value: 1000, number: "2022713" },
+                                        { value: 1000, number: "0056818" },
+                                        ...(showAllTickets ? [
+                                            { value: 5000, number: "1234567" },
+                                            { value: 5000, number: "7654321" },
+                                            { value: 2500, number: "9876543" },
+                                            { value: 2500, number: "5432109" },
+                                            { value: 1000, number: "8765432" },
+                                            { value: 1000, number: "3456789" },
+                                            { value: 500, number: "2468135" },
+                                            { value: 500, number: "1357924" },
+                                            { value: 100, number: "9753186" },
+                                        ] : [])
+                                    ].map((ticket, index) => (
+                                        <motion.div
+                                            key={ticket.number}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.03 * index }}
+                                            whileHover={{ scale: 1.03 }}
+                                            className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-2 sm:p-2.5 border border-gray-200 hover:border-yellow-400 transition-all"
+                                        >
+                                            <div className="text-center mb-1.5">
+                                                <span className="text-sm sm:text-base font-bold text-gray-900">
+                                                    R$ {ticket.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                </span>
+                                            </div>
+
+                                            <div className="bg-gray-700 rounded-md p-1.5 sm:p-2 mb-1">
+                                                <span className="text-white font-bold text-xs sm:text-sm tracking-wider block text-center">
+                                                    {ticket.number}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center justify-center gap-1">
+                                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                                                <span className="text-green-600 font-bold text-[10px] sm:text-xs">
+                                                    Disponível
+                                                </span>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                {/* Botão mostrar mais/menos */}
+                                <motion.button
+                                    onClick={() => setShowAllTickets(!showAllTickets)}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm"
+                                >
+                                    {showAllTickets ? (
+                                        <>
+                                            Mostrar menos
+                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                            </svg>
+                                        </>
+                                    ) : (
+                                        <>
+                                            Mostrar mais (+9 ocultos)
+                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </>
+                                    )}
+                                </motion.button>
+                            </motion.div>
+                        </motion.div>
 
                         <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                             <div
@@ -499,13 +1001,13 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 <div className="flex items-center justify-between gap-2">
                                     <div className="flex items-center gap-2 sm:gap-3">
                                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center">
-                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-black" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <h2 className="text-base sm:text-lg md:text-xl font-bold text-red-500">Títulos Premiados</h2>
-                                            <p className="text-red-500/80 text-xs sm:text-sm">Veja a lista de prêmios</p>
+                                            <h2 className="text-base sm:text-lg md:text-xl font-bold text-black">Títulos Premiados</h2>
+                                            <p className="text-black/80 text-xs sm:text-sm">Veja a lista de prêmios</p>
                                         </div>
                                     </div>
                                     <div className="bg-red-600/20 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg flex-shrink-0">
