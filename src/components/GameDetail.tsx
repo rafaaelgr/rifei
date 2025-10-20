@@ -695,7 +695,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         onClick={handleParticipar}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="flex-1 bg-green-700 hover:bg-green-500 text-white text-xs xs:text-sm sm:text-base font-bold h-10 xs:h-11 sm:h-12 px-3 xs:px-4
+                                        className="flex-1 py-4 bg-green-700 hover:bg-green-500 text-white text-xs xs:text-sm sm:text-base font-bold h-10 xs:h-11 sm:h-12 px-3 xs:px-4
                                         rounded-lg sm:rounded-xl transition-all cursor-pointer shadow-lg shadow-green-500/25 
                                         flex items-center justify-between gap-2"
                                     >
@@ -880,7 +880,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         onClick={handleParticipar}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="flex-1 bg-green-700 hover:bg-green-500 text-white text-xs xs:text-sm sm:text-base font-bold h-10 xs:h-11 sm:h-12 px-3 xs:px-4
+                                        className="flex-1 py-4 bg-green-700 hover:bg-green-500 text-white text-xs xs:text-sm sm:text-base font-bold h-10 xs:h-11 sm:h-12 px-3 xs:px-4
                                         rounded-lg sm:rounded-xl transition-all cursor-pointer shadow-lg shadow-green-500/25 
                                         flex items-center justify-between gap-2"
                                     >
