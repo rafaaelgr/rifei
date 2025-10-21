@@ -87,9 +87,9 @@ export const Header = () => {
                         <motion.div
                             whileHover={{ rotate: 360, scale: 1.1 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="w-10 h-10 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30"
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 bg-cover"
+                            style={{ backgroundImage: "url(/logo.png)" }}
                         >
-                            <FaStar className="text-white text-lg" />
                         </motion.div>
                         <div className="flex flex-col">
                             <span className="text-2xl font-bold bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent leading-tight">
@@ -185,7 +185,7 @@ export const Header = () => {
                             whileHover={{ scale: 1.1, rotate: 5 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={handleAvatarClick}
-                            className="relative w-12 h-12 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-full flex items-center justify-center border-3 border-white cursor-pointer shadow-xl shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300"
+                            className="relative w-10 h-10 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-full flex items-center justify-center border-3 border-white cursor-pointer shadow-xl shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300"
                             aria-label={isAuthenticated ? "Abrir perfil" : "Fazer login"}
                         >
                             {isAuthenticated && user ? (
@@ -207,7 +207,7 @@ export const Header = () => {
                                         </span>
                                     )}
                                     <motion.div
-                                        className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white z-20"
+                                        className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white z-20"
                                         animate={{ scale: [1, 1.2, 1] }}
                                         transition={{ duration: 2, repeat: Infinity }}
                                     />
