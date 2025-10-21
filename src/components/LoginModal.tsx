@@ -12,6 +12,7 @@ interface LoginModalProps {
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const [isLogin, setIsLogin] = useState(true);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Campos de Login
     const [cpfLogin, setCpfLogin] = useState("");
@@ -25,23 +26,46 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const [instagram, setInstagram] = useState("");
     const [passwordRegister, setPasswordRegister] = useState("");
 
-    const { login, register, isLoading: authLoading, error: authError, clearError } = useAuth();
+    const { login, register, isLoading: authLoading, error: authError, clearError, user } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         clearError();
+        setSuccessMessage(null);
 
         try {
             if (isLogin) {
                 await login(cpfLogin, password);
+                handleClearFields();
+                onClose();
             } else {
+                // Guardar CPF e senha antes de registrar
+                const registrationCpf = cpf;
+                const registrationPassword = passwordRegister;
+
                 await register(name, email, cpf, whatsapp, instagram, passwordRegister);
-                // Após registro, fazer login automático
-                await login(cpf, passwordRegister);
+
+                // Verificar se o usuário foi autenticado após o registro
+                // Se user ainda for null, significa que a API retornou apenas mensagem de sucesso
+                if (!user) {
+                    // Redirecionar para o login com os dados preenchidos
+                    setSuccessMessage("Conta criada com sucesso! Agora faça login.");
+                    setCpfLogin(registrationCpf);
+                    setPassword(registrationPassword);
+                    setIsLogin(true);
+                    // Limpar apenas os campos de registro
+                    setName("");
+                    setEmail("");
+                    setCpf("");
+                    setWhatsapp("");
+                    setInstagram("");
+                    setPasswordRegister("");
+                } else {
+                    // Login automático funcionou, fechar modal
+                    handleClearFields();
+                    onClose();
+                }
             }
-            // Limpar campos após sucesso
-            handleClearFields();
-            onClose();
         } catch (err) {
             // Erro já está sendo tratado no AuthContext
             console.error("Erro ao processar:", err);
@@ -57,6 +81,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         setWhatsapp("");
         setInstagram("");
         setPasswordRegister("");
+        setSuccessMessage(null);
     };
 
     const handleClose = () => {
@@ -68,6 +93,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const handleToggleMode = () => {
         setIsLogin(!isLogin);
         clearError();
+        setSuccessMessage(null);
     };
 
     return (
@@ -251,6 +277,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                             </div>
                                         </div>
                                     </>
+                                )}
+
+                                {successMessage && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="bg-green-50 text-green-600 px-4 py-3 rounded-lg text-sm font-medium"
+                                    >
+                                        {successMessage}
+                                    </motion.div>
                                 )}
 
                                 {authError && (

@@ -142,7 +142,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Formato 1: { token, user: {...} }
             // Formato 2: { distinctId, event, properties: {...} }
             // Formato 3: { name, email, cpf, whatsapp, instagram, password }
+            // Formato 4: { message: "Usuário criado com sucesso" } - apenas mensagem de sucesso
             const responseData = result.data as any;
+
+            // Se a resposta for apenas uma mensagem de sucesso, retornar sem processar dados
+            if (responseData.message && !responseData.properties && !responseData.user && !responseData.name) {
+                // Retornar sucesso sem dados do usuário - LoginModal vai lidar com o redirecionamento
+                return;
+            }
 
             let userData: User;
 

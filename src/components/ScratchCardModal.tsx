@@ -2,87 +2,130 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaGift, FaStar, FaFire, FaGem, FaCrown, FaHeart } from "react-icons/fa";
+import { FaTimes, FaGift, FaStar, FaFire, FaGem, FaCrown, FaHeart, FaCheckCircle, FaTimesCircle, FaCode } from "react-icons/fa";
+import { raspadinhaService, PlayRaspadinhaResult } from "@/services/raspadinha.service";
 
 interface ScratchCardModalProps {
     isOpen: boolean;
     onClose: () => void;
+    saleId: number | null;
 }
 
 interface Prize {
     icon: React.ReactNode;
     text: string;
     color: string;
+    isWinner: boolean;
 }
 
-export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onClose }) => {
+export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onClose, saleId }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isScratching, setIsScratching] = useState(false);
     const [scratchPercentage, setScratchPercentage] = useState(0);
     const [prizes, setPrizes] = useState<Prize[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [result, setResult] = useState<PlayRaspadinhaResult | null>(null);
+    const [showDebug, setShowDebug] = useState(false);
 
-    // Prêmios possíveis com ícones e cores
-    const allPrizes: Prize[] = [
-        {
-            icon: <FaGift className="text-4xl" />,
-            text: "1 Cota",
-            color: "from-pink-400 to-pink-600"
-        },
-        {
-            icon: <FaGem className="text-4xl" />,
-            text: "5 Cotas",
-            color: "from-blue-400 to-blue-600"
-        },
-        {
-            icon: <FaStar className="text-4xl" />,
-            text: "10% OFF",
-            color: "from-purple-400 to-purple-600"
-        },
-        {
-            icon: <FaCrown className="text-4xl" />,
-            text: "20% OFF",
-            color: "from-yellow-400 to-yellow-600"
-        },
-        {
-            icon: <FaFire className="text-4xl" />,
-            text: "3 Cotas",
-            color: "from-orange-400 to-orange-600"
-        },
-        {
-            icon: <FaHeart className="text-4xl" />,
-            text: "R$ 50",
-            color: "from-red-400 to-red-600"
-        },
-        {
-            icon: <FaGem className="text-4xl" />,
-            text: "R$ 100",
-            color: "from-emerald-400 to-emerald-600"
-        },
-        {
-            icon: <FaStar className="text-4xl" />,
-            text: "25% OFF",
-            color: "from-indigo-400 to-indigo-600"
-        },
-        {
-            icon: <FaGift className="text-4xl" />,
-            text: "2 Cotas",
-            color: "from-teal-400 to-teal-600"
+    // Função para mapear texto para ícone e cor
+    const getPrizeStyle = (text: string, isWinner: boolean) => {
+        // Se perdeu, usa estilo cinza
+        if (text.toLowerCase() === "perdeu") {
+            return {
+                icon: <FaTimesCircle className="text-4xl" />,
+                color: "from-gray-400 to-gray-600"
+            };
         }
-    ];
+
+        // Se ganhou, determina ícone e cor baseado no tipo de prêmio
+        const lowerText = text.toLowerCase();
+
+        if (lowerText.includes("cota")) {
+            return {
+                icon: <FaGift className="text-4xl" />,
+                color: "from-pink-400 to-pink-600"
+            };
+        }
+
+        if (lowerText.includes("%") || lowerText.includes("off") || lowerText.includes("desconto")) {
+            return {
+                icon: <FaStar className="text-4xl" />,
+                color: "from-purple-400 to-purple-600"
+            };
+        }
+
+        if (lowerText.includes("r$") || lowerText.includes("reais")) {
+            return {
+                icon: <FaGem className="text-4xl" />,
+                color: "from-emerald-400 to-emerald-600"
+            };
+        }
+
+        // Default para prêmios
+        return {
+            icon: <FaCrown className="text-4xl" />,
+            color: "from-yellow-400 to-yellow-600"
+        };
+    };
 
     useEffect(() => {
-        if (isOpen) {
-            // Embaralha os prêmios ao abrir o modal
-            const shuffledPrizes = [...allPrizes].sort(() => Math.random() - 0.5);
-            setPrizes(shuffledPrizes);
-            setScratchPercentage(0);
+        const fetchRaspadinha = async () => {
+            if (!isOpen || !saleId) return;
 
-            // Pequeno delay para garantir que o canvas seja renderizado
-            setTimeout(() => {
-                initCanvas();
-            }, 100);
-        }
-    }, [isOpen]);
+            setLoading(true);
+            setError(null);
+            setScratchPercentage(0);
+            setResult(null);
+            setPrizes([]);
+
+            try {
+                // Gera um seed único baseado no timestamp
+                const clientSeed = `SEED-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+                const response = await raspadinhaService.playRaspadinha({
+                    saleId,
+                    clientSeed
+                });
+
+                if (response.error) {
+                    setError(response.error);
+                    return;
+                }
+
+                if (response.data) {
+                    setResult(response.data.result);
+
+                    // Mapeia os squares para prizes
+                    const mappedPrizes = response.data.result.squares.map((square) => {
+                        const isWinner = square.toLowerCase() !== "perdeu";
+                        const style = getPrizeStyle(square, isWinner);
+
+                        return {
+                            text: square,
+                            icon: style.icon,
+                            color: style.color,
+                            isWinner
+                        };
+                    });
+
+                    setPrizes(mappedPrizes);
+
+                    // Pequeno delay para garantir que o canvas seja renderizado
+                    setTimeout(() => {
+                        initCanvas();
+                    }, 100);
+                }
+            } catch (err) {
+                console.error("Erro ao buscar raspadinha:", err);
+                setError("Erro ao carregar raspadinha. Tente novamente.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRaspadinha();
+    }, [isOpen, saleId]);
 
     const initCanvas = () => {
         const canvas = canvasRef.current;
@@ -324,10 +367,16 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
     const handleCloseModal = () => {
         setScratchPercentage(0);
         setPrizes([]);
+        setResult(null);
+        setError(null);
+        setShowDebug(false);
         onClose();
     };
 
     const isFullyRevealed = scratchPercentage >= 60;
+
+    // Não renderiza se não tem saleId
+    if (!saleId) return null;
 
     return (
         <AnimatePresence>
@@ -345,7 +394,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                         exit={{ scale: 0.9, opacity: 0, y: 30 }}
                         transition={{ type: "spring", damping: 30, stiffness: 400 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 max-w-lg w-full shadow-2xl border border-gray-200"
+                        className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 max-w-2xl w-full shadow-2xl border border-gray-200 max-h-[90vh] overflow-y-auto"
                     >
                         {/* Botão Fechar */}
                         <motion.button
@@ -376,81 +425,103 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                                 Raspe & Ganhe!
                             </h2>
                             <p className="text-gray-600 font-medium">
-                                Descubra seus 9 prêmios incríveis 🎁
+                                {loading ? "Carregando..." : "Descubra seus 9 prêmios incríveis 🎁"}
                             </p>
                         </div>
 
+                        {/* Erro */}
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
+                            >
+                                <p className="text-red-600 text-sm font-medium text-center">{error}</p>
+                            </motion.div>
+                        )}
+
                         {/* Área da Raspadinha */}
-                        <div className="relative mb-6 rounded-2xl overflow-hidden shadow-2xl">
-                            {/* Grid 3x3 de Prêmios (fica atrás do canvas) */}
-                            <div className="grid grid-cols-3 gap-2 p-3 bg-gradient-to-br from-gray-900 to-gray-800 relative z-0">
-                                {prizes.map((prize, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, scale: 0.5 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: index * 0.03 }}
-                                        className={`aspect-square bg-gradient-to-br ${prize.color} rounded-xl flex flex-col items-center justify-center shadow-lg border-2 border-white/20 relative overflow-hidden`}
-                                    >
-                                        {/* Brilho de fundo */}
-                                        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-
+                        {!loading && !error && prizes.length > 0 && (
+                            <div className="relative mb-6 rounded-2xl overflow-hidden shadow-2xl">
+                                {/* Grid 3x3 de Prêmios (fica atrás do canvas) */}
+                                <div className="grid grid-cols-3 gap-2 p-3 bg-gradient-to-br from-gray-900 to-gray-800 relative z-0">
+                                    {prizes.map((prize, index) => (
                                         <motion.div
-                                            animate={isFullyRevealed ? {
-                                                scale: [1, 1.15, 1],
-                                                rotate: [0, 5, -5, 0]
-                                            } : {}}
-                                            transition={{
-                                                duration: 0.6,
-                                                repeat: isFullyRevealed ? Infinity : 0,
-                                                repeatDelay: 2,
-                                                delay: index * 0.1
-                                            }}
-                                            className="relative z-10 flex flex-col items-center gap-1"
+                                            key={index}
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: index * 0.03 }}
+                                            className={`aspect-square bg-gradient-to-br ${prize.color} rounded-xl flex flex-col items-center justify-center shadow-lg border-2 ${prize.isWinner ? 'border-yellow-300' : 'border-white/20'} relative overflow-hidden`}
                                         >
-                                            <div className="text-white drop-shadow-lg">
-                                                {prize.icon}
-                                            </div>
-                                            <span className="text-xs sm:text-sm font-bold text-white drop-shadow-lg">
-                                                {prize.text}
-                                            </span>
-                                        </motion.div>
+                                            {/* Brilho de fundo */}
+                                            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
 
-                                        {/* Efeito de brilho */}
-                                        {isFullyRevealed && (
                                             <motion.div
-                                                initial={{ x: '-100%', opacity: 0 }}
-                                                animate={{ x: '200%', opacity: [0, 1, 0] }}
+                                                animate={isFullyRevealed && prize.isWinner ? {
+                                                    scale: [1, 1.15, 1],
+                                                    rotate: [0, 5, -5, 0]
+                                                } : {}}
                                                 transition={{
-                                                    duration: 1.5,
-                                                    repeat: Infinity,
-                                                    repeatDelay: 3,
+                                                    duration: 0.6,
+                                                    repeat: isFullyRevealed && prize.isWinner ? Infinity : 0,
+                                                    repeatDelay: 2,
                                                     delay: index * 0.1
                                                 }}
-                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
-                                            />
-                                        )}
-                                    </motion.div>
-                                ))}
-                            </div>
+                                                className="relative z-10 flex flex-col items-center gap-1"
+                                            >
+                                                <div className="text-white drop-shadow-lg">
+                                                    {prize.icon}
+                                                </div>
+                                                <span className="text-xs sm:text-sm font-bold text-white drop-shadow-lg text-center px-1">
+                                                    {prize.text}
+                                                </span>
+                                            </motion.div>
 
-                            {/* Canvas da Raspadinha (cobre todo o grid) */}
-                            {scratchPercentage < 100 && (
-                                <canvas
-                                    ref={canvasRef}
-                                    className="absolute inset-0 cursor-crosshair w-full h-full select-none z-50"
-                                    style={{ touchAction: "none" }}
-                                    onMouseDown={handleMouseDown}
-                                    onMouseUp={handleMouseUp}
-                                    onMouseMove={handleScratch}
-                                    onMouseLeave={handleMouseUp}
-                                    onTouchStart={handleTouchStart}
-                                    onTouchEnd={handleTouchEnd}
-                                    onTouchMove={handleScratch}
-                                    onContextMenu={(e) => e.preventDefault()}
-                                />
-                            )}
-                        </div>
+                                            {/* Efeito de brilho apenas para vencedores */}
+                                            {isFullyRevealed && prize.isWinner && (
+                                                <motion.div
+                                                    initial={{ x: '-100%', opacity: 0 }}
+                                                    animate={{ x: '200%', opacity: [0, 1, 0] }}
+                                                    transition={{
+                                                        duration: 1.5,
+                                                        repeat: Infinity,
+                                                        repeatDelay: 3,
+                                                        delay: index * 0.1
+                                                    }}
+                                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+                                                />
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                {/* Canvas da Raspadinha (cobre todo o grid) */}
+                                {scratchPercentage < 100 && (
+                                    <canvas
+                                        ref={canvasRef}
+                                        className="absolute inset-0 cursor-crosshair w-full h-full select-none z-50"
+                                        style={{ touchAction: "none" }}
+                                        onMouseDown={handleMouseDown}
+                                        onMouseUp={handleMouseUp}
+                                        onMouseMove={handleScratch}
+                                        onMouseLeave={handleMouseUp}
+                                        onTouchStart={handleTouchStart}
+                                        onTouchEnd={handleTouchEnd}
+                                        onTouchMove={handleScratch}
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* Loading state */}
+                        {loading && (
+                            <div className="flex items-center justify-center py-20">
+                                <div className="relative">
+                                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-orange-500"></div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Barra de Progresso */}
                         {scratchPercentage > 0 && scratchPercentage < 100 && (
@@ -481,8 +552,122 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                             </motion.div>
                         )}
 
+                        {/* Resultado do Prêmio */}
+                        {isFullyRevealed && result && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mb-6"
+                            >
+                                {result.wonPrize !== null && result.wonPrize > 0 ? (
+                                    <div className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border-2 border-green-300">
+                                        <div className="flex items-center justify-center gap-3 mb-3">
+                                            <FaCheckCircle className="text-green-600 text-3xl" />
+                                            <h3 className="text-2xl font-bold text-green-700">
+                                                Parabéns! 🎉
+                                            </h3>
+                                        </div>
+                                        <p className="text-center text-green-800 font-semibold text-lg mb-2">
+                                            Você ganhou: <span className="text-2xl">R$ {result.wonPrize.toFixed(2)}</span>
+                                        </p>
+                                        {result.wonPrizeDetails && (
+                                            <div className="mt-3 p-3 bg-white rounded-xl">
+                                                <p className="text-sm text-gray-700">
+                                                    <strong>Tipo:</strong> {result.wonPrizeDetails.type}
+                                                </p>
+                                                {result.wonPrizeDetails.description && (
+                                                    <p className="text-sm text-gray-600 mt-1">
+                                                        {result.wonPrizeDetails.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="p-5 bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl border-2 border-gray-300">
+                                        <div className="flex items-center justify-center gap-3 mb-2">
+                                            <FaTimesCircle className="text-gray-500 text-2xl" />
+                                            <h3 className="text-xl font-bold text-gray-700">
+                                                Que pena!
+                                            </h3>
+                                        </div>
+                                        <p className="text-center text-gray-600 font-medium">
+                                            Não foi dessa vez, mas continue participando!
+                                        </p>
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* Botão de Debug */}
+                        {isFullyRevealed && result && (
+                            <motion.button
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.2 }}
+                                onClick={() => setShowDebug(!showDebug)}
+                                className="w-full mb-4 flex items-center justify-center gap-2 bg-slate-100 text-slate-700 py-2.5 px-4 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-all border border-slate-300"
+                            >
+                                <FaCode size={14} />
+                                {showDebug ? "Ocultar" : "Ver"} Informações de Verificação
+                            </motion.button>
+                        )}
+
+                        {/* Debug Info */}
+                        {showDebug && result && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="mb-6 overflow-hidden"
+                            >
+                                <div className="p-4 bg-slate-900 text-slate-100 rounded-xl space-y-3">
+                                    <h4 className="font-bold text-lg mb-3 text-white flex items-center gap-2">
+                                        <FaCode />
+                                        Informações de Verificação
+                                    </h4>
+
+                                    <div className="space-y-2">
+                                        <div className="p-3 bg-slate-800 rounded-lg">
+                                            <p className="text-xs text-slate-400 mb-1">Roll Principal</p>
+                                            <p className="font-mono text-sm text-emerald-400 font-semibold">
+                                                {result.debug.mainRoll}
+                                            </p>
+                                        </div>
+
+                                        <div className="p-3 bg-slate-800 rounded-lg">
+                                            <p className="text-xs text-slate-400 mb-2">Código de Verificação PHP</p>
+                                            <div className="bg-slate-950 p-3 rounded border border-slate-700 overflow-x-auto">
+                                                <code className="text-xs text-green-400 font-mono whitespace-pre-wrap break-all">
+                                                    {result.debug.verification.phpCalculateRoll}
+                                                </code>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-3 bg-slate-800 rounded-lg">
+                                            <p className="text-xs text-slate-400 mb-2">URL de Verificação</p>
+                                            <a
+                                                href={result.debug.verification.verifyUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-blue-400 hover:text-blue-300 underline break-all"
+                                            >
+                                                {result.debug.verification.verifyUrl}
+                                            </a>
+                                        </div>
+
+                                        <div className="p-3 bg-blue-900/30 border border-blue-700 rounded-lg mt-3">
+                                            <p className="text-xs text-blue-300">
+                                                💡 <strong>Como verificar:</strong> Copie o código PHP acima, cole no site de verificação e execute para confirmar o resultado.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Botões */}
-                        {isFullyRevealed && (
+                        {isFullyRevealed && !error && (
                             <div className="flex gap-3">
                                 <motion.button
                                     initial={{ scale: 0.95, opacity: 0 }}
@@ -490,29 +675,16 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                                     whileHover={{ scale: 1.03, y: -2 }}
                                     whileTap={{ scale: 0.97 }}
                                     onClick={handleCloseModal}
-                                    className="flex-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all shadow-lg relative overflow-hidden"
+                                    className="flex-1 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all shadow-lg relative overflow-hidden"
                                 >
                                     <motion.div
                                         animate={{ x: [-20, 200] }}
                                         transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
                                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
                                     />
-                                    <span className="relative z-10">🎉 Resgatar Prêmios</span>
+                                    <span className="relative z-10">Fechar</span>
                                 </motion.button>
                             </div>
-                        )}
-
-                        {isFullyRevealed && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                                className="text-center mt-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200"
-                            >
-                                <p className="text-sm font-semibold text-green-700">
-                                    🎊 Parabéns! Seus prêmios estão prontos!
-                                </p>
-                            </motion.div>
                         )}
                     </motion.div>
                 </motion.div>

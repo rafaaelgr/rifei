@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTicketAlt, FaSignOutAlt, FaEnvelope, FaIdCard, FaInstagram, FaReceipt, FaUser } from "react-icons/fa";
+import { FaTimes, FaTicketAlt, FaSignOutAlt, FaEnvelope, FaIdCard, FaInstagram, FaReceipt, FaUser, FaGift } from "react-icons/fa";
 import { useAuth } from "@/contexts/AuthContext";
 import { vendasService } from "@/services/vendas.service";
 import { Order } from "@/types";
+import { ScratchCardModal } from "./ScratchCardModal";
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -19,6 +20,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     const [orders, setOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
     const [activeTab, setActiveTab] = useState<TabType>("orders");
+    const [showScratchCard, setShowScratchCard] = useState(false);
+    const [selectedSaleId, setSelectedSaleId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -269,6 +272,22 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                                                                         </div>
                                                                     </div>
                                                                 )}
+
+                                                                {order.raspadinhaValue > 0 && order.hasRaspadinha && !order.raspadinhaUsed && (
+                                                                    <motion.button
+                                                                        whileHover={{ scale: 1.02 }}
+                                                                        whileTap={{ scale: 0.98 }}
+                                                                        onClick={() => {
+                                                                            setSelectedSaleId(order.id);
+                                                                            setShowScratchCard(true);
+                                                                        }}
+                                                                        className="w-full mt-3 flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-2.5 px-4 rounded-xl font-semibold text-sm hover:shadow-lg transition-all"
+                                                                        aria-label="Usar raspadinha"
+                                                                    >
+                                                                        <FaGift size={14} />
+                                                                        Usar Raspadinha
+                                                                    </motion.button>
+                                                                )}
                                                             </div>
                                                         </motion.div>
                                                     ))
@@ -280,6 +299,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                             </div>
                         </motion.div>
                     </div>
+
+                    {/* Modal de Raspadinha */}
+                    <ScratchCardModal
+                        isOpen={showScratchCard}
+                        onClose={() => {
+                            setShowScratchCard(false);
+                            setSelectedSaleId(null);
+                        }}
+                        saleId={selectedSaleId}
+                    />
 
                     <style jsx global>{`
                         .custom-scrollbar::-webkit-scrollbar {

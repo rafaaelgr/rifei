@@ -125,4 +125,7 @@ export interface Order {
     price: number;
     date: string;
     numbers: string[];
+    raspadinhaValue: number;
+    hasRaspadinha: boolean;
+    raspadinhaUsed: boolean;
 }
