@@ -11,6 +11,7 @@ import { vendasService } from "@/services/vendas.service";
 import { TbCloverFilled } from "react-icons/tb";
 import { PiClover } from "react-icons/pi";
 import { UserProfileModal } from "./UserProfileModal";
+import { div } from "framer-motion/client";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -57,6 +58,10 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
     const [showAllTickets, setShowAllTickets] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [endDate] = useState(() => {
+        // Define a data de término uma única vez: 7 dias a partir de agora
+        return new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+    });
 
     // Calcular valor total baseado na quantidade e promoções
     const calculateTotal = useCallback((qty: number): number => {
@@ -88,14 +93,11 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setTotalValue(total);
     }, [quantity, calculateTotal, rifa]);
 
-    // Calcular countdown e progresso
+    // Calcular countdown regressivo de 7 dias a partir de hoje
     useEffect(() => {
         const calculateTimeRemaining = () => {
-            if (!rifa || !rifa.closure) return;
-
             const now = new Date().getTime();
-            const endTime = new Date(rifa.closure).getTime();
-            const difference = endTime - now;
+            const difference = endDate - now;
 
             if (difference > 0) {
                 const days = Math.floor(difference / (1000 * 60 * 60 * 24));
@@ -105,8 +107,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                 setTimeRemaining({ days, hours, minutes, seconds });
 
-                // Calcular progresso (assumindo 7 dias de campanha)
-                const totalCampaignTime = 7 * 24 * 60 * 60 * 1000; // 7 dias
+                // Calcular progresso (quanto tempo já passou dos 7 dias)
+                const totalCampaignTime = 7 * 24 * 60 * 60 * 1000;
                 const elapsed = totalCampaignTime - difference;
                 const progress = Math.min((elapsed / totalCampaignTime) * 100, 100);
                 setProgressPercentage(progress);
@@ -120,7 +122,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         const interval = setInterval(calculateTimeRemaining, 1000);
 
         return () => clearInterval(interval);
-    }, [rifa.closure]);
+    }, [endDate]);
 
     const handleIncrement = () => {
         setQuantity(prev => prev + 1);
@@ -469,7 +471,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             <img src="/ico.png" alt="" className="max-w-12 rounded-full absolute right-0" />
                                         </motion.h2>
 
-                                        {/* Countdown */}
+                                        {/* Countdown Regressivo */}
                                         <div className="bg-[#2c0201] backdrop-blur-sm rounded-xl p-3 sm:p-4 mb-4 uppercase">
                                             <p className="text-center text-white/90 text-xs sm:text-sm font-semibold mb-2 uppercase tracking-wider">
                                                 Encerra em
@@ -477,43 +479,67 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             <div className="flex items-center justify-center gap-2 sm:gap-3">
                                                 {timeRemaining.days > 0 && (
                                                     <>
-                                                        <div className="text-center">
+                                                        <motion.div
+                                                            key={`days-${timeRemaining.days}`}
+                                                            initial={{ y: -20, opacity: 0 }}
+                                                            animate={{ y: 0, opacity: 1 }}
+                                                            transition={{ duration: 0.3 }}
+                                                            className="text-center"
+                                                        >
                                                             <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
                                                                 <span className="text-xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
                                                                     {String(timeRemaining.days).padStart(2, '0')}
                                                                 </span>
                                                             </div>
                                                             <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">dias</span>
-                                                        </div>
+                                                        </motion.div>
                                                         <span className="text-2xl sm:text-3xl font-bold text-white">:</span>
                                                     </>
                                                 )}
-                                                <div className="text-center">
+                                                <motion.div
+                                                    key={`hours-${timeRemaining.hours}`}
+                                                    initial={{ y: -20, opacity: 0 }}
+                                                    animate={{ y: 0, opacity: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="text-center"
+                                                >
                                                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
                                                         <span className="text-xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
                                                             {String(timeRemaining.hours).padStart(2, '0')}
                                                         </span>
                                                     </div>
                                                     <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">horas</span>
-                                                </div>
+                                                </motion.div>
                                                 <span className="text-2xl sm:text-3xl font-bold text-white">:</span>
-                                                <div className="text-center">
+                                                <motion.div
+                                                    key={`minutes-${timeRemaining.minutes}`}
+                                                    initial={{ y: -20, opacity: 0 }}
+                                                    animate={{ y: 0, opacity: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="text-center"
+                                                >
                                                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
                                                         <span className="text-xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
                                                             {String(timeRemaining.minutes).padStart(2, '0')}
                                                         </span>
                                                     </div>
                                                     <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">min</span>
-                                                </div>
+                                                </motion.div>
                                                 <span className="text-2xl sm:text-3xl font-bold text-white">:</span>
-                                                <div className="text-center">
+                                                <motion.div
+                                                    key={`seconds-${timeRemaining.seconds}`}
+                                                    initial={{ y: -20, opacity: 0 }}
+                                                    animate={{ y: 0, opacity: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="text-center"
+                                                >
                                                     <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-3">
                                                         <span className="text-xl sm:text-3xl md:text-4xl font-bold text-white tabular-nums">
                                                             {String(timeRemaining.seconds).padStart(2, '0')}
                                                         </span>
                                                     </div>
                                                     <span className="text-[10px] sm:text-xs text-white/80 mt-1 block">seg</span>
-                                                </div>
+                                                </motion.div>
                                             </div>
                                         </div>
 
@@ -739,8 +765,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 className="bg-white rounded-xl p-2.5 sm:p-3 border-2 border-gray-200"
                             >
                                 {rifa.rewards && rifa.rewards.length > 0 ? (
-                                    rifa.rewards.map((reward, index) => (<>
-
+                                    rifa.rewards.map((reward, index) => (
                                         <motion.div
                                             key={reward.number}
                                             initial={{ opacity: 0, scale: 0.9 }}
@@ -768,7 +793,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </span>
                                             </div>
                                         </motion.div>
-                                    </>))
+                                    ))
                                 ) : (
                                     <div className="text-center py-6 sm:py-8 text-gray-500">
                                         <p className="text-sm sm:text-base">Nenhum prêmio cadastrado ainda</p>
