@@ -88,7 +88,7 @@ export const Header = () => {
                             whileHover={{ rotate: 360, scale: 1.1 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 bg-cover"
-                            style={{ backgroundImage: "url('/logo.png')" }}
+                            style={{ backgroundImage: "url('/pipa.png')" }}
                         >
                         </motion.div>
                         <div className="flex flex-col">

@@ -70,7 +70,7 @@ export default function Home() {
           <div className="flex justify-center mb-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-full p-4">
               <Image
-                src="/LOGO.png"
+                src="/pipa.png"
                 alt="Logo"
                 width={80}
                 height={80}

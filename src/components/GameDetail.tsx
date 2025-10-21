@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaFacebook } from "react-icons/fa";
 import { FaTelegram } from "react-icons/fa6";
 import { AiFillTwitterCircle } from "react-icons/ai";
@@ -58,26 +58,10 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [showAllTickets, setShowAllTickets] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-    if (!rifa) {
-        return (
-            <div className="min-h-screen pt-24 pb-12 px-6 mt-10 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Carregando informações da rifa...</p>
-                </div>
-            </div>
-        );
-    }
-
-    const socialIcons = [
-        { Icon: FaFacebook, label: "Facebook" },
-        { Icon: FaTelegram, label: "Telegram" },
-        { Icon: AiFillTwitterCircle, label: "Twitter" },
-        { Icon: IoLogoWhatsapp, label: "WhatsApp" },
-    ];
-
     // Calcular valor total baseado na quantidade e promoções
-    const calculateTotal = (qty: number): number => {
+    const calculateTotal = useCallback((qty: number): number => {
+        if (!rifa) return 0;
+
         if (!rifa.packages || rifa.packages.length === 0) {
             return qty * rifa.ticketsPrice;
         }
@@ -96,17 +80,18 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         }
 
         return qty * rifa.ticketsPrice;
-    };
+    }, [rifa]);
 
     // Atualizar valor total quando quantidade mudar
     useEffect(() => {
-        setTotalValue(calculateTotal(quantity));
-    }, [quantity, rifa]);
+        const total = calculateTotal(quantity);
+        setTotalValue(total);
+    }, [quantity, calculateTotal, rifa]);
 
     // Calcular countdown e progresso
     useEffect(() => {
         const calculateTimeRemaining = () => {
-            if (!rifa.closure) return;
+            if (!rifa || !rifa.closure) return;
 
             const now = new Date().getTime();
             const endTime = new Date(rifa.closure).getTime();
@@ -159,26 +144,19 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     };
 
     const handleParticipar = () => {
-        // Abrir modal para pedir CPF
         setShowCpfModal(true);
         setCpfError("");
     };
 
     const validateCpf = (cpf: string): boolean => {
-        // Remove caracteres não numéricos
         const cleanCpf = cpf.replace(/\D/g, "");
-
-        // Verifica se tem 11 dígitos
         if (cleanCpf.length !== 11) return false;
-
-        // Verifica se todos os dígitos são iguais
         if (/^(\d)\1{10}$/.test(cleanCpf)) return false;
 
         return true;
     };
 
     const handleConfirmPurchase = async () => {
-        // Validar CPF
         if (!validateCpf(cpf)) {
             setCpfError("CPF inválido. Digite um CPF válido com 11 dígitos.");
             return;
@@ -189,10 +167,9 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setIsLoadingPix(true);
 
         try {
-            // Chamar API real para gerar PIX
             const response = await vendasService.comprarTicket({
                 action_id: rifa.id,
-                cpf: cpf.replace(/\D/g, ""), // Remove formatação
+                cpf: cpf.replace(/\D/g, ""),
                 amount: quantity,
             });
 
@@ -203,7 +180,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 return;
             }
 
-            // Usar dados reais da API
             setPixData({
                 qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
                     response.data.qrCode
@@ -257,6 +233,24 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const handleVerMeusNumeros = () => {
         setIsProfileModalOpen(true);
     };
+
+    if (!rifa) {
+        return (
+            <div className="min-h-screen pt-24 pb-12 px-6 mt-10 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Carregando informações da rifa...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const socialIcons = [
+        { Icon: FaFacebook, label: "Facebook" },
+        { Icon: FaTelegram, label: "Telegram" },
+        { Icon: AiFillTwitterCircle, label: "Twitter" },
+        { Icon: IoLogoWhatsapp, label: "WhatsApp" },
+    ];
 
     return (
         <motion.div
