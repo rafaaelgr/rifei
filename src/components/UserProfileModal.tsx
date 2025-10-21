@@ -18,7 +18,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     const { user, logout } = useAuth();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
-    const [activeTab, setActiveTab] = useState<TabType>("profile");
+    const [activeTab, setActiveTab] = useState<TabType>("orders");
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -111,8 +111,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                                     <button
                                         onClick={() => setActiveTab("profile")}
                                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${activeTab === "profile"
-                                                ? "bg-slate-900 text-white shadow-sm"
-                                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                            ? "bg-slate-900 text-white shadow-sm"
+                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                                             }`}
                                     >
                                         <FaUser size={14} />
@@ -121,8 +121,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                                     <button
                                         onClick={() => setActiveTab("orders")}
                                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${activeTab === "orders"
-                                                ? "bg-slate-900 text-white shadow-sm"
-                                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                            ? "bg-slate-900 text-white shadow-sm"
+                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                                             }`}
                                     >
                                         <FaReceipt size={14} />

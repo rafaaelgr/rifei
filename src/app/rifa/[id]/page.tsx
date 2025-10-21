@@ -24,7 +24,6 @@ const RifaDetailPage = () => {
             setError(null);
 
             try {
-                // Busca informações da rifa usando o serviço
                 const response = await rifasService.obterInfo(id);
 
                 if (response.error || !response.data) {

@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { FaBook, FaUser, FaGift, FaTrophy, FaTicketAlt, FaFileContract, FaStar } from "react-icons/fa";
-import { motion, useAnimation } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
 import { LoginModal } from "./LoginModal";
+import { useAuth } from "@/contexts/AuthContext";
+import React, { useState, useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 import { UserProfileModal } from "./UserProfileModal";
 import { ScratchCardModal } from "./ScratchCardModal";
+import { FaUser, FaTrophy, FaTicketAlt, FaFileContract } from "react-icons/fa";
 
 export const Header = () => {
     const { user, isAuthenticated } = useAuth();
@@ -88,7 +88,7 @@ export const Header = () => {
                             whileHover={{ rotate: 360, scale: 1.1 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 bg-cover"
-                            style={{ backgroundImage: "url(/logo.png)" }}
+                            style={{ backgroundImage: "url('/logo.png')" }}
                         >
                         </motion.div>
                         <div className="flex flex-col">
@@ -138,27 +138,6 @@ export const Header = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <FaFileContract className="relative z-10 text-lg" />
                             <span className="relative z-10 font-medium text-sm">Termos</span>
-                        </motion.button>
-
-                        <motion.button
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsScratchCardOpen(true)}
-                            className="group relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white cursor-pointer transition-all duration-300 shadow-lg shadow-red-500/30 hover:shadow-red-500/50"
-                            aria-label="Resgatar prêmio"
-                        >
-                            <motion.div
-                                animate={{ rotate: [0, 10, -10, 10, 0] }}
-                                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                            >
-                                <FaGift className="text-lg" />
-                            </motion.div>
-                            <span className="font-semibold text-sm">Resgatar</span>
-                            <motion.div
-                                className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-white"
-                                animate={{ scale: [1, 1.2, 1] }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            />
                         </motion.button>
                     </motion.nav>
 
@@ -226,5 +205,3 @@ export const Header = () => {
         </>
     );
 };
-
-

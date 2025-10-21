@@ -10,6 +10,7 @@ import type { Rifa } from "@/types";
 import { vendasService } from "@/services/vendas.service";
 import { TbCloverFilled } from "react-icons/tb";
 import { PiClover } from "react-icons/pi";
+import { UserProfileModal } from "./UserProfileModal";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -55,6 +56,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [progressPercentage, setProgressPercentage] = useState(0);
     const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
     const [showAllTickets, setShowAllTickets] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     if (!rifa) {
         return (
@@ -252,6 +254,10 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setCpfError("");
     };
 
+    const handleVerMeusNumeros = () => {
+        setIsProfileModalOpen(true);
+    };
+
     return (
         <motion.div
             initial="hidden"
@@ -278,6 +284,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         <motion.div
                             initial={{ scale: 0, y: 50 }}
                             animate={{ scale: 1, y: 0 }}
+                            onClick={handleVerMeusNumeros}
                             transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
                             className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10 w-full"
                         >
@@ -286,6 +293,18 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             </motion.button>
                         </motion.div>
                     </div>
+
+                    <motion.div
+                        initial={{ scale: 0, y: 50 }}
+                        animate={{ scale: 1, y: 0 }}
+                        onClick={handleVerMeusNumeros}
+                        transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
+                        className="mt-3 w-full -mb-5"
+                    >
+                        <motion.button className="bg-green-600 shadow-xl border-t border-white/50 text-white p-1 text-xs uppercase font-bold rounded-md w-full">
+                            coletar raspadinha
+                        </motion.button>
+                    </motion.div>
 
                     <div className="px-3 xs:px-4 sm:px-5 md:px-6 pb-4 sm:pb-6 md:pb-8 pt-10 xs:pt-12 sm:pt-14 md:pt-16 mt-2 xs:mt-3 sm:mt-4 md:mt-5">
                         <motion.p variants={itemVariants} className="text-gray-500 text-base sm:text-base text-center mb-2 px-2">{rifa.description}</motion.p>
@@ -350,7 +369,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             whileHover={{ scale: 1.05, y: -3 }}
                                             whileTap={{ scale: 0.95 }}
                                             className={`relative ${selectedPackage === item.qty
-                                                ? "bg-[#2c0201] border-2 border-red-600 shadow-lg shadow-teal-500/50"
+                                                ? "bg-[#2c0201]/20 border-2 border-[#2c0201] shadow-lg shadow-teal-500/50"
                                                 : "bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-400"
                                                 } rounded-xl p-2.5 sm:p-3 transition-all`}
                                         >
@@ -367,13 +386,17 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </motion.div>
                                             )}
 
-                                            <div className={`text-xl sm:text-2xl font-bold mb-1 ${selectedPackage === item.qty ? "text-white" : "text-gray-900"
-                                                }`}>
-                                                {item.qty}
+                                            <div className={`text-xl sm:text-2xl font-bold mb-1 text-black`}>
+
+                                                {item.qty === 50 ? <div className="flex items-center justify-center">
+                                                    <span className="text-[22px] sm:text-xs text-black">
+                                                        {item.qty} +
+                                                    </span>
+                                                    <img src="/ico.png" className="max-w-12 -ml-1 -mr-2 invert-100" alt="" />
+                                                </div> : item.qty}
                                             </div>
 
-                                            <div className={`text-[10px] sm:text-xs uppercase tracking-wide ${selectedPackage === item.qty ? "text-white/90" : "text-gray-500"
-                                                }`}>
+                                            <div className={`text-[10px] sm:text-xs uppercase tracking-wide text-black`}>
                                                 Cotas
                                             </div>
                                         </motion.button>
@@ -448,7 +471,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         <motion.h2
                                             className="text-center flex items-center justify-center gap-1 uppercase text-lg sm:text-2xl md:text-3xl font-bold text-[#2c0201] mb-4"
                                         >
-                                            RASPADINHA em dobro
+                                            dobro de chance de ganhar
                                             <img src="/ico.png" alt="" className="max-w-12 rounded-full absolute right-0" />
                                         </motion.h2>
 
@@ -506,7 +529,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             animate={{ scale: 1 }}
                                             transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
                                             className="text-center text-base sm:text-lg md:text-xl font-bold mb-2 bg-[#26a34a] rounded-md p-3 text-white uppercase">
-                                            Ativar multiplicador
+                                            ativar chance em dobro
                                         </motion.p>
 
                                         {/* Data de validade */}
@@ -721,29 +744,11 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 transition={{ delay: 1.2 }}
                                 className="bg-white rounded-xl p-2.5 sm:p-3 border-2 border-gray-200"
                             >
-                                {/* Grade de bilhetes premiados */}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5 mb-2.5">
-                                    {[
-                                        { value: 10000, number: "9858777" },
-                                        { value: 10000, number: "3008825" },
-                                        { value: 10000, number: "2170316" },
-                                        { value: 1000, number: "6212144" },
-                                        { value: 1000, number: "2022713" },
-                                        { value: 1000, number: "0056818" },
-                                        ...(showAllTickets ? [
-                                            { value: 5000, number: "1234567" },
-                                            { value: 5000, number: "7654321" },
-                                            { value: 2500, number: "9876543" },
-                                            { value: 2500, number: "5432109" },
-                                            { value: 1000, number: "8765432" },
-                                            { value: 1000, number: "3456789" },
-                                            { value: 500, number: "2468135" },
-                                            { value: 500, number: "1357924" },
-                                            { value: 100, number: "9753186" },
-                                        ] : [])
-                                    ].map((ticket, index) => (
+                                {rifa.rewards && rifa.rewards.length > 0 ? (
+                                    rifa.rewards.map((reward, index) => (<>
+
                                         <motion.div
-                                            key={ticket.number}
+                                            key={reward.number}
                                             initial={{ opacity: 0, scale: 0.9 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ delay: 0.03 * index }}
@@ -752,32 +757,36 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         >
                                             <div className="text-center mb-1.5">
                                                 <span className="text-sm sm:text-base font-bold text-gray-900">
-                                                    R$ {ticket.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                    {reward.name}
                                                 </span>
                                             </div>
 
                                             <div className="bg-[#2c0201]/20 rounded-md p-1.5 sm:p-2 mb-1">
                                                 <span className="text-[#2c0201] font-bold text-xs sm:text-sm tracking-wider block text-center">
-                                                    {ticket.number}
+                                                    {reward.number}
                                                 </span>
                                             </div>
 
                                             <div className="flex items-center justify-center gap-1">
                                                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                                                <span className="text-green-600 font-bold text-[10px] sm:text-xs">
-                                                    Disponível
+                                                <span className={`text-green-600 font-bold text-[10px] sm:text-xs ${reward.winnerId !== null ? "text-orange-400" : "text-green-600"}`}>
+                                                    {reward.winnerId !== null ? "Sorteado" : "Disponível"}
                                                 </span>
                                             </div>
                                         </motion.div>
-                                    ))}
-                                </div>
+                                    </>))
+                                ) : (
+                                    <div className="text-center py-6 sm:py-8 text-gray-500">
+                                        <p className="text-sm sm:text-base">Nenhum prêmio cadastrado ainda</p>
+                                    </div>
+                                )}
 
                                 {/* Botão mostrar mais/menos */}
                                 <motion.button
                                     onClick={() => setShowAllTickets(!showAllTickets)}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="w-full bg-[#2c0201] text-white font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm"
+                                    className="w-full bg-[#2c0201] text-white mt-3 font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm"
                                 >
                                     {showAllTickets ? (
                                         <>
@@ -788,7 +797,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         </>
                                     ) : (
                                         <>
-                                            Mostrar mais (+9 ocultos)
+                                            Mostrar mais
                                             <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
@@ -826,7 +835,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 transition={{ delay: 1.4 }}
                                 className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border-2 border-gray-200"
                             >
-                                {/* Main Tabs */}
                                 <div className="relative border-b-2 border-gray-200 mb-4 sm:mb-6">
                                     <div className="flex gap-1">
                                         <motion.button
@@ -854,32 +862,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 />
                                             )}
                                         </motion.button>
-
-                                        {/* <motion.button
-                                            onClick={() => setActiveTab("rankings")}
-                                            whileHover={{ y: -2 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className={`relative flex-1 py-4 px-6 font-bold text-base transition-all duration-300
-                                                ${activeTab === "rankings"
-                                                    ? "text-red-600"
-                                                    : "text-gray-500 hover:text-gray-700"
-                                                }`}
-                                            aria-label="Aba de Rankings"
-                                        >
-                                            <span className="relative z-10 flex items-center justify-center gap-2">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                                </svg>
-                                                Rankings
-                                            </span>
-                                            {activeTab === "rankings" && (
-                                                <motion.div
-                                                    layoutId="activeTab"
-                                                    className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-t-full shadow-lg shadow-red-500/50"
-                                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                                />
-                                            )}
-                                        </motion.button> */}
                                     </div>
                                 </div>
 
@@ -890,7 +872,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     className="grid grid-cols-1 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6"
                                 >
                                     <div
-                                        className="relative bg-green-700 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg shadow-teal-500/20 overflow-hidden group transition-all duration-300"
+                                        className="relative bg-green-600 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg shadow-teal-500/20 overflow-hidden group transition-all duration-300"
                                     >
                                         <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full -mr-8 -mt-8 sm:-mr-10 sm:-mt-10 group-hover:scale-150 transition-transform duration-500"></div>
                                         <div className="relative z-10">
@@ -901,7 +883,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
                                                     </div>
-                                                    <h3 className="text-white font-bold text-sm sm:text-base">Lista de Ganhadores</h3>
+                                                    <h3 className="text-white font-bold text-sm sm:text-base">Lista de Prêmios</h3>
                                                 </div>
                                                 <div className="bg-white/20 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
                                                     <span className="text-white font-bold text-sm sm:text-base md:text-lg">
@@ -911,28 +893,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* <div
-                                        className="relative bg-red-700 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg shadow-red-500/20 overflow-hidden group transition-all duration-300"
-                                    >
-                                        <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full -mr-8 -mt-8 sm:-mr-10 sm:-mt-10 group-hover:scale-150 transition-transform duration-500"></div>
-                                        <div className="relative z-10">
-                                            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center">
-                                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                </div>
-                                                <div className="bg-white/20 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
-                                                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">
-                                                        {rifa.rewards?.filter((r) => r.winnerId !== null).length || 0}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <p className="text-white/80 text-[10px] sm:text-xs font-medium mb-0.5">Status</p>
-                                            <h3 className="text-white font-bold text-sm sm:text-base">Sorteados</h3>
-                                        </div>
-                                    </div> */}
                                 </motion.div>
 
                                 <AnimatePresence mode="wait">
@@ -987,9 +947,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                                 <span className="text-base sm:text-xl">🏆</span>
                                                             </div>
                                                         ) : (
-                                                            <span className="bg-teal-100 text-teal-700 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg font-bold text-[10px] xs:text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
-                                                                Disponível
-                                                            </span>
+                                                            <></>
                                                         )}
                                                     </motion.div>
                                                 ))
@@ -1007,67 +965,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             exit={{ opacity: 0, x: -20 }}
                                             transition={{ duration: 0.3 }}
                                             className="space-y-6"
-                                        >
-                                            <div className="flex gap-2">
-                                                {["Dia", "Semana", "Mês"].map((period, index) => (
-                                                    <motion.button
-                                                        key={period}
-                                                        initial={{ opacity: 0, y: -10 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: index * 0.1 }}
-                                                        whileHover={{ scale: 1.05 }}
-                                                        whileTap={{ scale: 0.95 }}
-                                                        className={`px-4 py-2 ${index === 0
-                                                            ? "bg-red-500 text-white"
-                                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                                            } font-bold rounded-lg text-sm transition-all`}
-                                                    >
-                                                        {period}
-                                                    </motion.button>
-                                                ))}
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                {[
-                                                    { name: "João Silva", cotas: "1.250", percent: "100%", color: "from-yellow-400 to-yellow-600" },
-                                                    { name: "Maria Santos", cotas: "980", percent: "78%", color: "from-gray-300 to-gray-400" },
-                                                    { name: "Carlos Souza", cotas: "750", percent: "60%", color: "from-red-400 to-red-600" },
-                                                    { name: "Ana Paula", cotas: "620", percent: "50%", color: "from-teal-400 to-teal-600" },
-                                                    { name: "Pedro Lima", cotas: "500", percent: "40%", color: "from-blue-400 to-blue-600" },
-                                                    { name: "Fernanda Costa", cotas: "380", percent: "30%", color: "from-purple-400 to-purple-600" },
-                                                    { name: "Roberto Alves", cotas: "250", percent: "20%", color: "from-pink-400 to-pink-600" },
-                                                ].map((rank, index) => (
-                                                    <motion.div
-                                                        key={rank.name}
-                                                        initial={{ opacity: 0, x: -20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: index * 0.1 }}
-                                                        className="relative"
-                                                    >
-                                                        <div className="flex items-center gap-3 mb-2">
-                                                            <motion.div
-                                                                whileHover={{ scale: 1.2, rotate: 360 }}
-                                                                transition={{ duration: 0.5 }}
-                                                                className={`w-8 h-8 bg-gradient-to-br ${rank.color} rounded-full flex items-center justify-center font-bold text-white shadow-md`}
-                                                            >
-                                                                {index + 1}
-                                                            </motion.div>
-                                                            <span className="font-bold text-gray-900">{rank.name}</span>
-                                                            <span className="ml-auto font-bold text-red-500">{rank.cotas} cotas</span>
-                                                        </div>
-                                                        <div className="relative h-8 bg-gray-100 rounded-xl overflow-hidden">
-                                                            <motion.div
-                                                                initial={{ width: 0 }}
-                                                                animate={{ width: rank.percent }}
-                                                                transition={{ delay: 0.3 + index * 0.1, duration: 0.8, ease: "easeOut" }}
-                                                                className={`absolute top-0 left-0 h-full bg-gradient-to-r ${rank.color} rounded-xl`}
-                                                            ></motion.div>
-                                                            <span className="absolute inset-0 flex items-center justify-end pr-3 text-sm font-bold text-white">{rank.percent}</span>
-                                                        </div>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        </motion.div>
+                                        ></motion.div>
                                     )}
                                 </AnimatePresence>
                             </motion.div>
@@ -1106,7 +1004,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             </motion.button>
 
                             <div className="text-center mb-6">
-                                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                                     <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
@@ -1117,15 +1015,27 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 </p>
                             </div>
 
-                            <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-red-200 mb-6">
+                            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-green-200 mb-6">
                                 <div className="flex items-center justify-between gap-4">
                                     <div>
-                                        <p className="text-xs sm:text-sm text-gray-600">Quantidade de cotas</p>
+                                        <p className="text-xs sm:text-sm text-gray-600">Cotas</p>
                                         <p className="text-lg sm:text-xl font-bold text-gray-900">{quantity}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs sm:text-sm text-gray-600">Raspadinhas</p>
+                                        <p className="text-lg sm:text-xl font-bold text-gray-900">
+                                            {quantity === 50 && "1"}
+                                            {quantity === 100 && "2"}
+                                            {quantity === 200 && "4"}
+                                            {quantity === 500 && "10"}
+                                            {quantity === 1000 && "20"}
+                                            {quantity === 2000 && "40"}
+                                            {quantity === 5000 && "100"}
+                                        </p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-xs sm:text-sm text-gray-600">Valor total</p>
-                                        <p className="text-xl sm:text-2xl font-bold text-red-600">
+                                        <p className="text-xl sm:text-2xl font-bold text-green-600">
                                             R$ {(totalValue || 0).toFixed(2).replace(".", ",")}
                                         </p>
                                     </div>
@@ -1144,8 +1054,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         onChange={handleCpfChange}
                                         maxLength={14}
                                         className={`w-full px-4 py-3 sm:py-4 border-2 rounded-xl focus:outline-none transition-colors text-center text-lg font-mono ${cpfError
-                                            ? "border-red-400 focus:border-red-500 bg-red-50"
-                                            : "border-gray-300 focus:border-red-500"
+                                            ? "border-green-400 focus:border-green-500 bg-green-50"
+                                            : "border-gray-300 focus:border-green-500"
                                             }`}
                                         placeholder="000.000.000-00"
                                     />
@@ -1163,7 +1073,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     onClick={handleConfirmPurchase}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg text-sm sm:text-base"
+                                    className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg text-sm sm:text-base"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1329,6 +1239,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <UserProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
         </motion.div>
     );
 };
