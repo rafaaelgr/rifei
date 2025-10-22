@@ -57,6 +57,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
     const [showAllTickets, setShowAllTickets] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+    const [isCheckingPayment, setIsCheckingPayment] = useState(false);
     const [endDate] = useState(() => {
         // Define a data de término: amanhã às 12:00 + 48 horas
         const tomorrow = new Date();
@@ -96,6 +98,44 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         const total = calculateTotal(quantity);
         setTotalValue(total);
     }, [quantity, calculateTotal, rifa]);
+
+    // Polling para verificar o status do pagamento
+    useEffect(() => {
+        if (!showPixModal || isLoadingPix || paymentConfirmed) {
+            return;
+        }
+
+        setIsCheckingPayment(true);
+
+        const checkPaymentStatus = async () => {
+            try {
+                const response = await vendasService.obterPedidos();
+
+                if (response.data && response.data.length > 0) {
+                    // Pegar o pedido com o maior ID
+                    const latestOrder = response.data.reduce((prev, current) =>
+                        current.id > prev.id ? current : prev
+                    );
+
+                    // Verificar se o status é "paid"
+                    if (latestOrder.status === "paid") {
+                        setPaymentConfirmed(true);
+                        setIsCheckingPayment(false);
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao verificar status do pagamento:", error);
+            }
+        };
+
+        // Verificar imediatamente
+        checkPaymentStatus();
+
+        // Continuar verificando a cada 3 segundos
+        const interval = setInterval(checkPaymentStatus, 3000);
+
+        return () => clearInterval(interval);
+    }, [showPixModal, isLoadingPix, paymentConfirmed]);
 
     // Calcular countdown regressivo de 48 horas a partir de amanhã às 12:00
     useEffect(() => {
@@ -217,6 +257,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const handleClosePixModal = () => {
         setShowPixModal(false);
         setCopied(false);
+        setPaymentConfirmed(false);
+        setIsCheckingPayment(false);
     };
 
     const formatCpf = (value: string) => {
@@ -237,6 +279,13 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     };
 
     const handleVerMeusNumeros = () => {
+        setIsProfileModalOpen(true);
+    };
+
+    const handleGoToProfile = () => {
+        setShowPixModal(false);
+        setPaymentConfirmed(false);
+        setIsCheckingPayment(false);
         setIsProfileModalOpen(true);
     };
 
@@ -1087,6 +1136,72 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         <p className="text-sm sm:text-base text-gray-500 text-center px-4">
                                             Aguarde enquanto geramos seu código PIX...
                                         </p>
+                                    </motion.div>
+                                ) : paymentConfirmed ? (
+                                    <motion.div
+                                        key="confirmed"
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        className="flex flex-col items-center justify-center py-8 sm:py-12 space-y-6"
+                                    >
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
+                                            className="w-16 h-16 sm:w-20 sm:h-20 bg-green-500 rounded-full flex items-center justify-center"
+                                        >
+                                            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </motion.div>
+
+                                        <div className="text-center px-4">
+                                            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                                                Pagamento Confirmado! 🎉
+                                            </h3>
+                                            <p className="text-sm sm:text-base text-gray-600 mb-2">
+                                                Seu pagamento foi processado com sucesso!
+                                            </p>
+                                            <p className="text-sm sm:text-base text-gray-600">
+                                                Acesse seu perfil para ver seus números da sorte e verificar se você ganhou algum bilhete premiado!
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-green-200 w-full">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="flex items-center gap-2">
+                                                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                    <p className="text-sm sm:text-base font-bold text-gray-900">
+                                                        {quantity} cotas adquiridas
+                                                    </p>
+                                                </div>
+                                                <p className="text-xs sm:text-sm text-gray-600 text-center">
+                                                    Seus números estão sendo processados e em breve estarão disponíveis no seu perfil
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <motion.button
+                                            onClick={handleGoToProfile}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                            Ver Meus Números e Prêmios
+                                        </motion.button>
+
+                                        <button
+                                            onClick={handleClosePixModal}
+                                            className="text-sm text-gray-500 hover:text-gray-700 transition-colors underline"
+                                        >
+                                            Fechar
+                                        </button>
                                     </motion.div>
                                 ) : (
                                     <motion.div
