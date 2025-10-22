@@ -16,6 +16,7 @@ interface Prize {
     text: string;
     color: string;
     isWinner: boolean;
+    showText: boolean;
 }
 
 export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onClose, saleId }) => {
@@ -30,11 +31,12 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
 
     // Função para mapear texto para ícone e cor
     const getPrizeStyle = (text: string, isWinner: boolean) => {
-        // Se perdeu, usa estilo cinza
+        // Se perdeu, usa estilo cinza e sem ícone/texto
         if (text.toLowerCase() === "perdeu") {
             return {
-                icon: <FaTimesCircle className="text-4xl" />,
-                color: "from-gray-400 to-gray-600"
+                icon: null,
+                color: "from-gray-200 to-gray-300",
+                showText: false
             };
         }
 
@@ -44,28 +46,32 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
         if (lowerText.includes("cota")) {
             return {
                 icon: <FaGift className="text-4xl" />,
-                color: "from-pink-400 to-pink-600"
+                color: "from-pink-400 to-pink-600",
+                showText: true
             };
         }
 
         if (lowerText.includes("%") || lowerText.includes("off") || lowerText.includes("desconto")) {
             return {
                 icon: <FaStar className="text-4xl" />,
-                color: "from-purple-400 to-purple-600"
+                color: "from-purple-400 to-purple-600",
+                showText: true
             };
         }
 
         if (lowerText.includes("r$") || lowerText.includes("reais")) {
             return {
                 icon: <FaGem className="text-4xl" />,
-                color: "from-emerald-400 to-emerald-600"
+                color: "from-emerald-400 to-emerald-600",
+                showText: true
             };
         }
 
         // Default para prêmios
         return {
             icon: <FaCrown className="text-4xl" />,
-            color: "from-yellow-400 to-yellow-600"
+            color: "from-yellow-400 to-yellow-600",
+            showText: true
         };
     };
 
@@ -105,7 +111,8 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                             text: square,
                             icon: style.icon,
                             color: style.color,
-                            isWinner
+                            isWinner,
+                            showText: style.showText
                         };
                     });
 
@@ -472,12 +479,16 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                                                 }}
                                                 className="relative z-10 flex flex-col items-center gap-1"
                                             >
-                                                <div className="text-white drop-shadow-lg">
-                                                    {prize.icon}
-                                                </div>
-                                                <span className="text-xs sm:text-sm font-bold text-white drop-shadow-lg text-center px-1">
-                                                    {prize.text}
-                                                </span>
+                                                {prize.showText && (
+                                                    <>
+                                                        <div className="text-white drop-shadow-lg">
+                                                            {prize.icon}
+                                                        </div>
+                                                        <span className="text-xs sm:text-sm font-bold text-white drop-shadow-lg text-center px-1">
+                                                            {prize.text}
+                                                        </span>
+                                                    </>
+                                                )}
                                             </motion.div>
 
                                             {/* Efeito de brilho apenas para vencedores */}
