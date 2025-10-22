@@ -424,6 +424,9 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                             <h2 className="text-4xl font-extrabold bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 bg-clip-text text-transparent mb-2">
                                 Raspe & Ganhe!
                             </h2>
+                            <p className="text-gray-600 font-medium text-base">
+                                Para ganhar o prêmio, você precisa encontrar 3 iguais!
+                            </p>
                             <p className="text-gray-600 font-medium">
                                 {loading ? "Carregando..." : ""}
                             </p>
