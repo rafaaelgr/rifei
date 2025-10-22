@@ -954,30 +954,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     </div>
                                 </div>
 
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 1.5 }}
-                                    className="grid grid-cols-1 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6"
-                                >
-                                    <div
-                                        className="relative bg-[#d6b600] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg shadow-teal-500/20 overflow-hidden group transition-all duration-300"
-                                    >
-                                        <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full -mr-8 -mt-8 sm:-mr-10 sm:-mt-10 group-hover:scale-150 transition-transform duration-500"></div>
-                                        <div className="relative z-10">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center">
-                                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                    </div>
-                                                    <h3 className="text-white font-bold text-sm sm:text-base">Lista de Prêmios</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
 
                                 <AnimatePresence mode="wait">
                                     <motion.div

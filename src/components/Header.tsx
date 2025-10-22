@@ -152,7 +152,7 @@ export const Header = () => {
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setIsLoginModalOpen(true)}
-                                className="relative flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 border border-red-400/30 rounded-xl px-5 py-2.5 hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
+                                className="relative flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 border border-red-400/30 rounded-xl px-5 py-1.5 text-sm hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
                             >
                                 <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                                 <FaUser className="text-white relative z-10" />
