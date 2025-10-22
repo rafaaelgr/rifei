@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { authToken } from "@/lib/api";
-import type { LoginResponse } from "@/services/auth.service";
 
 interface User {
     id: string;
