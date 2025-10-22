@@ -573,7 +573,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mb-6"
                             >
-                                {result.squares.some(square => square.toLowerCase() !== "perdeu") ? (
+                                {result.squares.filter(square => square.toLowerCase() !== "perdeu").length >= 3 ? (
                                     <div className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border-2 border-green-300">
                                         <div className="flex flex-col justify-center gap-3 mb-3">
                                             <FaCheckCircle className="text-green-600 text-3xl" />
