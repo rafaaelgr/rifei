@@ -12,8 +12,8 @@ const sofiaSans = Sofia_Sans({
 
 
 export const metadata: Metadata = {
-  title: "Ação ",
-  description: "Loja de Pipa + Iphone 17 ou 25k no PIX",
+  title: "Joia Raras Ações | Loja de Pipa + Iphone 17 ou 25k no PIX",
+  description: "Ação da Loja de Pipa + Iphone 17 ou 25k no PIX",
 };
 
 export default function RootLayout({
