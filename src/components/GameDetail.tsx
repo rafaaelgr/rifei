@@ -60,8 +60,13 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [showAllTickets, setShowAllTickets] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [endDate] = useState(() => {
-        // Define a data de término uma única vez: 7 dias a partir de agora
-        return new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+        // Define a data de término: amanhã às 12:00 + 48 horas
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(12, 0, 0, 0);
+
+        // Adicionar 48 horas (2 dias)
+        return tomorrow.getTime() + (48 * 60 * 60 * 1000);
     });
 
     // Calcular valor total baseado na quantidade e promoções
@@ -94,7 +99,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setTotalValue(total);
     }, [quantity, calculateTotal, rifa]);
 
-    // Calcular countdown regressivo de 7 dias a partir de hoje
+    // Calcular countdown regressivo de 48 horas a partir de amanhã às 12:00
     useEffect(() => {
         const calculateTimeRemaining = () => {
             const now = new Date().getTime();
@@ -108,8 +113,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                 setTimeRemaining({ days, hours, minutes, seconds });
 
-                // Calcular progresso (quanto tempo já passou dos 7 dias)
-                const totalCampaignTime = 7 * 24 * 60 * 60 * 1000;
+                // Calcular progresso (quanto tempo já passou das 48 horas)
+                const totalCampaignTime = 48 * 60 * 60 * 1000;
                 const elapsed = totalCampaignTime - difference;
                 const progress = Math.min((elapsed / totalCampaignTime) * 100, 100);
                 setProgressPercentage(progress);
@@ -891,7 +896,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     className="grid grid-cols-1 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6"
                                 >
                                     <div
-                                        className="relative bg-green-600 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg shadow-teal-500/20 overflow-hidden group transition-all duration-300"
+                                        className="relative bg-[#d6b600] rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg shadow-teal-500/20 overflow-hidden group transition-all duration-300"
                                     >
                                         <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full -mr-8 -mt-8 sm:-mr-10 sm:-mt-10 group-hover:scale-150 transition-transform duration-500"></div>
                                         <div className="relative z-10">

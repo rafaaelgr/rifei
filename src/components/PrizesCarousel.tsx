@@ -77,86 +77,41 @@ const prizes: Prize[] = [
     }
 ];
 
-const getPrizeGradient = (value: number, name: string): string => {
-    if (name.includes("TENTE NOVAMENTE")) {
-        return "from-gray-600 via-gray-700 to-gray-800";
+const getPrizeValue = (value: number): string => {
+    if (value > 0) {
+        return `R$ ${value}`;
     }
-    if (name === "VIP") {
-        return "from-purple-600 via-purple-700 to-purple-800";
-    }
-    if (name.includes("KIT") || name.includes("CARRETILHA") || name.includes("LINHA")) {
-        return "from-green-600 via-green-700 to-green-800";
-    }
-    if (value >= 500) {
-        return "from-yellow-500 via-amber-600 to-orange-600";
-    }
-    if (value >= 200) {
-        return "from-blue-600 via-blue-700 to-blue-800";
-    }
-    if (value >= 100) {
-        return "from-cyan-600 via-cyan-700 to-cyan-800";
-    }
-    if (value >= 50) {
-        return "from-teal-600 via-teal-700 to-teal-800";
-    }
-    return "from-emerald-600 via-emerald-700 to-emerald-800";
-};
-
-const getPrizeIcon = (name: string): string => {
-    if (name.includes("TENTE NOVAMENTE")) return "🔄";
-    if (name === "VIP") return "👑";
-    if (name.includes("KIT") || name.includes("CARRETILHA") || name.includes("LINHA")) return "🎣";
-    return "💰";
+    return "Prêmio";
 };
 
 const PrizeCard = ({ prize, index }: { prize: Prize; index: number }) => {
-    const gradient = getPrizeGradient(prize.value, prize.name);
-    const icon = getPrizeIcon(prize.name);
+    const prizeLabel = getPrizeValue(prize.value);
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
-            className="flex-shrink-0 w-72 sm:w-80 mx-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="flex-shrink-0 w-48 sm:w-52 mx-2"
         >
-            <div className={`relative bg-gradient-to-br ${gradient} rounded-2xl p-6 shadow-2xl border-2 border-white/20 hover:scale-105 transition-transform duration-300 h-full`}>
-
-                {/* Content */}
-                <div className="relative z-10 flex flex-col h-full">
-                    {/* Icon and Value */}
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-5xl drop-shadow-lg">{icon}</span>
-                        {prize.value > 0 && (
-                            <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                                <span className="text-white font-bold text-lg">
-                                    R$ {prize.value}
-                                </span>
-                            </div>
-                        )}
+            <div className="relative bg-[#2c0201]/10 border border-[#2c0201] rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 h-full">
+                <div className="flex flex-col gap-2">
+                    {/* Value Badge */}
+                    <div className="flex items-center justify-between">
+                        <span className="inline-block uppercase bg-[#2c0201]/20 border border-[#2c0201] px-3 py-1 rounded-full text-[#2c0201] text-xs font-bold">
+                            {prizeLabel}
+                        </span>
                     </div>
 
                     {/* Prize Name */}
-                    <h3 className="text-white font-extrabold text-2xl mb-2 drop-shadow-lg leading-tight">
+                    <h3 className="text-[#2c0201] font-bold text-base leading-tight line-clamp-2">
                         {prize.name}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-white/90 text-sm font-medium drop-shadow leading-relaxed">
+                    <p className="text-[#2c0201]/80 text-xs leading-snug line-clamp-2">
                         {prize.description}
                     </p>
-
-                    {/* Decorative element */}
-                    <div className="mt-auto pt-4">
-                        <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-white/40"
-                                initial={{ width: "0%" }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: 1, delay: index * 0.1 }}
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
         </motion.div>
@@ -169,7 +124,7 @@ export const PrizesCarousel = () => {
 
     // Triplicar os prêmios para criar o efeito infinito
     const infinitePrizes = [...prizes, ...prizes, ...prizes];
-    const cardWidth = 320; // width + margin
+    const cardWidth = 220; // width + margin (192px + 16px margin)
     const totalWidth = prizes.length * cardWidth;
 
     useEffect(() => {
@@ -177,7 +132,7 @@ export const PrizesCarousel = () => {
             await controls.start({
                 x: -totalWidth,
                 transition: {
-                    duration: prizes.length * 3, // 3 segundos por prêmio
+                    duration: prizes.length * 2, // 2 segundos por prêmio
                     ease: "linear",
                     repeat: Infinity,
                 }
@@ -200,7 +155,6 @@ export const PrizesCarousel = () => {
 
     return (
         <div className="w-full overflow-hidden">
-
             <div
                 className="relative"
                 onMouseEnter={handleMouseEnter}
