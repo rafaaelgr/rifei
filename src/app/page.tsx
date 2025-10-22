@@ -30,11 +30,11 @@ export default function Home() {
     try {
       if (isLogin) {
         await login(cpfLogin, password);
-        router.push("/rifa/1");
+        router.push("/rifa/12");
       } else {
         await register(name, email, cpf, whatsapp, instagram, passwordRegister);
         await login(cpf, passwordRegister);
-        router.push("/rifa/1");
+        router.push("/rifa/12");
       }
       handleClearFields();
     } catch (err) {

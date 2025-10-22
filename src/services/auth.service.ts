@@ -1,4 +1,4 @@
-import { apiRequest } from "@/lib/api";
+import { apiRequest, authToken } from "@/lib/api";
 
 interface CreateAccountPayload {
     email: string;
@@ -40,7 +40,6 @@ interface ChangePasswordPayload {
 }
 
 export const authService = {
-    // POST /create-account - Criar conta
     async criarConta(payload: CreateAccountPayload) {
         const response = await apiRequest<LoginResponse>("/create-account", {
             method: "POST",
@@ -51,10 +50,12 @@ export const authService = {
             return { error: response.error || "Erro ao criar conta", data: null };
         }
 
+        // Salva o token nos cookies
+        authToken.set(response.data.token);
+
         return { data: response.data };
     },
 
-    // POST /login - Login
     async login(payload: LoginPayload) {
         const response = await apiRequest<LoginResponse>("/login", {
             method: "POST",
@@ -65,10 +66,17 @@ export const authService = {
             return { error: response.error || "Erro ao fazer login", data: null };
         }
 
+        // Salva o token nos cookies
+        authToken.set(response.data.token);
+
         return { data: response.data };
     },
 
-    // POST /security-code - Criar código de segurança para trocar senha
+    async logout() {
+        // Remove o token dos cookies
+        authToken.remove();
+    },
+
     async criarCodigoSeguranca() {
         const response = await apiRequest<SecurityCodeResponse>("/security-code", {
             method: "POST",
@@ -81,7 +89,6 @@ export const authService = {
         return { data: response.data };
     },
 
-    // POST /validate-code - Validar código
     async validarCodigo(payload: ValidateCodePayload) {
         const response = await apiRequest<{ valid: boolean; message: string }>("/validate-code", {
             method: "POST",
@@ -95,7 +102,6 @@ export const authService = {
         return { data: response.data };
     },
 
-    // PUT /change-password - Trocar senha
     async trocarSenha(payload: ChangePasswordPayload) {
         const response = await apiRequest<{ message: string }>("/change-password", {
             method: "PUT",

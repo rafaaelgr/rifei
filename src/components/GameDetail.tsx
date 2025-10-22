@@ -12,6 +12,7 @@ import { TbCloverFilled } from "react-icons/tb";
 import { PiClover } from "react-icons/pi";
 import { UserProfileModal } from "./UserProfileModal";
 import { div } from "framer-motion/client";
+import { PrizesCarousel } from "./PrizesCarousel";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -758,72 +759,71 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 </div>
                             </div>
 
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.2 }}
-                                className="bg-white rounded-xl p-2.5 sm:p-3 border-2 border-gray-200"
-                            >
-                                {rifa.rewards && rifa.rewards.length > 0 ? (
-                                    rifa.rewards.map((reward, index) => (
-                                        <motion.div
-                                            key={index}
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.03 * index }}
-                                            whileHover={{ scale: 1.03 }}
-                                            className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-2 sm:p-2.5 border border-gray-200 hover:border-yellow-400 transition-all"
-                                        >
-                                            <div className="text-center mb-1.5">
-                                                <span className="text-sm sm:text-base font-bold text-gray-900">
-                                                    {reward.name}
-                                                </span>
-                                            </div>
+                            {rifa.rewards && rifa.rewards.length > 0 ? (
+                                <>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
+                                        {(showAllTickets ? rifa.rewards : rifa.rewards.slice(0, 8)).map((reward, index) => (
+                                            <motion.div
+                                                key={index}
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: 0.03 * index }}
+                                                whileHover={{ scale: 1.03 }}
+                                                className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-2 sm:p-2.5 border border-gray-200 hover:border-yellow-400 transition-all"
+                                            >
+                                                <div className="text-center mb-1.5">
+                                                    <span className="text-sm sm:text-base font-bold text-gray-900">
+                                                        {reward.name}
+                                                    </span>
+                                                </div>
 
-                                            <div className="bg-[#2c0201]/20 rounded-md p-1.5 sm:p-2 mb-1">
-                                                <span className="text-[#2c0201] font-bold text-xs sm:text-sm tracking-wider block text-center">
-                                                    {reward.number}
-                                                </span>
-                                            </div>
+                                                <div className="bg-[#2c0201]/20 rounded-md p-1.5 sm:p-2 mb-1">
+                                                    <span className="text-[#2c0201] font-bold text-xs sm:text-sm tracking-wider block text-center">
+                                                        {reward.number}
+                                                    </span>
+                                                </div>
 
-                                            <div className="flex items-center justify-center gap-1">
-                                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                                                <span className={`text-green-600 font-bold text-[10px] sm:text-xs ${reward.winnerId !== null ? "text-orange-400" : "text-green-600"}`}>
-                                                    {reward.winnerId !== null ? "Sorteado" : "Disponível"}
-                                                </span>
-                                            </div>
-                                        </motion.div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-6 sm:py-8 text-gray-500">
-                                        <p className="text-sm sm:text-base">Nenhum prêmio cadastrado ainda</p>
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                                                    <span className={`text-green-600 font-bold text-[10px] sm:text-xs ${reward.winnerId !== null ? "text-orange-400" : "text-green-600"}`}>
+                                                        {reward.winnerId !== null ? "Sorteado" : "Disponível"}
+                                                    </span>
+                                                </div>
+                                            </motion.div>
+                                        ))}
                                     </div>
-                                )}
 
-                                {/* Botão mostrar mais/menos */}
-                                <motion.button
-                                    onClick={() => setShowAllTickets(!showAllTickets)}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="w-full bg-[#2c0201] text-white mt-3 font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm"
-                                >
-                                    {showAllTickets ? (
-                                        <>
-                                            Mostrar menos
-                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                            </svg>
-                                        </>
-                                    ) : (
-                                        <>
-                                            Mostrar mais
-                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </>
+                                    {/* Botão mostrar mais/menos */}
+                                    {rifa.rewards.length > 8 && (
+                                        <motion.button
+                                            onClick={() => setShowAllTickets(!showAllTickets)}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className="w-full bg-[#2c0201] text-white mt-3 font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs sm:text-sm"
+                                        >
+                                            {showAllTickets ? (
+                                                <>
+                                                    Mostrar menos
+                                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                    </svg>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Mostrar mais
+                                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </>
+                                            )}
+                                        </motion.button>
                                     )}
-                                </motion.button>
-                            </motion.div>
+                                </>
+                            ) : (
+                                <div className="text-center py-6 sm:py-8 text-gray-500">
+                                    <p className="text-sm sm:text-base">Nenhum prêmio cadastrado ainda</p>
+                                </div>
+                            )}
                         </motion.div>
 
                         <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
@@ -915,77 +915,17 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 </motion.div>
 
                                 <AnimatePresence mode="wait">
-                                    {activeTab === "premios" ? (
-                                        <motion.div
-                                            key="premios"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: 20 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="space-y-3"
-                                        >
-                                            {rifa.rewards && rifa.rewards.length > 0 ? (
-                                                rifa.rewards.map((reward, index) => (
-                                                    <motion.div
-                                                        key={reward.id}
-                                                        initial={{ opacity: 0, x: -20 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: index * 0.05 }}
-                                                        whileHover={{ scale: 1.02, x: 5 }}
-                                                        className={`flex items-center justify-between gap-2 p-2 sm:p-3 ${reward.winnerId !== null
-                                                            ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400"
-                                                            : "bg-gray-50 border border-gray-200"
-                                                            } rounded-lg sm:rounded-xl hover:border-gray-300 transition-colors`}
-                                                    >
-                                                        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                                                            <div
-                                                                className={`${reward.winnerId !== null ? "bg-black" : "bg-gray-700"
-                                                                    } text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg flex items-center gap-1.5 sm:gap-2 flex-shrink-0`}
-                                                            >
-                                                                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" />
-                                                                </svg>
-                                                                <span className="font-bold text-xs sm:text-sm">{reward.number}</span>
-                                                            </div>
-                                                            <div className="flex flex-col min-w-0 flex-1">
-                                                                <span className="text-gray-900 font-bold text-xs sm:text-sm md:text-base truncate">
-                                                                    {reward.name}
-                                                                </span>
-                                                                {reward.description && (
-                                                                    <span className="text-gray-600 text-[10px] xs:text-xs sm:text-sm truncate">
-                                                                        {reward.description}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        {reward.winnerId !== null ? (
-                                                            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                                                                <span className="text-gray-900 font-bold text-xs sm:text-sm hidden xs:inline">
-                                                                    Sorteado
-                                                                </span>
-                                                                <span className="text-base sm:text-xl">🏆</span>
-                                                            </div>
-                                                        ) : (
-                                                            <></>
-                                                        )}
-                                                    </motion.div>
-                                                ))
-                                            ) : (
-                                                <div className="text-center py-6 sm:py-8 text-gray-500">
-                                                    <p className="text-sm sm:text-base">Nenhum prêmio cadastrado ainda</p>
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            key="rankings"
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: -20 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="space-y-6"
-                                        ></motion.div>
-                                    )}
+                                    <motion.div
+                                        key="premios"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="space-y-3"
+                                    >
+                                        <PrizesCarousel />
+                                    </motion.div>
+
                                 </AnimatePresence>
                             </motion.div>
                         </motion.div>

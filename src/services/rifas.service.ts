@@ -55,11 +55,6 @@ interface AddRewardPayload {
 
 // Converter ActionResponse para Rifa (formato do frontend)
 const convertActionToRifa = (action: ActionResponse): Rifa => {
-    console.log('🔍 Debug API - Dados recebidos:', {
-        ticketsPrice: action.ticketsPrice,
-        packages: action.packages
-    });
-
     return {
         id: action.id || 0,
         title: action.title || "",

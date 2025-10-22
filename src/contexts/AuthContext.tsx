@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
+import { authToken } from "@/lib/api";
 import type { LoginResponse } from "@/services/auth.service";
 
 interface User {
@@ -42,12 +43,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Verificar se há usuário salvo no localStorage
+        // Verificar se há usuário salvo no localStorage e token nos cookies
         const savedUser = localStorage.getItem("user");
-        const savedToken = localStorage.getItem("token");
+        const token = authToken.get();
 
-        if (savedUser && savedToken) {
+        // Só restaura o usuário se houver token válido nos cookies
+        if (savedUser && token) {
             setUser(JSON.parse(savedUser));
+        } else if (savedUser && !token) {
+            // Se tem usuário mas não tem token, limpa o localStorage
+            localStorage.removeItem("user");
         }
     }, []);
 
@@ -101,9 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(userData);
             localStorage.setItem("user", JSON.stringify(userData));
 
-            // Token pode não vir na resposta
-            const token = responseData.token || `temp_${userData.cpf}_${Date.now()}`;
-            localStorage.setItem("token", token);
+            // Token já foi salvo nos cookies pelo authService.login()
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Erro ao fazer login";
             setError(errorMessage);
@@ -199,9 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(userData);
             localStorage.setItem("user", JSON.stringify(userData));
 
-            // Token pode não vir na resposta, criar um token temporário se necessário
-            const token = responseData.token || `temp_${userData.cpf}_${Date.now()}`;
-            localStorage.setItem("token", token);
+            // Token já foi salvo nos cookies pelo authService.criarConta()
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Erro ao criar conta";
             setError(errorMessage);
@@ -214,7 +215,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const logout = () => {
         setUser(null);
         localStorage.removeItem("user");
-        localStorage.removeItem("token");
+        // Remove o token dos cookies
+        authService.logout();
     };
 
     const updateUser = (userData: Partial<User>) => {

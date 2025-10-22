@@ -26,22 +26,22 @@ const RifaDetailPage = () => {
             try {
                 const response = await rifasService.obterInfo(id);
 
-                if (response.error || !response.data) {
-                    setError(response.error || "Erro ao carregar rifa");
+                if (response.error || !response.data || response.data.title === "") {
+                    router.push("/rifa/12");
                     return;
                 }
 
                 setRifa(response.data);
             } catch (err) {
                 console.error("Erro ao carregar rifa:", err);
-                setError("Erro ao carregar informações da rifa");
+                router.push("/rifa/12");
             } finally {
                 setLoading(false);
             }
         };
 
         carregarRifa();
-    }, [id]);
+    }, [id, router]);
 
     if (loading) {
         return (
