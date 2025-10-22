@@ -11,6 +11,8 @@ import { vendasService } from "@/services/vendas.service";
 import { PiClover } from "react-icons/pi";
 import { UserProfileModal } from "./UserProfileModal";
 import { PrizesCarousel } from "./PrizesCarousel";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoginModal } from "./LoginModal";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -33,6 +35,7 @@ interface GameDetailProps {
 }
 
 export const GameDetail = ({ rifa }: GameDetailProps) => {
+    const { isAuthenticated } = useAuth();
     const [activeTab, setActiveTab] = useState("premios");
     const [quantity, setQuantity] = useState(100);
     const [totalValue, setTotalValue] = useState(0);
@@ -107,6 +110,18 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
         setIsCheckingPayment(true);
 
+        // Se o usuário NÃO está autenticado
+        if (!isAuthenticated) {
+            // Aguardar 30 segundos e então mostrar mensagem
+            const timeout = setTimeout(() => {
+                setPaymentConfirmed(true);
+                setIsCheckingPayment(false);
+            }, 60000); // 60 segundos
+
+            return () => clearTimeout(timeout);
+        }
+
+        // Se o usuário ESTÁ autenticado, fazer polling
         const checkPaymentStatus = async () => {
             try {
                 const response = await vendasService.obterPedidos();
@@ -135,7 +150,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         const interval = setInterval(checkPaymentStatus, 3000);
 
         return () => clearInterval(interval);
-    }, [showPixModal, isLoadingPix, paymentConfirmed]);
+    }, [showPixModal, isLoadingPix, paymentConfirmed, isAuthenticated]);
 
     // Calcular countdown regressivo de 48 horas a partir de amanhã às 12:00
     useEffect(() => {
@@ -1149,52 +1164,91 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
-                                            className="w-16 h-16 sm:w-20 sm:h-20 bg-green-500 rounded-full flex items-center justify-center"
+                                            className={`w-16 h-16 sm:w-20 sm:h-20 ${isAuthenticated ? "bg-green-500" : "bg-blue-500"} rounded-full flex items-center justify-center`}
                                         >
-                                            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
+                                            {isAuthenticated ? (
+                                                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            )}
                                         </motion.div>
 
                                         <div className="text-center px-4">
                                             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                                                Pagamento Confirmado! 🎉
+                                                {isAuthenticated ? "Pagamento Confirmado!" : "Pagamento Gerado!"}
                                             </h3>
-                                            <p className="text-sm sm:text-base text-gray-600 mb-2">
-                                                Seu pagamento foi processado com sucesso!
-                                            </p>
-                                            <p className="text-sm sm:text-base text-gray-600">
-                                                Acesse seu perfil para ver seus números da sorte e verificar se você ganhou algum bilhete premiado!
-                                            </p>
+                                            {isAuthenticated ? (
+                                                <>
+                                                    <p className="text-sm sm:text-base text-gray-600 mb-2">
+                                                        Seu pagamento foi processado com sucesso!
+                                                    </p>
+                                                    <p className="text-sm sm:text-base text-gray-600">
+                                                        Acesse seu perfil para ver seus números da sorte e verificar se você ganhou algum bilhete premiado!
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p className="text-sm sm:text-base text-gray-600 mb-2">
+                                                        Seu código PIX foi gerado com sucesso!
+                                                    </p>
+                                                    <p className="text-sm sm:text-base text-gray-600">
+                                                        <strong>Faça login ou crie uma conta</strong> para acompanhar seus números da sorte e verificar se você ganhou algum bilhete premiado!
+                                                    </p>
+                                                </>
+                                            )}
                                         </div>
 
-                                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-green-200 w-full">
+                                        <div className={`bg-gradient-to-br ${isAuthenticated ? "from-green-50 to-green-100 border-green-200" : "from-blue-50 to-blue-100 border-blue-200"} rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 w-full`}>
                                             <div className="flex flex-col items-center gap-3">
                                                 <div className="flex items-center gap-2">
-                                                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <svg className={`w-5 h-5 ${isAuthenticated ? "text-green-600" : "text-blue-600"}`} fill="currentColor" viewBox="0 0 20 20">
                                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                     </svg>
                                                     <p className="text-sm sm:text-base font-bold text-gray-900">
                                                         {quantity} cotas adquiridas
                                                     </p>
                                                 </div>
-                                                <p className="text-xs sm:text-sm text-gray-600 text-center">
-                                                    Seus números estão sendo processados e em breve estarão disponíveis no seu perfil
-                                                </p>
+                                                {isAuthenticated ? (
+                                                    <p className="text-xs sm:text-sm text-gray-600 text-center">
+                                                        Seus números estão sendo processados e em breve estarão disponíveis no seu perfil
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-xs sm:text-sm text-gray-600 text-center">
+                                                        Seus números estarão disponíveis após o pagamento ser confirmado. Faça login para acompanhar!
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
 
-                                        <motion.button
-                                            onClick={handleGoToProfile}
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                            Ver Meus Números e Prêmios
-                                        </motion.button>
+                                        {isAuthenticated ? (
+                                            <motion.button
+                                                onClick={handleGoToProfile}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                                Ver Meus Números e Prêmios
+                                            </motion.button>
+                                        ) : (
+                                            <motion.button
+                                                onClick={handleGoToProfile}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                                </svg>
+                                                Fazer Login ou Criar Conta
+                                            </motion.button>
+                                        )}
 
                                         <button
                                             onClick={handleClosePixModal}
