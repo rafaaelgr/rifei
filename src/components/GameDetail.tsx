@@ -8,10 +8,8 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Rifa } from "@/types";
 import { vendasService } from "@/services/vendas.service";
-import { TbCloverFilled } from "react-icons/tb";
 import { PiClover } from "react-icons/pi";
 import { UserProfileModal } from "./UserProfileModal";
-import { div } from "framer-motion/client";
 import { PrizesCarousel } from "./PrizesCarousel";
 
 const containerVariants = {
@@ -283,32 +281,34 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             }}
                         ></motion.div>
 
-                        <motion.div
-                            initial={{ scale: 0, y: 50 }}
-                            animate={{ scale: 1, y: 0 }}
-                            onClick={handleVerMeusNumeros}
-                            transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
-                            className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10 w-full"
-                        >
-                            <motion.button className="bg-[#4e0b09] shadow-xl border-t border-white/50 text-white p-1 text-xs uppercase font-bold rounded-md w-full rounded-t-none">
-                                ver meus numeros
-                            </motion.button>
-                        </motion.div>
+                        <div className="flex w-full gap-1 mt-1">
+                            <motion.div
+                                initial={{ scale: 0, y: 50 }}
+                                animate={{ scale: 1, y: 0 }}
+                                onClick={handleVerMeusNumeros}
+                                transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
+                                className="w-full"
+                            >
+                                <motion.button className="bg-[#4e0b09] shadow-xl border-t border-white/50 text-white p-1.5 text-xs uppercase font-bold rounded-md w-full">
+                                    ver meus numeros
+                                </motion.button>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ scale: 0, y: 50 }}
+                                animate={{ scale: 1, y: 0 }}
+                                onClick={handleVerMeusNumeros}
+                                transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
+                                className="w-full"
+                            >
+                                <motion.button className="bg-green-600 shadow-xl border-t border-white/50 text-white p-1.5 text-xs uppercase font-bold rounded-md w-full">
+                                    coletar raspadinha
+                                </motion.button>
+                            </motion.div>
+                        </div>
                     </div>
 
-                    <motion.div
-                        initial={{ scale: 0, y: 50 }}
-                        animate={{ scale: 1, y: 0 }}
-                        onClick={handleVerMeusNumeros}
-                        transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
-                        className="mt-3 w-full -mb-5"
-                    >
-                        <motion.button className="bg-green-600 shadow-xl border-t border-white/50 text-white p-1 text-xs uppercase font-bold rounded-md w-full">
-                            coletar raspadinha
-                        </motion.button>
-                    </motion.div>
-
-                    <div className="px-3 xs:px-4 sm:px-5 md:px-6 pb-4 sm:pb-6 md:pb-8 pt-10 xs:pt-12 sm:pt-14 md:pt-16 mt-2 xs:mt-3 sm:mt-4 md:mt-5">
+                    <div className="px-3 xs:px-4 sm:px-5 md:px-6 pb-4 sm:pb-6 md:pb-8 pt-10 xs:pt-12 sm:pt-14 md:pt-16 xs:mt-3 sm:mt-4 md:mt-5">
                         <motion.p variants={itemVariants} className="text-gray-500 text-base sm:text-base text-center mb-2 px-2">{rifa.description}</motion.p>
                         <motion.p variants={itemVariants} className="text-gray-500 mt-10 text-sm sm:text-base text-center">
                             Por apenas
@@ -465,21 +465,20 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         {!rifa.closure && (
                             <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                                 <div
-                                    className="bg-white shadow-md rounded-xl sm:rounded-2xl p-1 sm:p-6 relative overflow-hidden"
+                                    className="bg-white shadow-md rounded-xl p-2 sm:rounded-2xl sm:p-6 relative overflow-hidden"
                                 >
                                     <motion.div
                                         className="relative z-10">
                                         {/* Título */}
                                         <motion.h2
-                                            className="text-center flex items-center justify-center gap-1 uppercase text-lg sm:text-2xl md:text-3xl font-bold text-[#2c0201] mb-4"
+                                            className="text-center flex items-center justify-center gap-1 uppercase p-2 text-base px-5 sm:text-2xl md:text-3xl font-bold text-[#2c0201] mb-4"
                                         >
-                                            dobro de chance de ganhar
-                                            <img src="/ico.png" alt="" className="max-w-12 rounded-full absolute right-0" />
+                                            menor cota valendo PS5 ou <br />R$ 3.000,00 no pix
+                                            {/* <img src="/ico.png" alt="" className="max-w-12 rounded-full absolute right-0" /> */}
                                         </motion.h2>
-
                                         {/* Countdown Regressivo */}
                                         <div className="bg-[#2c0201] backdrop-blur-sm rounded-xl p-3 sm:p-4 mb-4 uppercase">
-                                            <p className="text-center text-white/90 text-xs sm:text-sm font-semibold mb-2 uppercase tracking-wider">
+                                            <p className="text-center text-white/90 text-xs sm:text-sm font-semibold uppercase tracking-wider">
                                                 Encerra em
                                             </p>
                                             <div className="flex items-center justify-center gap-2 sm:gap-3">
@@ -548,15 +547,16 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </motion.div>
                                             </div>
                                         </div>
+                                        <motion.p className="text-center text-sm mt-2 text-[#2c0201] mb-2">valendo para compras acima de R$ 20,00</motion.p>
 
                                         {/* Texto promocional */}
-                                        <motion.p
+                                        <motion.button
                                             initial={{ scale: 0.9 }}
                                             animate={{ scale: 1 }}
                                             transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
-                                            className="text-center text-base sm:text-lg md:text-xl font-bold mb-2 bg-[#26a34a] rounded-md p-3 text-white uppercase">
-                                            ativar chance em dobro
-                                        </motion.p>
+                                            className="text-center w-full text-base sm:text-lg md:text-xl font-bold mb-2 bg-[#26a34a] rounded-md p-3 text-white uppercase">
+                                            GARANTIR MINHA CHANCE
+                                        </motion.button>
 
                                         {/* Data de validade */}
                                         {rifa.closure && (
@@ -583,7 +583,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         >
                             <div className="flex items-start gap-2 mb-2">
                                 <div className="flex-1 text-center">
-                                    <h4 className="text-sm sm:text-sm font-bold text-[#2c0201] uppercase">A cada 50 cotas você ganha uma raspadinha</h4>
+                                    <h4 className="text-base sm:text-sm font-bold text-[#2c0201] uppercase">A cada 50 cotas você ganha uma raspadinha</h4>
                                 </div>
                             </div>
 
@@ -784,7 +784,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                                                 <div className="bg-[#2c0201]/20 rounded-md p-1.5 sm:p-2 mb-1">
                                                     <span className="text-[#2c0201] font-bold text-xs sm:text-sm tracking-wider block text-center">
-                                                        {reward.number}
+                                                        {String(reward.number).padStart(6, '0')}
                                                     </span>
                                                 </div>
 
@@ -845,11 +845,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             <p className="text-black/80 text-xs sm:text-sm">Veja a lista de prêmios</p>
                                         </div>
                                     </div>
-                                    <div className="bg-[#2c0201]/50 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg flex-shrink-0">
-                                        <span className="text-[#2c0201] font-bold text-xs sm:text-sm uppercase">
-                                            Total {rifa.rewards?.length || 0}
-                                        </span>
-                                    </div>
                                 </div>
                             </div>
 
@@ -908,11 +903,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                         </svg>
                                                     </div>
                                                     <h3 className="text-white font-bold text-sm sm:text-base">Lista de Prêmios</h3>
-                                                </div>
-                                                <div className="bg-white/20 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
-                                                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">
-                                                        {rifa.rewards?.filter((r) => !r.isSold && !r.winnerId).length || 0}
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

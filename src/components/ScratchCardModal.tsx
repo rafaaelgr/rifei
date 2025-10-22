@@ -425,7 +425,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                                 Raspe & Ganhe!
                             </h2>
                             <p className="text-gray-600 font-medium">
-                                {loading ? "Carregando..." : "Descubra seus 9 prêmios incríveis 🎁"}
+                                {loading ? "Carregando..." : ""}
                             </p>
                         </div>
 
@@ -561,39 +561,38 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
                             >
                                 {result.wonPrize !== null && result.wonPrize > 0 ? (
                                     <div className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border-2 border-green-300">
-                                        <div className="flex items-center justify-center gap-3 mb-3">
+                                        <div className="flex flex-col justify-center gap-3 mb-3">
                                             <FaCheckCircle className="text-green-600 text-3xl" />
                                             <h3 className="text-2xl font-bold text-green-700">
-                                                Parabéns! 🎉
+                                                Parabéns pelo prêmio!
+                                            </h3>
+                                            <h3 className="text-center text-gray-700 font-medium">
+                                                O prêmio em Pix será enviado em até 48 horas.
+                                                Caso precise de ajuda, entre em contato com o nosso suporte.
                                             </h3>
                                         </div>
-                                        <p className="text-center text-green-800 font-semibold text-lg mb-2">
-                                            Você ganhou: <span className="text-2xl">R$ {result.wonPrize.toFixed(2)}</span>
-                                        </p>
-                                        {result.wonPrizeDetails && (
-                                            <div className="mt-3 p-3 bg-white rounded-xl">
-                                                <p className="text-sm text-gray-700">
-                                                    <strong>Tipo:</strong> {result.wonPrizeDetails.type}
-                                                </p>
-                                                {result.wonPrizeDetails.description && (
-                                                    <p className="text-sm text-gray-600 mt-1">
-                                                        {result.wonPrizeDetails.description}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
                                     </div>
                                 ) : (
-                                    <div className="p-5 bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl border-2 border-gray-300">
+                                    <div className="p-5 bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl border-2 text-center border-gray-300">
                                         <div className="flex items-center justify-center gap-3 mb-2">
-                                            <FaTimesCircle className="text-gray-500 text-2xl" />
                                             <h3 className="text-xl font-bold text-gray-700">
-                                                Que pena!
+                                                Você não deu sorte…
                                             </h3>
                                         </div>
+                                        <h3 className="text-center text-gray-700 font-medium">Mas aqui vai um bônus!</h3>
                                         <p className="text-center text-gray-600 font-medium">
-                                            Não foi dessa vez, mas continue participando!
+                                            Entre no nosso grupo VIP e participe de dinâmicas exclusivas!
                                         </p>
+
+                                        <a
+                                            href="https://chat.whatsapp.com/H5qGS8KmBmo1d3dtxJv7jJ?mode=wwt"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex text-sm font-bold justify-center items-center mt-4 px-4 py-2 bg-gradient-to-r from-green-500 to-green-700 text-white rounded-lg shadow hover:from-green-600 hover:to-green-800 transition-all"
+                                            style={{ textDecoration: 'none' }}
+                                        >
+                                            Clique aqui para ser redirecionado ao grupo VIP
+                                        </a>
                                     </div>
                                 )}
                             </motion.div>
