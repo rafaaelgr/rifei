@@ -31,7 +31,6 @@ export interface Rifa {
     soldOut: boolean;
 }
 
-// Interfaces antigas (manter por compatibilidade se necessário)
 export interface RifaOld {
     id: string;
     titulo: string;
@@ -44,22 +43,12 @@ export interface RifaOld {
     dataFim: string;
     createdAt: string;
     updatedAt: string;
-
-    // Configurações de cotas
     numberTickets: number;
     cotasVendidas: number;
     cotasReservadas: number;
-
-    // Números bloqueados
     numerosBloqueados?: number[];
-
-    // Prêmios
     premios: Premio[];
-
-    // Promoções
     promocoes: Promocao[];
-
-    // Redes sociais
     redesSociais: {
         facebook?: string;
         instagram?: string;
