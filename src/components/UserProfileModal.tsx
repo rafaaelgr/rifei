@@ -23,6 +23,45 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     const [showScratchCard, setShowScratchCard] = useState(false);
     const [selectedSaleId, setSelectedSaleId] = useState<number | null>(null);
 
+    // Função para ajustar o horário subtraindo 3 horas
+    const adjustTimezone = (dateString: string): string => {
+        try {
+            // Formato esperado: "21/10/2025 às 22:55:09"
+            const parts = dateString.split(" às ");
+            if (parts.length !== 2) return dateString;
+
+            const [datePart, timePart] = parts;
+            const [day, month, year] = datePart.split("/");
+            const [hours, minutes, seconds] = timePart.split(":");
+
+            // Criar objeto Date
+            const date = new Date(
+                parseInt(year),
+                parseInt(month) - 1,
+                parseInt(day),
+                parseInt(hours),
+                parseInt(minutes),
+                parseInt(seconds)
+            );
+
+            // Subtrair 3 horas
+            date.setHours(date.getHours() - 3);
+
+            // Formatar de volta
+            const adjustedDay = String(date.getDate()).padStart(2, "0");
+            const adjustedMonth = String(date.getMonth() + 1).padStart(2, "0");
+            const adjustedYear = date.getFullYear();
+            const adjustedHours = String(date.getHours()).padStart(2, "0");
+            const adjustedMinutes = String(date.getMinutes()).padStart(2, "0");
+            const adjustedSeconds = String(date.getSeconds()).padStart(2, "0");
+
+            return `${adjustedDay}/${adjustedMonth}/${adjustedYear} às ${adjustedHours}:${adjustedMinutes}:${adjustedSeconds}`;
+        } catch (error) {
+            console.error("Erro ao ajustar timezone:", error);
+            return dateString;
+        }
+    };
+
     useEffect(() => {
         const fetchOrders = async () => {
             if (!isOpen) return;
@@ -252,7 +291,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                                                                 </div>
 
                                                                 <div className="text-xs text-slate-500">
-                                                                    {order.date}
+                                                                    {adjustTimezone(order.date)}
                                                                 </div>
 
                                                                 {order.numbers.length > 0 && (
