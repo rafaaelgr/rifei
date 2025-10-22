@@ -44,6 +44,10 @@ export const vendasService = {
             body: JSON.stringify(payload),
         });
 
+        if (payload.amount <= 0 || payload.amount < 5) {
+            return { error: "Valor inválido. Deve ser maior que 5", data: null };
+        }
+
         if (response.error || !response.data) {
             return { error: response.error || "Erro ao comprar ticket", data: null };
         }
