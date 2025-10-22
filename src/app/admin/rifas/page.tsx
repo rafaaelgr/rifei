@@ -385,7 +385,7 @@ export default function RifasPage() {
 
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Link href={`/rifa/${rifa.id}`} target="_blank">
+                                                <Link href={`/12${rifa.id}`} target="_blank">
                                                     <motion.button
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}

@@ -27,14 +27,14 @@ const RifaDetailPage = () => {
                 const response = await rifasService.obterInfo(id);
 
                 if (response.error || !response.data || response.data.title === "") {
-                    router.push("/rifa/12");
+                    router.push("/12");
                     return;
                 }
 
                 setRifa(response.data);
             } catch (err) {
                 console.error("Erro ao carregar rifa:", err);
-                router.push("/rifa/12");
+                router.push("/12");
             } finally {
                 setLoading(false);
             }

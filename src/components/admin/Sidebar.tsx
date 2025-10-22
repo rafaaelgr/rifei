@@ -55,7 +55,7 @@ export const Sidebar = () => {
                         <span className="text-white text-2xl font-bold">R</span>
                     </motion.div>
                     <div>
-                        <h1 className="text-xl font-bold text-white">Rifei</h1>
+                        <h1 className="text-xl font-bold text-white">Ações</h1>
                         <p className="text-xs text-gray-400">Painel Admin</p>
                     </div>
                 </Link>
@@ -91,16 +91,6 @@ export const Sidebar = () => {
 
             {/* User Section */}
             <div className="p-4 border-t border-gray-700">
-                {/* <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-gray-700/50 rounded-xl">
-                    <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold">A</span>
-                    </div>
-                    <div className="flex-1">
-                        <p className="text-sm font-semibold text-white">Admin</p>
-                        <p className="text-xs text-gray-400">admin@rifei.com</p>
-                    </div>
-                </div> */}
-
                 <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

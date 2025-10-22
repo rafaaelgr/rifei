@@ -75,7 +75,7 @@ const apiRequest = async <T>(
 
                 // Redireciona para a página de login apenas no client-side
                 if (typeof window !== "undefined") {
-                    window.location.href = "/rifa/12";
+                    window.location.href = "/12";
                 }
             }
 

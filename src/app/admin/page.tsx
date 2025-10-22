@@ -94,7 +94,7 @@ export default function AdminDashboard() {
                 className="mb-8"
             >
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-                <p className="text-gray-600">Bem-vindo ao painel administrativo da Rifei</p>
+                <p className="text-gray-600">Bem-vindo ao painel administrativo</p>
             </motion.div>
 
             {/* Stats Grid */}

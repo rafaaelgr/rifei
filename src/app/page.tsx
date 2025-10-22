@@ -6,7 +6,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/rifa/12");
+    router.push("/12");
   }, []);
 
   return (<></>);
