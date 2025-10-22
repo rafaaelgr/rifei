@@ -60,6 +60,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
     const [showAllTickets, setShowAllTickets] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const [isCheckingPayment, setIsCheckingPayment] = useState(false);
     const [endDate] = useState(() => {
@@ -301,7 +302,12 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setShowPixModal(false);
         setPaymentConfirmed(false);
         setIsCheckingPayment(false);
-        setIsProfileModalOpen(true);
+
+        if (isAuthenticated) {
+            setIsProfileModalOpen(true);
+        } else {
+            setIsLoginModalOpen(true);
+        }
     };
 
     if (!rifa) {
@@ -1364,6 +1370,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             </AnimatePresence>
 
             <UserProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
+            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
         </motion.div>
     );
 };
