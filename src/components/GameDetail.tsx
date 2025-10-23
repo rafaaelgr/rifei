@@ -132,7 +132,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             const timeout = setTimeout(() => {
                 setPaymentConfirmed(true);
                 setIsCheckingPayment(false);
-            }, 90000); // 90 segundos
+            }, 60000); // 90 segundos
 
             return () => clearTimeout(timeout);
         }
@@ -257,7 +257,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 amount: quantity,
             });
 
-            if (!response.data) return
+            if (!response) return
 
             // Verifica se é erro de CPF não encontrado de várias formas possíveis
             const errorMessage = response.data?.message?.toLowerCase() || "";
