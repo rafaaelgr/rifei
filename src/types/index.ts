@@ -22,6 +22,8 @@ export interface Rifa {
     title: string;
     description: string;
     ticketsPrice: number;
+    numberTickets: number;
+    soldTicketsCount: number;
     finished: boolean;
     closure: string | null;
     image: string;

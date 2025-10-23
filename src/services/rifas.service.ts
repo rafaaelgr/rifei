@@ -60,6 +60,8 @@ const convertActionToRifa = (action: ActionResponse): Rifa => {
         title: action.title || "",
         description: action.description || "",
         ticketsPrice: action.ticketsPrice !== undefined && action.ticketsPrice !== null ? action.ticketsPrice : 0,
+        numberTickets: action.numberTickets || 0,
+        soldTicketsCount: action.soldTicketsCount || 0,
         finished: action.finished || false,
         closure: action.closure || null,
         image: action.image || "",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FaFacebook } from "react-icons/fa";
 import { FaTelegram } from "react-icons/fa6";
 import { AiFillTwitterCircle } from "react-icons/ai";
@@ -63,15 +63,17 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const [isCheckingPayment, setIsCheckingPayment] = useState(false);
-    const [endDate] = useState(() => {
-        // Define a data de término: amanhã às 12:00 + 48 horas
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(12, 0, 0, 0);
 
-        // Adicionar 48 horas (2 dias)
-        return tomorrow.getTime() + (48 * 60 * 60 * 1000);
-    });
+    // Ref para a seção de cotas
+    const cotasRef = useRef<HTMLDivElement>(null);
+
+    // Função para scroll suave até as cotas
+    const handleScrollToCotas = () => {
+        cotasRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    };
 
     // Calcular valor total baseado na quantidade e promoções
     const calculateTotal = useCallback((qty: number): number => {
@@ -153,8 +155,14 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         return () => clearInterval(interval);
     }, [showPixModal, isLoadingPix, paymentConfirmed, isAuthenticated]);
 
-    // Calcular countdown regressivo de 48 horas a partir de amanhã às 12:00
+    // Calcular countdown regressivo até amanhã às 12:00
     useEffect(() => {
+        // Define a data de término: amanhã às 12:00
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(12, 0, 0, 0);
+        const endDate = tomorrow.getTime();
+
         const calculateTimeRemaining = () => {
             const now = new Date().getTime();
             const difference = endDate - now;
@@ -167,9 +175,11 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                 setTimeRemaining({ days, hours, minutes, seconds });
 
-                // Calcular progresso (quanto tempo já passou das 48 horas)
-                const totalCampaignTime = 48 * 60 * 60 * 1000;
-                const elapsed = totalCampaignTime - difference;
+                // Calcular progresso (quanto tempo já passou desde o início do dia de hoje até amanhã 12:00)
+                const startOfToday = new Date();
+                startOfToday.setHours(0, 0, 0, 0);
+                const totalCampaignTime = endDate - startOfToday.getTime();
+                const elapsed = now - startOfToday.getTime();
                 const progress = Math.min((elapsed / totalCampaignTime) * 100, 100);
                 setProgressPercentage(progress);
             } else {
@@ -182,7 +192,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         const interval = setInterval(calculateTimeRemaining, 1000);
 
         return () => clearInterval(interval);
-    }, [endDate]);
+    }, []);
 
     const handleIncrement = () => {
         setQuantity(prev => prev + 1);
@@ -333,7 +343,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             initial="hidden"
             animate="visible"
             variants={containerVariants}
-            className="min-h-screen pt-24 pb-12 px-6 mt-5"
+            className="min-h-screen pt-24 pb-12 px-6"
         >
             <div className="max-w-[900px] mx-auto">
                 <motion.div variants={itemVariants} className="bg-[#f7f7f7] rounded-xl overflow-hidden">
@@ -378,41 +388,109 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         </div>
                     </div>
 
-                    <div className="px-3 xs:px-4 sm:px-5 md:px-6 pb-4 sm:pb-6 md:pb-8 pt-10 xs:pt-12 sm:pt-14 md:pt-16 xs:mt-3 sm:mt-4 md:mt-5">
-                        <motion.p variants={itemVariants} className="text-gray-500 text-base sm:text-base text-center mb-2 px-2">{rifa.description}</motion.p>
-                        <motion.p variants={itemVariants} className="text-gray-500 mt-10 text-sm sm:text-base text-center">
-                            Por apenas
-                        </motion.p>
-                        <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-4 sm:mb-6 md:mb-8 mt-3">
-                            <motion.div
-                                animate={{ rotate: [0, 360] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                className="w-5 h-5 sm:w-6 sm:h-6 bg-red-600 rounded-full flex items-center justify-center shadow-md"
-                            >
-                                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                                </svg>
-                            </motion.div>
-                            <motion.span
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 1, type: "spring", bounce: 0.6 }}
-                                className="text-3xl xs:text-3xl sm:text-4xl font-bold text-gray-900"
-                            >
-                                R$ {(rifa.ticketsPrice || 0).toFixed(2).replace(".", ",")}
-                            </motion.span>
-                        </motion.div>
+                    {/* Barra de Progresso de Vendas */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                        className=""
+                    >
+                        <div className="w-full mt-5">
+                            {/* Header da barra de progresso */}
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <motion.div
+                                        animate={{ scale: [1, 1.2, 1] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                        className="w-2 h-2 bg-green-400 rounded-full"
+                                    />
+                                    <span className="text-black/90 text-xs sm:text-sm font-semibold uppercase tracking-wide">
+                                        Meta de Vendas
+                                    </span>
+                                </div>
+                                <span className="text-black/70 text-xs sm:text-sm font-bold">
+                                    {(((rifa.soldTicketsCount || 0) / 1000000) * 100).toFixed(1)}%
+                                </span>
+                            </div>
+
+                            {/* Barra de progresso */}
+                            <div className="relative h-3 sm:h-4 bg-black/10 rounded-full overflow-hidden backdrop-blur-sm">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.min(((rifa.soldTicketsCount || 0) / 1000000) * 100, 100)}%` }}
+                                    transition={{ duration: 1.5, ease: "easeOut", delay: 1 }}
+                                    className="absolute top-0 left-0 h-full bg-gradient-to-r overflow-hidden from-green-400 via-green-500 to-emerald-500 rounded-full shadow-lg"
+                                >
+                                    {/* Efeito de brilho animado */}
+                                    <motion.div
+                                        animate={{
+                                            x: ['-100%', '200%']
+                                        }}
+                                        transition={{
+                                            duration: 2,
+                                            repeat: Infinity,
+                                            ease: "linear",
+                                            repeatDelay: 1
+                                        }}
+                                        className="absolute top-0 left-0 h-full w-1/2 bg-gradient-to-r from-transparent via-black/30 to-transparent"
+                                    />
+                                </motion.div>
+                            </div>
+
+                            {/* Informações de vendas */}
+                            <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center gap-1.5">
+                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-black text-xs sm:text-sm font-bold">
+                                        {(rifa.soldTicketsCount || 0).toLocaleString('pt-BR')} vendidas
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                    <span className="text-black/60 text-xs sm:text-sm font-semibold">
+                                        {(1000000 - (rifa.soldTicketsCount || 0)).toLocaleString('pt-BR')} restantes
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <div className="">
+                        <motion.p variants={itemVariants} className="text-gray-500 text-xs mt-5 sm:text-base text-center mb-2 px-2">{rifa.description}</motion.p>
 
                         {/* Planos de Cotas Normais */}
                         <motion.div variants={itemVariants} className="mt-4 sm:mt-6">
                             <div
-                                className="bg-[#2c0201] rounded-xl p-2.5 sm:p-3 mb-2 sm:mb-3"
+                                className="bg-[#2c0201] rounded-xl mb-5 flex items-center py-3 justify-between px-5"
                             >
-                                <div className="flex items-center gap-2">
-                                    <PiClover className="text-xl" />
-                                    <h2 className="text-sm sm:text-base font-bold text-white uppercase">comece sua sorte</h2>
-                                </div>
+                                <motion.p variants={itemVariants} className="text-white/70 uppercase text-sm sm:text-base text-center">
+                                    Por apenas
+                                </motion.p>
+                                <motion.div variants={itemVariants} className="flex items-center justify-center gap-2">
+                                    <motion.div
+                                        animate={{ rotate: [0, 360] }}
+                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                        className="w-5 h-5 sm:w-6 sm:h-6 bg-red-600 rounded-full flex items-center justify-center shadow-md"
+                                    >
+                                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
+                                        </svg>
+                                    </motion.div>
+                                    <motion.span
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: 1, type: "spring", bounce: 0.6 }}
+                                        className="text-2xl xs:text-3xl sm:text-4xl font-bold text-white"
+                                    >
+                                        R$ {(rifa.ticketsPrice || 0).toFixed(2).replace(".", ",")}
+                                    </motion.span>
+                                </motion.div>
                             </div>
 
                             <motion.div
@@ -621,10 +699,11 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                                         {/* Texto promocional */}
                                         <motion.button
+                                            onClick={handleScrollToCotas}
                                             initial={{ scale: 0.9 }}
                                             animate={{ scale: 1 }}
                                             transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
-                                            className="text-center w-full text-base sm:text-lg md:text-xl font-bold mb-2 bg-[#26a34a] rounded-md p-3 text-white uppercase">
+                                            className="text-center w-full text-base sm:text-lg md:text-xl z-50 font-bold mb-2 bg-[#26a34a] rounded-md p-3 text-white uppercase">
                                             GARANTIR MINHA CHANCE
                                         </motion.button>
 
@@ -668,7 +747,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                 ].map((item, index) => (
                                     <div
                                         key={item.cotas}
-                                        className="bg-[#2c0201] rounded-lg whitespace-nowrap px-2 pr-0 sm:p-2 flex items-center justify-between gap-1"
+                                        className="bg-[#2c0201] rounded-lg whitespace-nowrap px-4 pr-0 sm:p-2 flex items-center justify-between gap-1"
                                     >
                                         <span className="text-[12px] sm:text-xs font-bold text-white">
                                             {item.cotas} cotas
@@ -684,7 +763,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
+                        <motion.div ref={cotasRef} variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                             <div
                                 className="bg-[#2c0201] shadow-md rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-3 sm:mb-4"
                             >
