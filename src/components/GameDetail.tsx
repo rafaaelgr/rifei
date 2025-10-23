@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { Rifa } from "@/types";
 import { vendasService } from "@/services/vendas.service";
 import { authService } from "@/services/auth.service";
-import { PiClover } from "react-icons/pi";
 import { UserProfileModal } from "./UserProfileModal";
 import { PrizesCarousel } from "./PrizesCarousel";
 import { useAuth } from "@/contexts/AuthContext";
@@ -266,7 +265,17 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 amount: quantity,
             });
 
-            if (!response) return
+            if (!response || response.error) {
+                setIsLoadingPix(false);
+                setShowRegisterForm(true);
+                setRegisterData({
+                    email: "",
+                    name: "",
+                    cpf: cpf.replace(/\D/g, ""),
+                    whatsapp: "",
+                });
+                return;
+            }
 
             // Verifica se é erro de CPF não encontrado de várias formas possíveis
             const errorMessage = response.data?.message?.toLowerCase() || "";
@@ -297,29 +306,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             setIsLoadingPix(false);
 
         } catch (error: any) {
-            // Verifica se o erro é 401 (CPF não encontrado)
-            const errorMessage = error?.message?.toLowerCase() || "";
-            const isCpfNotFound =
-                error?.response?.status === 401 ||
-                errorMessage.includes("cpf não encontrado") ||
-                errorMessage.includes("cpf nao encontrado") ||
-                errorMessage.includes("unauthorized");
-
-            if (isCpfNotFound) {
-                setIsLoadingPix(false);
-                setShowRegisterForm(true);
-                setRegisterData({
-                    email: "",
-                    name: "",
-                    cpf: cpf.replace(/\D/g, ""),
-                    whatsapp: "",
-                });
-                return;
-            }
-
-            alert("Erro ao gerar código PIX. Tente novamente.");
-            setShowPixModal(false);
             setIsLoadingPix(false);
+            setShowRegisterForm(true);
+            setRegisterData({
+                email: "",
+                name: "",
+                cpf: cpf.replace(/\D/g, ""),
+                whatsapp: "",
+            });
+            return;
         }
     };
 

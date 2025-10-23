@@ -38,6 +38,19 @@ interface WebhookPixPayload {
 }
 
 export const vendasService = {
+    // GET /check-cpf/:cpf - Verificar se CPF existe
+    async checkCpf(cpf: string) {
+        const response = await apiRequest<{ exists: boolean }>(`/check-cpf/${cpf}`, {
+            method: "GET",
+        });
+
+        if (response.error) {
+            return { error: response.error, data: null };
+        }
+
+        return { data: response.data };
+    },
+
     // POST /buy-ticket - Comprar ticket
     async comprarTicket(payload: BuyTicketPayload) {
         const response = await apiRequest<BuyTicketResponse>("/buy-ticket", {
