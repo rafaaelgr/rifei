@@ -8,6 +8,7 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Rifa } from "@/types";
 import { vendasService } from "@/services/vendas.service";
+import { authService } from "@/services/auth.service";
 import { PiClover } from "react-icons/pi";
 import { UserProfileModal } from "./UserProfileModal";
 import { PrizesCarousel } from "./PrizesCarousel";
@@ -63,6 +64,18 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+    const [showRegisterForm, setShowRegisterForm] = useState(false);
+    const [registerData, setRegisterData] = useState({
+        email: "",
+        name: "",
+        cpf: "",
+        whatsapp: "",
+    });
+    const [registerErrors, setRegisterErrors] = useState({
+        email: "",
+        name: "",
+        whatsapp: "",
+    });
 
     // Ref para a seção de cotas
     const cotasRef = useRef<HTMLDivElement>(null);
@@ -246,6 +259,19 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             });
 
             if (response.error || !response.data) {
+                // Verifica se é erro de CPF não encontrado
+                if (response.error?.includes("CPF não encontrado") || response.error?.includes("Unauthorized")) {
+                    setIsLoadingPix(false);
+                    setShowRegisterForm(true);
+                    setRegisterData({
+                        email: "",
+                        name: "",
+                        cpf: cpf.replace(/\D/g, ""),
+                        whatsapp: "",
+                    });
+                    return;
+                }
+
                 alert(`Erro ao gerar PIX: ${response.error || "Erro desconhecido"}`);
                 setShowPixModal(false);
                 setIsLoadingPix(false);
@@ -260,8 +286,22 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 saleId: response.data.saleId,
             });
             setIsLoadingPix(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Erro ao gerar PIX:", error);
+            
+            // Verifica se o erro é 401 (CPF não encontrado)
+            if (error?.response?.status === 401 || error?.message?.includes("CPF não encontrado")) {
+                setIsLoadingPix(false);
+                setShowRegisterForm(true);
+                setRegisterData({
+                    email: "",
+                    name: "",
+                    cpf: cpf.replace(/\D/g, ""),
+                    whatsapp: "",
+                });
+                return;
+            }
+
             alert("Erro ao gerar código PIX. Tente novamente.");
             setShowPixModal(false);
             setIsLoadingPix(false);
@@ -285,6 +325,9 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         setCopied(false);
         setPaymentConfirmed(false);
         setIsCheckingPayment(false);
+        setShowRegisterForm(false);
+        setRegisterData({ email: "", name: "", cpf: "", whatsapp: "" });
+        setRegisterErrors({ email: "", name: "", whatsapp: "" });
     };
 
     const formatCpf = (value: string) => {
@@ -317,6 +360,113 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             setIsProfileModalOpen(true);
         } else {
             setIsLoginModalOpen(true);
+        }
+    };
+
+    const handleRegisterInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        
+        if (name === "whatsapp") {
+            const formattedWhatsapp = value
+                .replace(/\D/g, "")
+                .replace(/^(\d{2})(\d)/g, "($1) $2")
+                .replace(/(\d)(\d{4})$/, "$1-$2");
+            setRegisterData(prev => ({ ...prev, [name]: formattedWhatsapp }));
+        } else {
+            setRegisterData(prev => ({ ...prev, [name]: value }));
+        }
+        
+        setRegisterErrors(prev => ({ ...prev, [name]: "" }));
+    };
+
+    const validateRegisterForm = () => {
+        const errors = {
+            email: "",
+            name: "",
+            whatsapp: "",
+        };
+
+        let isValid = true;
+
+        if (!registerData.email) {
+            errors.email = "Email é obrigatório";
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerData.email)) {
+            errors.email = "Email inválido";
+            isValid = false;
+        }
+
+        if (!registerData.name) {
+            errors.name = "Nome é obrigatório";
+            isValid = false;
+        } else if (registerData.name.length < 3) {
+            errors.name = "Nome deve ter pelo menos 3 caracteres";
+            isValid = false;
+        }
+
+        if (!registerData.whatsapp) {
+            errors.whatsapp = "WhatsApp é obrigatório";
+            isValid = false;
+        } else if (registerData.whatsapp.replace(/\D/g, "").length < 10) {
+            errors.whatsapp = "WhatsApp inválido";
+            isValid = false;
+        }
+
+        setRegisterErrors(errors);
+        return isValid;
+    };
+
+    const handleRegisterAndGeneratePix = async () => {
+        if (!validateRegisterForm()) {
+            return;
+        }
+
+        setIsLoadingPix(true);
+
+        try {
+            // Primeiro cria a conta
+            const registerResponse = await authService.criarConta({
+                email: registerData.email,
+                name: registerData.name,
+                cpf: registerData.cpf,
+                whatsapp: registerData.whatsapp.replace(/\D/g, ""),
+            });
+
+            if (registerResponse.error || !registerResponse.data) {
+                alert(`Erro ao criar conta: ${registerResponse.error || "Erro desconhecido"}`);
+                setIsLoadingPix(false);
+                return;
+            }
+
+            // Após criar a conta com sucesso, gera o PIX
+            const pixResponse = await vendasService.comprarTicket({
+                action_id: rifa.id,
+                cpf: registerData.cpf,
+                amount: quantity,
+            });
+
+            if (pixResponse.error || !pixResponse.data) {
+                alert(`Erro ao gerar PIX: ${pixResponse.error || "Erro desconhecido"}`);
+                setIsLoadingPix(false);
+                setShowRegisterForm(false);
+                setShowPixModal(false);
+                return;
+            }
+
+            // Sucesso! Mostra o PIX
+            setPixData({
+                qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+                    pixResponse.data.qrCode
+                )}`,
+                pixCopiaECola: pixResponse.data.qrCode,
+                saleId: pixResponse.data.saleId,
+            });
+            setShowRegisterForm(false);
+            setIsLoadingPix(false);
+        } catch (error) {
+            console.error("Erro ao cadastrar e gerar PIX:", error);
+            alert("Erro ao processar sua solicitação. Tente novamente.");
+            setIsLoadingPix(false);
         }
     };
 
@@ -405,7 +555,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         className="w-2 h-2 bg-green-400 rounded-full"
                                     />
                                     <span className="text-black/90 text-xs sm:text-sm font-semibold uppercase tracking-wide">
-                                        Meta de Vendas
+                                        Progresso da ação
                                     </span>
                                 </div>
                                 <span className="text-black/70 text-xs sm:text-sm font-bold">
@@ -435,27 +585,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         className="absolute top-0 left-0 h-full w-1/2 bg-gradient-to-r from-transparent via-black/30 to-transparent"
                                     />
                                 </motion.div>
-                            </div>
-
-                            {/* Informações de vendas */}
-                            <div className="flex items-center justify-between mt-2">
-                                <div className="flex items-center gap-1.5">
-                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="text-black text-xs sm:text-sm font-bold">
-                                        {(rifa.soldTicketsCount || 0).toLocaleString('pt-BR')} vendidas
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                    </svg>
-                                    <span className="text-black/60 text-xs sm:text-sm font-semibold">
-                                        {(1000000 - (rifa.soldTicketsCount || 0)).toLocaleString('pt-BR')} restantes
-                                    </span>
-                                </div>
                             </div>
                         </div>
                     </motion.div>

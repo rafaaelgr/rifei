@@ -3,10 +3,8 @@ import { apiRequest, authToken } from "@/lib/api";
 interface CreateAccountPayload {
     email: string;
     name: string;
-    instagram: string;
     cpf: string;
     whatsapp: string;
-    password: string;
 }
 
 interface LoginPayload {
