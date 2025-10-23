@@ -283,14 +283,19 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 return;
             }
 
+            // @ts-ignore
             setPixData({
                 qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+                    // @ts-ignore
                     response.data.qrCode
                 )}`,
-                pixCopiaECola: response.data.qrCode,
-                saleId: response.data.saleId,
+                pixCopiaECola: // @ts-ignore
+                    response.data.qrCode,
+                saleId: // @ts-ignore
+                    response.data.saleId,
             });
             setIsLoadingPix(false);
+
         } catch (error: any) {
             // Verifica se o erro é 401 (CPF não encontrado)
             const errorMessage = error?.message?.toLowerCase() || "";
