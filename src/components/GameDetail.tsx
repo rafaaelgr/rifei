@@ -241,6 +241,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     };
 
     const handleConfirmPurchase = async () => {
+        // Validação do valor mínimo
+        const valorTotal = calculateTotal(quantity);
+        const VALOR_MINIMO = 5;
+
+        if (valorTotal < VALOR_MINIMO) {
+            setCpfError(`O valor mínimo para compra é R$ ${VALOR_MINIMO.toFixed(2)}. Valor atual: R$ ${valorTotal.toFixed(2)}. Por favor, aumente a quantidade de números.`);
+            return;
+        }
+
         if (!validateCpf(cpf)) {
             setCpfError("CPF inválido. Digite um CPF válido com 11 dígitos.");
             return;
@@ -277,7 +286,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 });
                 return;
             }
-
             // Se chegou aqui, response.data existe
             setPixData({
                 qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
@@ -424,6 +432,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     };
 
     const handleRegisterAndGeneratePix = async () => {
+        // Validação do valor mínimo
+        const valorTotal = calculateTotal(quantity);
+        const VALOR_MINIMO = 5;
+
+        if (valorTotal < VALOR_MINIMO) {
+            alert(`O valor mínimo para compra é R$ ${VALOR_MINIMO.toFixed(2)}. Valor atual: R$ ${valorTotal.toFixed(2)}. Por favor, aumente a quantidade de números.`);
+            return;
+        }
+
         if (!validateRegisterForm()) {
             return;
         }
