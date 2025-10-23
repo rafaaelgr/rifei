@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { UserProfileModal } from "./UserProfileModal";
 import { ScratchCardModal } from "./ScratchCardModal";
+import { TermsModal } from "./TermsModal";
 import { FaUser, FaTrophy, FaTicketAlt, FaFileContract } from "react-icons/fa";
 
 export const Header = () => {
@@ -13,6 +14,7 @@ export const Header = () => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [isScratchCardOpen, setIsScratchCardOpen] = useState(false);
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const controls = useAnimation();
 
@@ -132,6 +134,7 @@ export const Header = () => {
                         <motion.button
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
+                            onClick={() => setIsTermsModalOpen(true)}
                             className="group relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-red-600 cursor-pointer transition-all duration-300"
                             aria-label="Termos e condições"
                         >
@@ -202,6 +205,7 @@ export const Header = () => {
             <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
             <UserProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
             <ScratchCardModal isOpen={isScratchCardOpen} onClose={() => setIsScratchCardOpen(false)} saleId={null} />
+            <TermsModal isOpen={isTermsModalOpen} onClose={() => setIsTermsModalOpen(false)} />
         </>
     );
 };

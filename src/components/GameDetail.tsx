@@ -51,7 +51,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [cpfError, setCpfError] = useState("");
     const [copied, setCopied] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState({
-        days: 0,
+        days: 2,
         hours: 0,
         minutes: 0,
         seconds: 0,
@@ -166,13 +166,12 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         return () => clearInterval(interval);
     }, [showPixModal, isLoadingPix, paymentConfirmed, isAuthenticated]);
 
-    // Calcular countdown regressivo até amanhã às 12:00
+    // Calcular countdown regressivo de 48 horas
     useEffect(() => {
-        // Define a data de término: amanhã às 12:00
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(12, 0, 0, 0);
-        const endDate = tomorrow.getTime();
+        // Define a data de término: 48 horas a partir de agora
+        const startTime = new Date().getTime();
+        const campaignDuration = 48 * 60 * 60 * 1000; // 48 horas em milissegundos
+        const endDate = startTime + campaignDuration;
 
         const calculateTimeRemaining = () => {
             const now = new Date().getTime();
@@ -186,12 +185,9 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                 setTimeRemaining({ days, hours, minutes, seconds });
 
-                // Calcular progresso (quanto tempo já passou desde o início do dia de hoje até amanhã 12:00)
-                const startOfToday = new Date();
-                startOfToday.setHours(0, 0, 0, 0);
-                const totalCampaignTime = endDate - startOfToday.getTime();
-                const elapsed = now - startOfToday.getTime();
-                const progress = Math.min((elapsed / totalCampaignTime) * 100, 100);
+                // Calcular progresso (quanto tempo já passou das 48 horas)
+                const elapsed = now - startTime;
+                const progress = Math.min((elapsed / campaignDuration) * 100, 100);
                 setProgressPercentage(progress);
             } else {
                 setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -1545,9 +1541,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             </h3>
                                             {isAuthenticated ? (
                                                 <>
-                                                    <p className="text-sm sm:text-base text-gray-600 mb-2">
-                                                        Seu pagamento foi processado com sucesso!
-                                                    </p>
                                                     <p className="text-sm sm:text-base text-gray-600">
                                                         Acesse seu perfil para ver seus números da sorte e verificar se você ganhou algum bilhete premiado!
                                                     </p>
@@ -1558,7 +1551,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                         Seu código PIX foi gerado com sucesso!
                                                     </p>
                                                     <p className="text-sm sm:text-base text-gray-600">
-                                                        <strong>Faça login ou crie uma conta</strong> para acompanhar seus números da sorte e verificar se você ganhou algum bilhete premiado!
+                                                        <strong>Faça login</strong> para acompanhar seus números da sorte e verificar se você ganhou algum bilhete premiado!
                                                     </p>
                                                 </>
                                             )}
@@ -1598,7 +1591,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </svg>
                                                 Ver Meus Números e Prêmios
                                             </motion.button>
-                                        ) : (
+                                        ) : (<>
                                             <motion.button
                                                 onClick={handleGoToProfile}
                                                 whileHover={{ scale: 1.02 }}
@@ -1610,7 +1603,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </svg>
                                                 Fazer Login
                                             </motion.button>
-                                        )}
+                                            <p className="w-full text-center text-green-400 text-sm">Sua senha foi enviada para o seu email, confira sua caixa de entrada ou spam.</p>
+                                        </>)}
 
                                         <button
                                             onClick={handleClosePixModal}
