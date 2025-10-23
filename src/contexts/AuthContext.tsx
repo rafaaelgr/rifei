@@ -23,7 +23,7 @@ interface AuthContextType {
     isLoading: boolean;
     error: string | null;
     login: (cpf: string, password: string) => Promise<void>;
-    register: (name: string, email: string, cpf: string, whatsapp: string, instagram: string, password: string) => Promise<void>;
+    register: (name: string, email: string, cpf: string, whatsapp: string, password: string) => Promise<void>;
     logout: () => void;
     updateUser: (userData: Partial<User>) => void;
     clearError: () => void;
@@ -80,7 +80,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     email: responseData.properties.email || "",
                     cpf: responseData.properties.cpf || cpf,
                     whatsapp: responseData.properties.whatsapp || "",
-                    instagram: responseData.properties.instagram || "",
                     totalTickets: 0,
                     activeTickets: 0,
                     wonPrizes: 0,
@@ -93,7 +92,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     email: responseData.user.email,
                     cpf: responseData.user.cpf,
                     whatsapp: responseData.user.whatsapp,
-                    instagram: responseData.user.instagram,
                     totalTickets: 0,
                     activeTickets: 0,
                     wonPrizes: 0,
@@ -120,8 +118,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: string,
         cpf: string,
         whatsapp: string,
-        instagram: string,
-        password: string
     ) => {
         setIsLoading(true);
         setError(null);
@@ -132,8 +128,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 email,
                 cpf,
                 whatsapp,
-                instagram,
-                password,
             });
 
             if (result.error || !result.data) {
@@ -163,7 +157,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     email: responseData.properties.email,
                     cpf: responseData.properties.cpf,
                     whatsapp: whatsapp, // Não vem na resposta, usar o enviado
-                    instagram: instagram, // Não vem na resposta, usar o enviado
                     totalTickets: 0,
                     activeTickets: 0,
                     wonPrizes: 0,
@@ -176,7 +169,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     email: responseData.user.email,
                     cpf: responseData.user.cpf,
                     whatsapp: responseData.user.whatsapp,
-                    instagram: responseData.user.instagram,
                     totalTickets: 0,
                     activeTickets: 0,
                     wonPrizes: 0,
@@ -189,7 +181,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     email: responseData.email,
                     cpf: responseData.cpf,
                     whatsapp: responseData.whatsapp || whatsapp,
-                    instagram: responseData.instagram || instagram,
                     totalTickets: 0,
                     activeTickets: 0,
                     wonPrizes: 0,
