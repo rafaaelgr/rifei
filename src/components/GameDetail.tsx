@@ -132,7 +132,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             const timeout = setTimeout(() => {
                 setPaymentConfirmed(true);
                 setIsCheckingPayment(false);
-            }, 100000); // 90 segundos
+            }, 90000); // 90 segundos
 
             return () => clearTimeout(timeout);
         }
