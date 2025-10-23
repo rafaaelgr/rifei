@@ -155,7 +155,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                     }
                 }
             } catch (error) {
-                console.error("Erro ao verificar status do pagamento:", error);
             }
         };
 
@@ -258,9 +257,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 amount: quantity,
             });
 
-            if (response.error || !response.data) {
-                // Verifica se é erro de CPF não encontrado
-                if (response.error?.includes("CPF não encontrado") || response.error?.includes("Unauthorized")) {
+            if (response) {
+                // Verifica se é erro de CPF não encontrado de várias formas possíveis
+                const errorMessage = response.data?.message.toLowerCase();
+                const isCpfNotFound =
+                    errorMessage.includes("cpf não encontrado") ||
+                    errorMessage.includes("cpf nao encontrado") ||
+                    errorMessage.includes("unauthorized");
+
+                if (isCpfNotFound) {
                     setIsLoadingPix(false);
                     setShowRegisterForm(true);
                     setRegisterData({
@@ -287,10 +292,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             });
             setIsLoadingPix(false);
         } catch (error: any) {
-            console.error("Erro ao gerar PIX:", error);
-            
             // Verifica se o erro é 401 (CPF não encontrado)
-            if (error?.response?.status === 401 || error?.message?.includes("CPF não encontrado")) {
+            const errorMessage = error?.message?.toLowerCase() || "";
+            const isCpfNotFound =
+                error?.response?.status === 401 ||
+                errorMessage.includes("cpf não encontrado") ||
+                errorMessage.includes("cpf nao encontrado") ||
+                errorMessage.includes("unauthorized");
+
+            if (isCpfNotFound) {
                 setIsLoadingPix(false);
                 setShowRegisterForm(true);
                 setRegisterData({
@@ -365,7 +375,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
     const handleRegisterInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        
+
         if (name === "whatsapp") {
             const formattedWhatsapp = value
                 .replace(/\D/g, "")
@@ -375,7 +385,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         } else {
             setRegisterData(prev => ({ ...prev, [name]: value }));
         }
-        
+
         setRegisterErrors(prev => ({ ...prev, [name]: "" }));
     };
 
@@ -422,6 +432,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         }
 
         setIsLoadingPix(true);
+        setShowRegisterForm(false);
 
         try {
             // Primeiro cria a conta
@@ -435,6 +446,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             if (registerResponse.error || !registerResponse.data) {
                 alert(`Erro ao criar conta: ${registerResponse.error || "Erro desconhecido"}`);
                 setIsLoadingPix(false);
+                setShowRegisterForm(true);
                 return;
             }
 
@@ -448,12 +460,11 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             if (pixResponse.error || !pixResponse.data) {
                 alert(`Erro ao gerar PIX: ${pixResponse.error || "Erro desconhecido"}`);
                 setIsLoadingPix(false);
-                setShowRegisterForm(false);
                 setShowPixModal(false);
                 return;
             }
 
-            // Sucesso! Mostra o PIX
+            // Sucesso! Define os dados do PIX e para o loading
             setPixData({
                 qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
                     pixResponse.data.qrCode
@@ -461,12 +472,13 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 pixCopiaECola: pixResponse.data.qrCode,
                 saleId: pixResponse.data.saleId,
             });
-            setShowRegisterForm(false);
+
+            // Para o loading para mostrar o QR Code
             setIsLoadingPix(false);
         } catch (error) {
-            console.error("Erro ao cadastrar e gerar PIX:", error);
             alert("Erro ao processar sua solicitação. Tente novamente.");
             setIsLoadingPix(false);
+            setShowRegisterForm(true);
         }
     };
 
@@ -1337,10 +1349,161 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                             className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-green-500 border-t-transparent rounded-full mb-4 sm:mb-6"
                                         />
-                                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-center px-4">Gerando Pagamento</h3>
+                                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-center px-4">
+                                            {showRegisterForm ? "Criando sua conta..." : "Gerando Pagamento"}
+                                        </h3>
                                         <p className="text-sm sm:text-base text-gray-500 text-center px-4">
-                                            Aguarde enquanto geramos seu código PIX...
+                                            {showRegisterForm ? "Aguarde enquanto criamos sua conta e geramos o pagamento..." : "Aguarde enquanto geramos seu código PIX..."}
                                         </p>
+                                    </motion.div>
+                                ) : showRegisterForm ? (
+                                    <motion.div
+                                        key="register"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="space-y-4 sm:space-y-6"
+                                    >
+                                        <div className="text-center pt-6 sm:pt-0">
+                                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                                </svg>
+                                            </div>
+                                            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Complete seu Cadastro</h3>
+                                            <p className="text-sm sm:text-base text-gray-500 mb-4 px-4">
+                                                CPF não encontrado. Complete seu cadastro para continuar com a compra.
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-blue-200">
+                                            <div className="flex items-center justify-between gap-4">
+                                                <div>
+                                                    <p className="text-xs sm:text-sm text-gray-600">Quantidade de cotas</p>
+                                                    <p className="text-lg sm:text-xl font-bold text-gray-900">{quantity}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-xs sm:text-sm text-gray-600">Valor total</p>
+                                                    <p className="text-xl sm:text-2xl font-bold text-blue-600">
+                                                        R$ {(totalValue || 0).toFixed(2).replace(".", ",")}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label htmlFor="register-name" className="block text-sm font-semibold text-gray-700 mb-2">
+                                                    Nome completo *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="register-name"
+                                                    name="name"
+                                                    value={registerData.name}
+                                                    onChange={handleRegisterInputChange}
+                                                    className={`w-full px-4 py-3 sm:py-4 border-2 rounded-xl focus:outline-none transition-colors ${registerErrors.name
+                                                        ? "border-red-400 focus:border-red-500 bg-red-50"
+                                                        : "border-gray-300 focus:border-blue-500"
+                                                        }`}
+                                                    placeholder="Digite seu nome completo"
+                                                />
+                                                {registerErrors.name && (
+                                                    <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center gap-1">
+                                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                        </svg>
+                                                        {registerErrors.name}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="register-email" className="block text-sm font-semibold text-gray-700 mb-2">
+                                                    Email *
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    id="register-email"
+                                                    name="email"
+                                                    value={registerData.email}
+                                                    onChange={handleRegisterInputChange}
+                                                    className={`w-full px-4 py-3 sm:py-4 border-2 rounded-xl focus:outline-none transition-colors ${registerErrors.email
+                                                        ? "border-red-400 focus:border-red-500 bg-red-50"
+                                                        : "border-gray-300 focus:border-blue-500"
+                                                        }`}
+                                                    placeholder="seu@email.com"
+                                                />
+                                                {registerErrors.email && (
+                                                    <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center gap-1">
+                                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                        </svg>
+                                                        {registerErrors.email}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="register-cpf" className="block text-sm font-semibold text-gray-700 mb-2">
+                                                    CPF *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="register-cpf"
+                                                    name="cpf"
+                                                    value={formatCpf(registerData.cpf)}
+                                                    disabled
+                                                    className="w-full px-4 py-3 sm:py-4 border-2 border-gray-300 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed text-center font-mono"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="register-whatsapp" className="block text-sm font-semibold text-gray-700 mb-2">
+                                                    WhatsApp *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="register-whatsapp"
+                                                    name="whatsapp"
+                                                    value={registerData.whatsapp}
+                                                    onChange={handleRegisterInputChange}
+                                                    maxLength={15}
+                                                    className={`w-full px-4 py-3 sm:py-4 border-2 rounded-xl focus:outline-none transition-colors ${registerErrors.whatsapp
+                                                        ? "border-red-400 focus:border-red-500 bg-red-50"
+                                                        : "border-gray-300 focus:border-blue-500"
+                                                        }`}
+                                                    placeholder="(00) 00000-0000"
+                                                />
+                                                {registerErrors.whatsapp && (
+                                                    <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center gap-1">
+                                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                        </svg>
+                                                        {registerErrors.whatsapp}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <motion.button
+                                                onClick={handleRegisterAndGeneratePix}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg text-sm sm:text-base"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Criar Conta e Gerar PIX
+                                            </motion.button>
+
+                                            <button
+                                                onClick={handleClosePixModal}
+                                                className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors underline"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 ) : paymentConfirmed ? (
                                     <motion.div

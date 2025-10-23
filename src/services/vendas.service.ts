@@ -10,6 +10,7 @@ interface BuyTicketPayload {
 interface BuyTicketResponse {
     qrCode: string;
     saleId: number;
+    message: any
 }
 
 interface SaleStatusResponse {

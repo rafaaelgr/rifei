@@ -33,7 +33,6 @@ const RifaDetailPage = () => {
 
                 setRifa(response.data);
             } catch (err) {
-                console.error("Erro ao carregar rifa:", err);
                 router.push("/12");
             } finally {
                 setLoading(false);

@@ -70,12 +70,18 @@ const apiRequest = async <T>(
             const errorData = await response.json().catch(() => ({}));
 
             // Se token inválido/expirado (401 Unauthorized), desloga e redireciona
+            // MAS não redireciona se for erro de "CPF não encontrado" (que deve mostrar formulário de cadastro)
             if (response.status === 401 || errorData.statusCode === 401) {
-                authToken.remove();
+                const isCpfNotFound = errorData.message?.includes("CPF não encontrado") ||
+                    errorData.error?.includes("CPF não encontrado");
 
-                // Redireciona para a página de login apenas no client-side
-                if (typeof window !== "undefined") {
-                    window.location.href = "/12";
+                if (!isCpfNotFound) {
+                    authToken.remove();
+
+                    // Redireciona para a página de login apenas no client-side
+                    if (typeof window !== "undefined") {
+                        window.location.href = "/12";
+                    }
                 }
             }
 

@@ -67,8 +67,6 @@ export default function EditarRifaPage() {
                 const rifa = responseRifa.data;
 
                 // Log para debug
-                console.log("Dados da rifa carregados:", rifa);
-
                 // Preencher formulário com dados da rifa (com valores padrão)
                 setFormData({
                     titulo: rifa.title || "",
@@ -116,7 +114,6 @@ export default function EditarRifaPage() {
                 }
 
             } catch (err) {
-                console.error("Erro ao carregar rifa:", err);
                 setError(err instanceof Error ? err.message : "Erro desconhecido ao carregar dados");
             } finally {
                 setLoading(false);
@@ -212,7 +209,6 @@ export default function EditarRifaPage() {
                     return;
                 }
             } catch (error) {
-                console.error("Erro ao remover prêmio:", error);
                 alert("Erro ao remover prêmio");
                 return;
             }
@@ -252,8 +248,6 @@ export default function EditarRifaPage() {
                 image: "",
             };
 
-            console.log("Salvando prêmio:", payload);
-
             const response = await rifasService.adicionarPremio(payload);
 
             if (response.error) {
@@ -272,7 +266,6 @@ export default function EditarRifaPage() {
 
             alert("Prêmio salvo com sucesso!");
         } catch (error) {
-            console.error("Erro ao salvar prêmio:", error);
             alert("Erro ao salvar prêmio");
         }
     };
@@ -315,8 +308,6 @@ export default function EditarRifaPage() {
             setSubmitting(true);
             setError(null);
 
-            console.log("Dados a atualizar:", { rifaId, payload, premios });
-
             // Tentar atualizar usando o serviço
             const response = await rifasService.atualizar(rifaId, payload);
 
@@ -326,13 +317,11 @@ export default function EditarRifaPage() {
 
             router.push("/admin/rifas");
         } catch (err) {
-            console.error("Erro ao atualizar rifa:", err);
             const errorMessage = err instanceof Error ? err.message : "Erro ao atualizar rifa";
 
             // Se for erro de endpoint não implementado, mostrar mensagem específica
             if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
                 alert("⚠️ Endpoint de atualização ainda não implementado no backend.\nDados preparados e logados no console para referência.");
-                console.log("Payload preparado para quando o endpoint estiver pronto:", payload);
             } else {
                 setError(errorMessage);
             }

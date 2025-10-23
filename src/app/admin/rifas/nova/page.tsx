@@ -167,7 +167,6 @@ export default function NovaRifaPage() {
                     })),
             };
 
-            console.log("Enviando payload para API:", payload);
 
             const result = await rifasService.criar(payload);
 
@@ -176,8 +175,6 @@ export default function NovaRifaPage() {
                 setLoading(false);
                 return;
             }
-
-            console.log("Rifa criada com sucesso:", result.data);
 
             // Se tiver prêmios, adicionar cada um
             if (premios.length > 0 && premios[0].numero && result.data) {
