@@ -281,10 +281,10 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             // Se chegou aqui, response.data existe
             setPixData({
                 qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-                    response.data.qrCode
+                    response?.data?.qrCode || ""
                 )}`,
-                pixCopiaECola: response.data.qrCode,
-                saleId: response.data.saleId,
+                pixCopiaECola: response?.data?.qrCode || "",
+                saleId: response?.data?.saleId || 0,
             });
             setIsLoadingPix(false);
 
