@@ -132,7 +132,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             const timeout = setTimeout(() => {
                 setPaymentConfirmed(true);
                 setIsCheckingPayment(false);
-            }, 60000); // 60 segundos
+            }, 100000); // 90 segundos
 
             return () => clearTimeout(timeout);
         }
@@ -257,42 +257,38 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 amount: quantity,
             });
 
-            if (response) {
-                // Verifica se é erro de CPF não encontrado de várias formas possíveis
-                const errorMessage = response.data?.message.toLowerCase();
-                const isCpfNotFound =
-                    errorMessage.includes("cpf não encontrado") ||
-                    errorMessage.includes("cpf nao encontrado") ||
-                    errorMessage.includes("unauthorized");
+            if (!response.data) return
 
-                if (isCpfNotFound) {
-                    setIsLoadingPix(false);
-                    setShowRegisterForm(true);
-                    setRegisterData({
-                        email: "",
-                        name: "",
-                        cpf: cpf.replace(/\D/g, ""),
-                        whatsapp: "",
-                    });
-                    return;
-                }
+            // Verifica se é erro de CPF não encontrado de várias formas possíveis
+            const errorMessage = (response.data as any)?.message?.toLowerCase() || "";
+            const isCpfNotFound =
+                errorMessage.includes("cpf não encontrado") ||
+                errorMessage.includes("cpf nao encontrado") ||
+                errorMessage.includes("unauthorized");
 
-                alert(`Erro ao gerar PIX: ${response.error || "Erro desconhecido"}`);
-                setShowPixModal(false);
+            if (isCpfNotFound) {
                 setIsLoadingPix(false);
+                setShowRegisterForm(true);
+                setRegisterData({
+                    email: "",
+                    name: "",
+                    cpf: cpf.replace(/\D/g, ""),
+                    whatsapp: "",
+                });
                 return;
             }
 
-            // @ts-ignore
+            alert(`Erro ao gerar PIX: ${response.error || "Erro desconhecido"}`);
+            setShowPixModal(false);
+            setIsLoadingPix(false);
+
+            // Se chegou aqui, response.data existe
             setPixData({
                 qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-                    // @ts-ignore
                     response.data.qrCode
                 )}`,
-                pixCopiaECola: // @ts-ignore
-                    response.data.qrCode,
-                saleId: // @ts-ignore
-                    response.data.saleId,
+                pixCopiaECola: response.data.qrCode,
+                saleId: response.data.saleId,
             });
             setIsLoadingPix(false);
 
@@ -1604,7 +1600,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                                                 </svg>
-                                                Fazer Login ou Criar Conta
+                                                Fazer Login
                                             </motion.button>
                                         )}
 
