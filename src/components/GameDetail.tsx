@@ -260,7 +260,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
             if (!response.data) return
 
             // Verifica se é erro de CPF não encontrado de várias formas possíveis
-            const errorMessage = (response.data as any)?.message?.toLowerCase() || "";
+            const errorMessage = response.data?.message?.toLowerCase() || "";
             const isCpfNotFound =
                 errorMessage.includes("cpf não encontrado") ||
                 errorMessage.includes("cpf nao encontrado") ||
@@ -277,10 +277,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 });
                 return;
             }
-
-            alert(`Erro ao gerar PIX: ${response.error || "Erro desconhecido"}`);
-            setShowPixModal(false);
-            setIsLoadingPix(false);
 
             // Se chegou aqui, response.data existe
             setPixData({
