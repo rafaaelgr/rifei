@@ -6,6 +6,7 @@ import { rifasService } from "@/services/rifas.service";
 import { GameDetail } from "@/components/GameDetail";
 import type { Rifa } from "@/types";
 import { Header } from "@/components/Header";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const RifaDetailPage = () => {
     const params = useParams();
@@ -85,10 +86,16 @@ const RifaDetailPage = () => {
         );
     }
 
-    return (<>
-        <Header />
-        <GameDetail rifa={rifa} />
-    </>);
+    return (
+        <>
+            <Header />
+            <GameDetail rifa={rifa} />
+            <WhatsAppButton
+                phoneNumber="5541998800114"
+                message="Olá! Gostaria de mais informações sobre a rifa."
+            />
+        </>
+    );
 };
 
 export default RifaDetailPage;
