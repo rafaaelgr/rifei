@@ -172,8 +172,24 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
     // Calcular countdown regressivo de 48 horas
     useEffect(() => {
-        // Define a data de término: 48 horas a partir de agora
-        const startTime = new Date().getTime();
+        // Define a data de término: 48 horas a partir das 12:00 de hoje
+        const getOrSetStartTime = () => {
+            const storageKey = 'campaign_start_time';
+            const storedStartTime = localStorage.getItem(storageKey);
+
+            if (storedStartTime) {
+                return parseInt(storedStartTime, 10);
+            }
+
+            // Se não existe, cria a data de início: 12:00 de hoje
+            const today = new Date();
+            today.setHours(12, 0, 0, 0);
+            const startTime = today.getTime();
+            localStorage.setItem(storageKey, startTime.toString());
+            return startTime;
+        };
+
+        const startTime = getOrSetStartTime();
         const campaignDuration = 48 * 60 * 60 * 1000; // 48 horas em milissegundos
         const endDate = startTime + campaignDuration;
 
