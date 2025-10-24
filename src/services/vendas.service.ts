@@ -96,9 +96,10 @@ export const vendasService = {
         return { success: true, data: response.data };
     },
 
-    // GET /orders - Obter pedidos do usuário
-    async obterPedidos() {
-        const response = await apiRequest<Order[]>("/orders", {
+    // GET /orders ou GET /orders/:cpf - Obter pedidos do usuário
+    async obterPedidos(cpf?: string) {
+        const endpoint = cpf ? `/orders/${cpf}` : "/orders";
+        const response = await apiRequest<Order[]>(endpoint, {
             method: "GET",
         });
 

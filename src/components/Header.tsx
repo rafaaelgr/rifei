@@ -1,18 +1,11 @@
 "use client";
 
-import { LoginModal } from "./LoginModal";
-import { useAuth } from "@/contexts/AuthContext";
 import React, { useState, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
-import { UserProfileModal } from "./UserProfileModal";
 import { ScratchCardModal } from "./ScratchCardModal";
 import { TermsModal } from "./TermsModal";
-import { FaUser, FaTrophy, FaTicketAlt, FaFileContract } from "react-icons/fa";
 
 export const Header = () => {
-    const { user, isAuthenticated } = useAuth();
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [isScratchCardOpen, setIsScratchCardOpen] = useState(false);
     const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -48,14 +41,6 @@ export const Header = () => {
             });
         }
     }, [isScrolled, controls]);
-
-    const handleAvatarClick = () => {
-        if (isAuthenticated) {
-            setIsProfileModalOpen(true);
-        } else {
-            setIsLoginModalOpen(true);
-        }
-    };
 
     return (
         <>
@@ -102,108 +87,9 @@ export const Header = () => {
                             </span>
                         </div>
                     </motion.div>
-
-                    <motion.nav
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.5 }}
-                        className="hidden md:flex items-center gap-2"
-                    >
-                        <motion.button
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="group relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-red-600 cursor-pointer transition-all duration-300"
-                            aria-label="Meus números"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-red-50 to-red-100/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <FaTicketAlt className="relative z-10 text-lg" />
-                            <span className="relative z-10 font-medium text-sm">Meus números</span>
-                        </motion.button>
-
-                        <motion.button
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="group relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-red-600 cursor-pointer transition-all duration-300"
-                            aria-label="Ganhadores"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-50 to-amber-100/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <FaTrophy className="relative z-10 text-lg" />
-                            <span className="relative z-10 font-medium text-sm">Ganhadores</span>
-                        </motion.button>
-
-                        <motion.button
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsTermsModalOpen(true)}
-                            className="group relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-red-600 cursor-pointer transition-all duration-300"
-                            aria-label="Termos e condições"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <FaFileContract className="relative z-10 text-lg" />
-                            <span className="relative z-10 font-medium text-sm">Termos</span>
-                        </motion.button>
-                    </motion.nav>
-
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4, duration: 0.5 }}
-                        className="flex items-center gap-3"
-                    >
-                        {!isAuthenticated && (
-                            <motion.button
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setIsLoginModalOpen(true)}
-                                className="relative flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 border border-red-400/30 rounded-xl px-5 py-1.5 text-sm hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
-                            >
-                                <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                                <FaUser className="text-white relative z-10" />
-                                <span className="text-white font-semibold text-sm relative z-10">Entrar</span>
-                            </motion.button>
-                        )}
-
-                        <motion.button
-                            whileHover={{ scale: 1.1, rotate: 5 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleAvatarClick}
-                            className="relative w-10 h-10 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-full flex items-center justify-center border-3 border-white cursor-pointer shadow-xl shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300"
-                            aria-label={isAuthenticated ? "Abrir perfil" : "Fazer login"}
-                        >
-                            {isAuthenticated && user ? (
-                                <>
-                                    <motion.div
-                                        className="absolute -inset-0.5 bg-gradient-to-r from-red-400 to-red-600 rounded-full opacity-75 blur-sm"
-                                        animate={{ rotate: 360 }}
-                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                    />
-                                    {user.avatar ? (
-                                        <img
-                                            src={user.avatar}
-                                            alt={user.name}
-                                            className="relative z-10 w-full h-full rounded-full object-cover border-2 border-white"
-                                        />
-                                    ) : (
-                                        <span className="relative z-10 text-white text-lg font-bold">
-                                            {user.name.charAt(0).toUpperCase()}
-                                        </span>
-                                    )}
-                                    <motion.div
-                                        className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white z-20"
-                                        animate={{ scale: [1, 1.2, 1] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                    />
-                                </>
-                            ) : (
-                                <FaUser className="text-white text-lg relative z-10" />
-                            )}
-                        </motion.button>
-                    </motion.div>
                 </motion.div>
             </motion.header>
 
-            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-            <UserProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
             <ScratchCardModal isOpen={isScratchCardOpen} onClose={() => setIsScratchCardOpen(false)} saleId={null} />
             <TermsModal isOpen={isTermsModalOpen} onClose={() => setIsTermsModalOpen(false)} />
         </>

@@ -1,18 +1,20 @@
 "use client";
 
+import type { Rifa } from "@/types";
+import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useCallback, useRef } from "react";
+
+import { LoginModal } from "./LoginModal";
 import { FaFacebook } from "react-icons/fa";
 import { FaTelegram } from "react-icons/fa6";
-import { AiFillTwitterCircle } from "react-icons/ai";
 import { IoLogoWhatsapp } from "react-icons/io";
-import { motion, AnimatePresence } from "framer-motion";
-import type { Rifa } from "@/types";
-import { vendasService } from "@/services/vendas.service";
+import { useAuth } from "@/contexts/AuthContext";
+import { PrizesCarousel } from "./PrizesCarousel";
+import { AiFillTwitterCircle } from "react-icons/ai";
 import { authService } from "@/services/auth.service";
 import { UserProfileModal } from "./UserProfileModal";
-import { PrizesCarousel } from "./PrizesCarousel";
-import { useAuth } from "@/contexts/AuthContext";
-import { LoginModal } from "./LoginModal";
+import { CPFInputModal } from "./CPFInputModal";
+import { vendasService } from "@/services/vendas.service";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -60,6 +62,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
     const [showAllTickets, setShowAllTickets] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [isCPFModalOpen, setIsCPFModalOpen] = useState(false);
+    const [consultedCPF, setConsultedCPF] = useState<string | undefined>(undefined);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const [isCheckingPayment, setIsCheckingPayment] = useState(false);
@@ -354,6 +358,12 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     };
 
     const handleVerMeusNumeros = () => {
+        setIsCPFModalOpen(true);
+    };
+
+    const handleCPFSuccess = (cpf: string) => {
+        setConsultedCPF(cpf);
+        setIsCPFModalOpen(false);
         setIsProfileModalOpen(true);
     };
 
@@ -1719,7 +1729,19 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                 )}
             </AnimatePresence>
 
-            <UserProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
+            <CPFInputModal
+                isOpen={isCPFModalOpen}
+                onClose={() => setIsCPFModalOpen(false)}
+                onSuccess={handleCPFSuccess}
+            />
+            <UserProfileModal
+                isOpen={isProfileModalOpen}
+                onClose={() => {
+                    setIsProfileModalOpen(false);
+                    setConsultedCPF(undefined);
+                }}
+                cpf={consultedCPF}
+            />
             <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
         </motion.div>
     );
