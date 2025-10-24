@@ -550,18 +550,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     ver meus numeros
                                 </motion.button>
                             </motion.div>
-
-                            <motion.div
-                                initial={{ scale: 0, y: 50 }}
-                                animate={{ scale: 1, y: 0 }}
-                                onClick={handleVerMeusNumeros}
-                                transition={{ delay: 0.6, duration: 0.5, type: "spring", bounce: 0.4 }}
-                                className="w-full"
-                            >
-                                <motion.button className="bg-green-600 shadow-xl border-t border-white/50 text-white p-1.5 text-xs uppercase font-bold rounded-md w-full">
-                                    coletar raspadinha
-                                </motion.button>
-                            </motion.div>
                         </div>
                     </div>
 
