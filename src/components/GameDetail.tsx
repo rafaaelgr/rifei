@@ -172,30 +172,31 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
     // Calcular countdown regressivo de 48 horas
     useEffect(() => {
-        // Define a data de término: 48 horas a partir das 12:00 de hoje
-        const getOrSetStartTime = () => {
-            const storageKey = 'campaign_start_time';
-            const storedStartTime = localStorage.getItem(storageKey);
+        // Define a data de término: amanhã às 14:00
+        const getOrSetEndTime = () => {
+            const storageKey = 'campaign_end_time';
+            const storedEndTime = localStorage.getItem(storageKey);
 
-            if (storedStartTime) {
-                return parseInt(storedStartTime, 10);
+            if (storedEndTime) {
+                return parseInt(storedEndTime, 10);
             }
 
-            // Se não existe, cria a data de início: 12:00 de hoje
-            const today = new Date();
-            today.setHours(12, 0, 0, 0);
-            const startTime = today.getTime();
-            localStorage.setItem(storageKey, startTime.toString());
-            return startTime;
+            // Se não existe, cria a data de término: amanhã às 14:00
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1); // Amanhã
+            tomorrow.setHours(14, 0, 0, 0); // 14:00
+            const endTime = tomorrow.getTime();
+            localStorage.setItem(storageKey, endTime.toString());
+            return endTime;
         };
 
-        const startTime = getOrSetStartTime();
-        const campaignDuration = 48 * 60 * 60 * 1000; // 48 horas em milissegundos
-        const endDate = startTime + campaignDuration;
+        const endDate = getOrSetEndTime();
+        const now = new Date().getTime();
+        const campaignDuration = endDate - now; // Tempo total até amanhã 14:00
 
         const calculateTimeRemaining = () => {
-            const now = new Date().getTime();
-            const difference = endDate - now;
+            const currentTime = new Date().getTime();
+            const difference = endDate - currentTime;
 
             if (difference > 0) {
                 const days = Math.floor(difference / (1000 * 60 * 60 * 24));
@@ -205,8 +206,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
 
                 setTimeRemaining({ days, hours, minutes, seconds });
 
-                // Calcular progresso (quanto tempo já passou das 48 horas)
-                const elapsed = now - startTime;
+                // Calcular progresso (quanto tempo já passou)
+                const elapsed = campaignDuration - difference;
                 const progress = Math.min((elapsed / campaignDuration) * 100, 100);
                 setProgressPercentage(progress);
             } else {
