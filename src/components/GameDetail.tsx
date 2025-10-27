@@ -771,21 +771,18 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         </motion.div>
 
                         {/* Seção Encerra Em */}
-                        {!rifa.closure && (
+                        {/* {!rifa.closure && (
                             <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                                 <div
                                     className="bg-white shadow-md rounded-xl p-2 sm:rounded-2xl sm:p-6 relative overflow-hidden"
                                 >
                                     <motion.div
                                         className="relative z-10">
-                                        {/* Título */}
                                         <motion.h2
                                             className="text-center flex items-center justify-center gap-1 uppercase p-2 text-base px-5 sm:text-2xl md:text-3xl font-bold text-[#2c0201] mb-4"
                                         >
                                             menor cota valendo PS5 ou <br />R$ 3.000,00 no pix
-                                            {/* <img src="/ico.png" alt="" className="max-w-12 rounded-full absolute right-0" /> */}
                                         </motion.h2>
-                                        {/* Countdown Regressivo */}
                                         <div className="bg-[#2c0201] backdrop-blur-sm rounded-xl p-3 sm:p-4 mb-4 uppercase">
                                             <p className="text-center text-white/90 text-xs sm:text-sm font-semibold uppercase tracking-wider">
                                                 Encerra em
@@ -858,7 +855,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         </div>
                                         <motion.p className="text-center text-sm mt-2 text-[#2c0201] mb-2">valendo para compras acima de R$ 20,00</motion.p>
 
-                                        {/* Texto promocional */}
                                         <motion.button
                                             onClick={handleScrollToCotas}
                                             initial={{ scale: 0.9 }}
@@ -868,7 +864,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             GARANTIR MINHA CHANCE
                                         </motion.button>
 
-                                        {/* Data de validade */}
                                         {rifa.closure && (
                                             <p className="text-center text-white/80 text-xs sm:text-sm">
                                                 Válido até {new Date(rifa.closure).toLocaleDateString('pt-BR', {
@@ -883,7 +878,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     </motion.div>
                                 </div>
                             </motion.div>
-                        )}
+                        )} */}
 
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
