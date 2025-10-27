@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/api";
+import type { TopClient, MinorTicketResponse } from "@/types";
 
 interface DashboardStats {
     totalRifas: number;
@@ -117,6 +118,54 @@ export const dashboardService = {
             data: [],
             error: "Endpoint de vendas não disponível na API atual"
         };
+    },
+
+    // Buscar top compradores
+    async buscarTopClientes(limit: number = 12): Promise<{ data: TopClient[]; error?: string }> {
+        try {
+            const response = await apiRequest<TopClient[]>(`/get-top-client/${limit}`, {
+                method: "GET",
+            });
+
+            if (response.error || !response.data) {
+                return {
+                    data: [],
+                    error: response.error || "Erro ao buscar top clientes"
+                };
+            }
+
+            return { data: response.data };
+        } catch (error) {
+            console.error("Erro ao buscar top clientes:", error);
+            return {
+                data: [],
+                error: error instanceof Error ? error.message : "Erro desconhecido"
+            };
+        }
+    },
+
+    // Buscar menor cota
+    async buscarMenorCota(raffleId: number): Promise<{ data: MinorTicketResponse | null; error?: string }> {
+        try {
+            const response = await apiRequest<MinorTicketResponse>(`/minor-ticket/12`, {
+                method: "POST",
+            });
+
+            if (response.error || !response.data) {
+                return {
+                    data: null,
+                    error: response.error || "Erro ao buscar menor cota"
+                };
+            }
+
+            return { data: response.data };
+        } catch (error) {
+            console.error("Erro ao buscar menor cota:", error);
+            return {
+                data: null,
+                error: error instanceof Error ? error.message : "Erro desconhecido"
+            };
+        }
     },
 };
 

@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/api";
-import { Order } from "@/types";
+import { Order, SalesResponse } from "@/types";
 
 interface BuyTicketPayload {
     action_id: number;
@@ -105,6 +105,22 @@ export const vendasService = {
 
         if (response.error || !response.data) {
             return { error: response.error || "Erro ao obter pedidos", data: null };
+        }
+
+        return { data: response.data };
+    },
+
+    // GET /admin/get-sales/:actionId - Obter vendas por ação (admin)
+    async obterVendas(actionId: number, page: number = 1, limit: number = 100) {
+        const response = await apiRequest<SalesResponse>(
+            `/sales?page=${page}&limit=${limit}`,
+            {
+                method: "GET",
+            }
+        );
+
+        if (response.error || !response.data) {
+            return { error: response.error || "Erro ao obter vendas", data: null };
         }
 
         return { data: response.data };

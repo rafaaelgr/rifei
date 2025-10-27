@@ -1,11 +1,9 @@
 import { apiRequest, authToken } from "@/lib/api";
 
-interface CreateAccountPayload {
-    email: string;
-    name: string;
-    cpf: string;
-    whatsapp: string;
-}
+/**
+ * Serviço de autenticação para administradores
+ * Este serviço gerencia apenas login/logout de admins
+ */
 
 interface LoginPayload {
     cpf: string;
@@ -24,36 +22,10 @@ interface LoginResponse {
     };
 }
 
-interface SecurityCodeResponse {
-    message: string;
-    code?: string; // Em desenvolvimento pode retornar o código
-}
-
-interface ValidateCodePayload {
-    code: string;
-}
-
-interface ChangePasswordPayload {
-    password: string;
-}
-
 export const authService = {
-    async criarConta(payload: CreateAccountPayload) {
-        const response = await apiRequest<LoginResponse>("/create-account", {
-            method: "POST",
-            body: JSON.stringify(payload),
-        });
-
-        if (response.error || !response.data) {
-            return { error: response.error || "Erro ao criar conta", data: null };
-        }
-
-        // Salva o token nos cookies
-        authToken.set(response.data.token);
-
-        return { data: response.data };
-    },
-
+    /**
+     * Faz login de administrador
+     */
     async login(payload: LoginPayload) {
         const response = await apiRequest<LoginResponse>("/login", {
             method: "POST",
@@ -64,62 +36,22 @@ export const authService = {
             return { error: response.error || "Erro ao fazer login", data: null };
         }
 
-        // Salva o token nos cookies
         authToken.set(response.data.token);
 
         return { data: response.data };
     },
 
+    /**
+     * Faz logout do administrador
+     * Remove o token dos cookies
+     */
     async logout() {
-        // Remove o token dos cookies
         authToken.remove();
-    },
-
-    async criarCodigoSeguranca() {
-        const response = await apiRequest<SecurityCodeResponse>("/security-code", {
-            method: "POST",
-        });
-
-        if (response.error || !response.data) {
-            return { error: response.error || "Erro ao criar código de segurança", data: null };
-        }
-
-        return { data: response.data };
-    },
-
-    async validarCodigo(payload: ValidateCodePayload) {
-        const response = await apiRequest<{ valid: boolean; message: string }>("/validate-code", {
-            method: "POST",
-            body: JSON.stringify(payload),
-        });
-
-        if (response.error || !response.data) {
-            return { error: response.error || "Erro ao validar código", data: null };
-        }
-
-        return { data: response.data };
-    },
-
-    async trocarSenha(payload: ChangePasswordPayload) {
-        const response = await apiRequest<{ message: string }>("/change-password", {
-            method: "PUT",
-            body: JSON.stringify(payload),
-        });
-
-        if (response.error || !response.data) {
-            return { error: response.error || "Erro ao trocar senha", data: null };
-        }
-
-        return { data: response.data };
     },
 };
 
 export type {
-    CreateAccountPayload,
     LoginPayload,
     LoginResponse,
-    SecurityCodeResponse,
-    ValidateCodePayload,
-    ChangePasswordPayload,
 };
 

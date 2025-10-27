@@ -120,3 +120,67 @@ export interface Order {
     hasRaspadinha: boolean;
     raspadinhaUsed: boolean;
 }
+
+export interface Purchase {
+    id: number;
+    txId: string;
+    tickets: number[];
+    amount: number;
+    createdAt: string;
+}
+
+export interface SalesUser {
+    name: string;
+    instagram: string;
+    cpf: string;
+}
+
+export interface SalesData {
+    userId: string;
+    user: SalesUser;
+    totalPurchases: number;
+    totalTickets: number;
+    totalAmount: number;
+    purchases: Purchase[];
+}
+
+export interface SalesResponse {
+    data: SalesData[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+    };
+}
+
+export interface TopClient {
+    instagram: string;
+    cpf: string;
+    ticketCount: number;
+}
+
+export interface MinorTicketNumber {
+    id: number;
+    number: number;
+    ownerId: string;
+    raffleId: number;
+    isSold: boolean;
+}
+
+export interface MinorTicketOwner {
+    id: string;
+    name: string;
+    email: string;
+    whatsapp: string;
+    instagram: string;
+}
+
+export interface MinorTicketResponse {
+    message: string;
+    number: MinorTicketNumber[];
+    return: {
+        message: string;
+        numbers: MinorTicketNumber[];
+        owners: MinorTicketOwner[];
+    };
+}

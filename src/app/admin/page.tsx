@@ -8,14 +8,22 @@ import {
     FaMoneyBillWave,
     FaUsers,
     FaChartLine,
-    FaSpinner
+    FaSpinner,
+    FaTrophy,
+    FaMedal,
+    FaStar,
+    FaInstagram,
+    FaWhatsapp
 } from "react-icons/fa";
 import { dashboardService } from "@/services/dashboard.service";
 import type { DashboardStats, RifaRecente } from "@/services/dashboard.service";
+import type { TopClient, MinorTicketResponse } from "@/types";
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [recentRifas, setRecentRifas] = useState<RifaRecente[]>([]);
+    const [topClients, setTopClients] = useState<TopClient[]>([]);
+    const [minorTicket, setMinorTicket] = useState<MinorTicketResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -27,9 +35,11 @@ export default function AdminDashboard() {
         setLoading(true);
         setError(null);
 
-        const [statsResult, rifasResult] = await Promise.all([
+        const [statsResult, rifasResult, topClientsResult, minorTicketResult] = await Promise.all([
             dashboardService.buscarEstatisticas(),
             dashboardService.buscarRifasRecentes(),
+            dashboardService.buscarTopClientes(12),
+            dashboardService.buscarMenorCota(12),
         ]);
 
         if (statsResult.error || !statsResult.data) {
@@ -42,18 +52,16 @@ export default function AdminDashboard() {
             setRecentRifas(rifasResult.data);
         }
 
+        if (!topClientsResult.error) {
+            setTopClients(topClientsResult.data);
+        }
+
+        if (!minorTicketResult.error && minorTicketResult.data) {
+            setMinorTicket(minorTicketResult.data);
+        }
+
         setLoading(false);
     };
-
-    // Mock data para vendas recentes (não disponível na API atual)
-    const recentSales: Array<{
-        id: string;
-        cliente: string;
-        rifa: string;
-        cotas: number;
-        valor: number;
-        status: "aprovado" | "pendente";
-    }> = [];
 
     if (loading) {
         return (
@@ -136,6 +144,68 @@ export default function AdminDashboard() {
                 />
             </div>
 
+            {/* Menor Cota Card */}
+            {minorTicket && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="mb-8"
+                >
+                    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                                    <FaStar className="text-xl text-gray-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900">Menor Cota</h2>
+                                    <p className="text-sm text-gray-500">Comprador com menor número</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Número da Cota - Destaque */}
+                            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 flex flex-col items-center justify-center">
+                                <span className="text-sm text-gray-500 mb-2">Número</span>
+                                <span className="text-6xl font-bold text-gray-900">
+                                    {minorTicket.return.numbers[0].number.toString().padStart(2, '0')}
+                                </span>
+                            </div>
+
+                            {/* Informações do Cliente */}
+                            <div className="md:col-span-2 bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <span className="text-xs text-gray-500 uppercase tracking-wide">Cliente</span>
+                                        <p className="font-semibold text-gray-900 mt-1">{minorTicket.return.owners[0].name}</p>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 uppercase tracking-wide">Rifa</span>
+                                        <p className="font-semibold text-gray-900 mt-1">#{minorTicket.return.numbers[0].raffleId}</p>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 uppercase tracking-wide">Instagram</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <FaInstagram className="text-gray-400 text-sm" />
+                                            <p className="text-sm text-gray-700">@{minorTicket.return.owners[0].instagram}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 uppercase tracking-wide">WhatsApp</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <FaWhatsapp className="text-gray-400 text-sm" />
+                                            <p className="text-sm text-gray-700">{minorTicket.return.owners[0].whatsapp}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
             {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Rifas Recentes */}
@@ -198,7 +268,7 @@ export default function AdminDashboard() {
                     </div>
                 </motion.div>
 
-                {/* Vendas Recentes */}
+                {/* Top Compradores */}
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -206,44 +276,71 @@ export default function AdminDashboard() {
                     className="bg-white rounded-2xl shadow-lg p-6"
                 >
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">Vendas Recentes</h2>
-                        <button className="text-sm text-red-500 hover:text-red-600 font-semibold">
-                            Ver todas
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <FaTrophy className="text-2xl text-yellow-500" />
+                            <h2 className="text-xl font-bold text-gray-900">Top Compradores</h2>
+                        </div>
                     </div>
 
                     <div className="space-y-3">
-                        {recentSales.length > 0 ? (
-                            recentSales.map((venda) => (
-                                <motion.div
-                                    key={venda.id}
-                                    whileHover={{ x: 5 }}
-                                    className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-red-300 transition-all"
-                                >
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-gray-900 text-sm mb-1">{venda.cliente}</h3>
-                                        <p className="text-xs text-gray-500">{venda.rifa} • {venda.cotas} cotas</p>
-                                    </div>
+                        {topClients.length > 0 ? (
+                            topClients.map((client, index) => {
+                                const getMedalColor = (position: number): string => {
+                                    if (position === 0) return "text-yellow-500";
+                                    if (position === 1) return "text-gray-400";
+                                    if (position === 2) return "text-amber-600";
+                                    return "text-gray-300";
+                                };
 
-                                    <div className="text-right">
-                                        <p className="font-bold text-gray-900 text-sm mb-1">
-                                            R$ {venda.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                        </p>
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-xs font-bold ${venda.status === "aprovado"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-yellow-100 text-yellow-700"
-                                                }`}
-                                        >
-                                            {venda.status === "aprovado" ? "Aprovado" : "Pendente"}
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            ))
+                                const getBgColor = (position: number): string => {
+                                    if (position === 0) return "bg-yellow-50 border-yellow-200";
+                                    if (position === 1) return "bg-gray-50 border-gray-200";
+                                    if (position === 2) return "bg-amber-50 border-amber-200";
+                                    return "bg-gray-50 border-gray-200";
+                                };
+
+                                return (
+                                    <motion.div
+                                        key={`${client.cpf}-${index}`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        whileHover={{ x: 5 }}
+                                        className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:border-red-300 ${getBgColor(index)}`}
+                                    >
+                                        <div className="flex items-center gap-3 flex-1">
+                                            <div className="flex items-center justify-center w-8 h-8">
+                                                {index < 3 ? (
+                                                    <FaMedal className={`text-2xl ${getMedalColor(index)}`} />
+                                                ) : (
+                                                    <span className="font-bold text-gray-400 text-sm">#{index + 1}</span>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-gray-900 text-sm truncate">
+                                                    {client.instagram}
+                                                </h3>
+                                                <p className="text-xs text-gray-500">{client.cpf}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-right">
+                                            <div className="flex items-center gap-2">
+                                                <FaTicketAlt className="text-red-500" />
+                                                <span className="font-bold text-gray-900 text-lg">
+                                                    {client.ticketCount}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-gray-500">cotas</p>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
                         ) : (
                             <div className="p-8 text-center text-gray-500">
-                                <p className="text-sm">Dados de vendas não disponíveis</p>
-                                <p className="text-xs mt-2">Endpoint de vendas precisa ser implementado na API</p>
+                                <FaUsers className="text-4xl mx-auto mb-3 text-gray-300" />
+                                <p className="text-sm">Nenhum comprador encontrado</p>
+                                <p className="text-xs mt-2">Os top compradores aparecerão aqui</p>
                             </div>
                         )}
                     </div>

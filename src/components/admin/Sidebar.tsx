@@ -10,8 +10,10 @@ import {
     FaChartLine,
     FaUsers,
     FaCog,
-    FaSignOutAlt
+    FaSignOutAlt,
+    FaUserShield
 } from "react-icons/fa";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 
 interface NavItem {
     label: string;
@@ -22,19 +24,26 @@ interface NavItem {
 const navItems: NavItem[] = [
     { label: "Dashboard", href: "/admin", icon: FaHome },
     { label: "Rifas", href: "/admin/rifas", icon: FaTicketAlt },
-    // { label: "Financeiro", href: "/admin/financeiro", icon: FaChartLine },
+    { label: "Financeiro", href: "/admin/financeiro", icon: FaChartLine },
     { label: "Clientes", href: "/admin/clientes", icon: FaUsers },
     { label: "Configurações", href: "/admin/configuracoes", icon: FaCog },
 ];
 
 export const Sidebar = () => {
     const pathname = usePathname();
+    const { admin, logout } = useAdminAuth();
 
     const isActive = (href: string) => {
         if (href === "/admin") {
             return pathname === href;
         }
         return pathname?.startsWith(href);
+    };
+
+    const handleLogout = () => {
+        if (window.confirm("Tem certeza que deseja sair?")) {
+            logout();
+        }
     };
 
     return (
@@ -89,9 +98,23 @@ export const Sidebar = () => {
                 })}
             </nav>
 
-            {/* User Section */}
-            <div className="p-4 border-t border-gray-700">
+            <div className="p-4 border-t border-gray-700 space-y-3">
+                {admin && (
+                    <div className="px-4 py-3 bg-gray-700/50 rounded-xl">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <FaUserShield className="text-white text-lg" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-white font-semibold text-sm truncate">{admin.name}</p>
+                                <p className="text-gray-400 text-xs truncate">{admin.email}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <motion.button
+                    onClick={handleLogout}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-gray-700/50 transition-all"
