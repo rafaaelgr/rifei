@@ -5,6 +5,14 @@ import { apiRequest, authToken } from "@/lib/api";
  * Este serviço gerencia apenas login/logout de admins
  */
 
+interface CreateAccountPayload {
+    email: string;
+    name: string;
+    cpf: string;
+    whatsapp: string;
+}
+
+
 interface LoginPayload {
     cpf: string;
     password: string;
@@ -41,6 +49,22 @@ export const authService = {
         return { data: response.data };
     },
 
+    async criarConta(payload: any) {
+        const response = await apiRequest<any>("/create-account", {
+            method: "POST",
+            body: JSON.stringify(payload),
+        });
+
+        if (response.error || !response.data) {
+            return { error: response.error || "Erro ao criar conta", data: null };
+        }
+
+        // Salva o token nos cookies
+        authToken.set(response.data.token);
+
+        return { data: response.data };
+    },
+
     /**
      * Faz logout do administrador
      * Remove o token dos cookies
@@ -53,5 +77,6 @@ export const authService = {
 export type {
     LoginPayload,
     LoginResponse,
+    CreateAccountPayload,
 };
 
