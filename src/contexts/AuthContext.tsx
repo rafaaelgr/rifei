@@ -121,85 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ) => {
         setIsLoading(true);
         setError(null);
-
-        try {
-            const result = await authService.criarConta({
-                name,
-                email,
-                cpf,
-                whatsapp,
-            });
-
-            if (result.error || !result.data) {
-                throw new Error(result.error || "Erro ao criar conta");
-            }
-
-            // A API pode retornar em diferentes formatos
-            // Formato 1: { token, user: {...} }
-            // Formato 2: { distinctId, event, properties: {...} }
-            // Formato 3: { name, email, cpf, whatsapp, instagram, password }
-            // Formato 4: { message: "Usuário criado com sucesso" } - apenas mensagem de sucesso
-            const responseData = result.data as any;
-
-            // Se a resposta for apenas uma mensagem de sucesso, retornar sem processar dados
-            if (responseData.message && !responseData.properties && !responseData.user && !responseData.name) {
-                // Retornar sucesso sem dados do usuário - LoginModal vai lidar com o redirecionamento
-                return;
-            }
-
-            let userData: User;
-
-            if (responseData.properties) {
-                // Formato com properties (resposta real da API)
-                userData = {
-                    id: responseData.distinctId || responseData.properties.cpf,
-                    name: responseData.properties.name,
-                    email: responseData.properties.email,
-                    cpf: responseData.properties.cpf,
-                    whatsapp: whatsapp, // Não vem na resposta, usar o enviado
-                    totalTickets: 0,
-                    activeTickets: 0,
-                    wonPrizes: 0,
-                };
-            } else if (responseData.user) {
-                // Formato padrão documentado
-                userData = {
-                    id: responseData.user.id,
-                    name: responseData.user.name,
-                    email: responseData.user.email,
-                    cpf: responseData.user.cpf,
-                    whatsapp: responseData.user.whatsapp,
-                    totalTickets: 0,
-                    activeTickets: 0,
-                    wonPrizes: 0,
-                };
-            } else if (responseData.name && responseData.email && responseData.cpf) {
-                // Formato direto - a resposta retorna os dados do usuário diretamente
-                userData = {
-                    id: responseData.cpf,
-                    name: responseData.name,
-                    email: responseData.email,
-                    cpf: responseData.cpf,
-                    whatsapp: responseData.whatsapp || whatsapp,
-                    totalTickets: 0,
-                    activeTickets: 0,
-                    wonPrizes: 0,
-                };
-            } else {
-                throw new Error("Formato de resposta inválido");
-            }
-
-            setUser(userData);
-            localStorage.setItem("user", JSON.stringify(userData));
-
-            // Token já foi salvo nos cookies pelo authService.criarConta()
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Erro ao criar conta";
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     const logout = () => {
@@ -221,65 +142,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         requestCode: async () => {
             setIsLoading(true);
             setError(null);
-
-            try {
-                const result = await authService.criarCodigoSeguranca();
-
-                if (result.error || !result.data) {
-                    throw new Error(result.error || "Erro ao solicitar código");
-                }
-
-                // Em desenvolvimento, o código pode vir na resposta
-                if (process.env.NODE_ENV === "development" && result.data.code) {
-                    console.log("Código de segurança:", result.data.code);
-                }
-            } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : "Erro ao solicitar código";
-                setError(errorMessage);
-                throw err;
-            } finally {
-                setIsLoading(false);
-            }
         },
 
-        validateCode: async (code: string): Promise<boolean> => {
+        validateCode: async (code: string): Promise<any> => {
             setIsLoading(true);
             setError(null);
-
-            try {
-                const result = await authService.validarCodigo({ code });
-
-                if (result.error || !result.data) {
-                    throw new Error(result.error || "Código inválido");
-                }
-
-                return result.data.valid;
-            } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : "Erro ao validar código";
-                setError(errorMessage);
-                return false;
-            } finally {
-                setIsLoading(false);
-            }
         },
 
         changePassword: async (password: string) => {
             setIsLoading(true);
             setError(null);
-
-            try {
-                const result = await authService.trocarSenha({ password });
-
-                if (result.error || !result.data) {
-                    throw new Error(result.error || "Erro ao trocar senha");
-                }
-            } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : "Erro ao trocar senha";
-                setError(errorMessage);
-                throw err;
-            } finally {
-                setIsLoading(false);
-            }
         },
     };
 
