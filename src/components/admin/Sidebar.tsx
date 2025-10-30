@@ -8,8 +8,6 @@ import {
     FaHome,
     FaTicketAlt,
     FaChartLine,
-    FaUsers,
-    FaCog,
     FaSignOutAlt,
     FaUserShield
 } from "react-icons/fa";
@@ -25,8 +23,6 @@ const navItems: NavItem[] = [
     { label: "Dashboard", href: "/admin", icon: FaHome },
     { label: "Rifas", href: "/admin/rifas", icon: FaTicketAlt },
     { label: "Financeiro", href: "/admin/financeiro", icon: FaChartLine },
-    { label: "Clientes", href: "/admin/clientes", icon: FaUsers },
-    { label: "Configurações", href: "/admin/configuracoes", icon: FaCog },
 ];
 
 export const Sidebar = () => {

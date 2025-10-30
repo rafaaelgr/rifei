@@ -154,6 +154,7 @@ export interface SalesResponse {
 }
 
 export interface TopClient {
+    name: string;
     instagram: string;
     cpf: string;
     ticketCount: number;
@@ -183,4 +184,21 @@ export interface MinorTicketResponse {
         numbers: MinorTicketNumber[];
         owners: MinorTicketOwner[];
     };
+}
+
+export interface ScratchCardWinner {
+    id: string;
+    name: string;
+    email: string;
+    cpf: string;
+    whatsapp: string;
+    instagram: string | null;
+}
+
+export interface ScratchCardReward {
+    rewardId: string;
+    name: string;
+    winnerId: string;
+    isPaid: boolean;
+    winner: ScratchCardWinner;
 }

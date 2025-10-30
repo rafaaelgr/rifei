@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/api";
-import type { TopClient, MinorTicketResponse } from "@/types";
+import type { TopClient, MinorTicketResponse, ScratchCardReward } from "@/types";
 
 interface DashboardStats {
     totalRifas: number;
@@ -121,10 +121,16 @@ export const dashboardService = {
     },
 
     // Buscar top compradores
-    async buscarTopClientes(limit: number = 12): Promise<{ data: TopClient[]; error?: string }> {
+    async buscarTopClientes(limit: number = 12, timeInSeconds?: number): Promise<{ data: TopClient[]; error?: string }> {
         try {
+            const body = timeInSeconds ? { time: timeInSeconds } : {};
+
             const response = await apiRequest<TopClient[]>(`/get-top-client/${limit}`, {
-                method: "GET",
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
 
             if (response.error || !response.data) {
@@ -145,9 +151,12 @@ export const dashboardService = {
     },
 
     // Buscar menor cota
-    async buscarMenorCota(raffleId: number): Promise<{ data: MinorTicketResponse | null; error?: string }> {
+    async buscarMenorCota(raffleId: number, limit: number = 1): Promise<{ data: MinorTicketResponse | null; error?: string }> {
         try {
-            const response = await apiRequest<MinorTicketResponse>(`/minor-ticket/12`, {
+            // Validar o limite entre 1 e 10
+            const validLimit = Math.max(1, Math.min(10, limit));
+
+            const response = await apiRequest<MinorTicketResponse>(`/minor-ticket/${raffleId}?limit=${validLimit}`, {
                 method: "POST",
             });
 
@@ -163,6 +172,57 @@ export const dashboardService = {
             console.error("Erro ao buscar menor cota:", error);
             return {
                 data: null,
+                error: error instanceof Error ? error.message : "Erro desconhecido"
+            };
+        }
+    },
+
+    // Buscar maior cota
+    async buscarMaiorCota(raffleId: number, limit: number = 1): Promise<{ data: MinorTicketResponse | null; error?: string }> {
+        try {
+            // Validar o limite entre 1 e 10
+            const validLimit = Math.max(1, Math.min(10, limit));
+
+            const response = await apiRequest<MinorTicketResponse>(`/major-ticket/${raffleId}?limit=${validLimit}`, {
+                method: "POST",
+            });
+
+            if (response.error || !response.data) {
+                return {
+                    data: null,
+                    error: response.error || "Erro ao buscar maior cota"
+                };
+            }
+
+            return { data: response.data };
+        } catch (error) {
+            console.error("Erro ao buscar maior cota:", error);
+            return {
+                data: null,
+                error: error instanceof Error ? error.message : "Erro desconhecido"
+            };
+        }
+    },
+
+    // Buscar premiações recentes das raspadinhas
+    async buscarPremiacoesRaspadinha(raffleId: number): Promise<{ data: ScratchCardReward[]; error?: string }> {
+        try {
+            const response = await apiRequest<ScratchCardReward[]>(`/admin/get-rewards-raspadinha/${raffleId}`, {
+                method: "GET",
+            });
+
+            if (response.error || !response.data) {
+                return {
+                    data: [],
+                    error: response.error || "Erro ao buscar premiações"
+                };
+            }
+
+            return { data: response.data };
+        } catch (error) {
+            console.error("Erro ao buscar premiações:", error);
+            return {
+                data: [],
                 error: error instanceof Error ? error.message : "Erro desconhecido"
             };
         }
