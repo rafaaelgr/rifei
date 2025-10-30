@@ -170,6 +170,45 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         return () => clearInterval(interval);
     }, [showPixModal, isLoadingPix, paymentConfirmed, isAuthenticated]);
 
+    // Disparar evento do Facebook Pixel quando pagamento for confirmado
+    useEffect(() => {
+        if (paymentConfirmed && typeof window !== 'undefined' && (window as any).fbq) {
+            // Adicionar parâmetro ?payment=success na URL
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has('payment')) {
+                url.searchParams.set('payment', 'success');
+                window.history.pushState({}, '', url.toString());
+            }
+
+            // Disparar evento Purchase do Facebook Pixel
+            (window as any).fbq('track', 'Purchase', {
+                value: totalValue,
+                currency: 'BRL',
+                content_name: rifa.title,
+                content_ids: [rifa.id],
+                content_type: 'product',
+                num_items: quantity,
+            });
+        }
+    }, [paymentConfirmed, totalValue, rifa.id, rifa.title, quantity]);
+
+    // Verificar se URL tem parâmetro payment=success e abrir modal automaticamente
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('payment') === 'success') {
+                // Abrir o modal direto na tela de sucesso
+                setShowPixModal(true);
+                setPaymentConfirmed(true);
+
+                // Remover o parâmetro da URL
+                const url = new URL(window.location.href);
+                url.searchParams.delete('payment');
+                window.history.replaceState({}, '', url.toString());
+            }
+        }
+    }, []); // Executa apenas uma vez na montagem do componente
+
     // Calcular countdown regressivo de 48 horas
     useEffect(() => {
         // Define a data de término: amanhã às 14:00
@@ -1532,7 +1571,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
-                                            className={`w-16 h-16 sm:w-20 sm:h-20 ${isAuthenticated ? "bg-green-500" : "bg-blue-500"} rounded-full flex items-center justify-center`}
+                                            className={`w-16 h-16 sm:w-20 sm:h-20 ${isAuthenticated ? "bg-green-500" : "bg-green-500"} rounded-full flex items-center justify-center`}
                                         >
                                             {isAuthenticated ? (
                                                 <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1540,14 +1579,14 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </svg>
                                             ) : (
                                                 <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                 </svg>
                                             )}
                                         </motion.div>
 
                                         <div className="text-center px-4">
                                             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                                                {isAuthenticated ? "Pagamento Confirmado!" : "Pagamento Gerado!"}
+                                                {isAuthenticated ? "Pagamento Confirmado!" : "Obrigado!"}
                                             </h3>
                                             {isAuthenticated ? (
                                                 <>
@@ -1558,7 +1597,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             ) : (
                                                 <>
                                                     <p className="text-sm sm:text-base text-gray-600 mb-2">
-                                                        Seu código PIX foi gerado com sucesso!
+                                                        Seu pagamento está sendo processado.
                                                     </p>
                                                     <p className="text-sm sm:text-base text-gray-600">
                                                         <strong>Faça login</strong> para acompanhar seus números da sorte e verificar se você ganhou algum bilhete premiado!
@@ -1567,15 +1606,12 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                             )}
                                         </div>
 
-                                        <div className={`bg-gradient-to-br ${isAuthenticated ? "from-green-50 to-green-100 border-green-200" : "from-blue-50 to-blue-100 border-blue-200"} rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 w-full`}>
+                                        <div className={`bg-gradient-to-br ${isAuthenticated ? "from-green-50 to-green-100 border-green-200" : "from-green-50 to-green-100 border-green-200"} rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 w-full`}>
                                             <div className="flex flex-col items-center gap-3">
                                                 <div className="flex items-center gap-2">
-                                                    <svg className={`w-5 h-5 ${isAuthenticated ? "text-green-600" : "text-blue-600"}`} fill="currentColor" viewBox="0 0 20 20">
+                                                    <svg className={`w-5 h-5 ${isAuthenticated ? "text-green-600" : "text-green-600"}`} fill="currentColor" viewBox="0 0 20 20">
                                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                     </svg>
-                                                    <p className="text-sm sm:text-base font-bold text-gray-900">
-                                                        {quantity} cotas adquiridas
-                                                    </p>
                                                 </div>
                                                 {isAuthenticated ? (
                                                     <p className="text-xs sm:text-sm text-gray-600 text-center">
@@ -1606,22 +1642,15 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 onClick={handleGoToProfile}
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.98 }}
-                                                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg"
+                                                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg"
                                             >
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                                                 </svg>
                                                 Fazer Login
                                             </motion.button>
-                                            <p className="w-full text-center text-green-400 text-sm">Sua senha foi enviada para o seu email, confira sua caixa de entrada ou spam.</p>
+                                            <p className="w-full text-center text-gray-700 text-sm">Sua senha foi enviada para o seu email, confira sua caixa de entrada ou spam.</p>
                                         </>)}
-
-                                        <button
-                                            onClick={handleClosePixModal}
-                                            className="text-sm text-gray-500 hover:text-gray-700 transition-colors underline"
-                                        >
-                                            Fechar
-                                        </button>
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -1702,25 +1731,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 )}
                                             </motion.button>
                                         </div>
-
-                                        {/* <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                                            <div className="flex gap-2 sm:gap-3">
-                                                <div className="flex-shrink-0">
-                                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                                <div className="text-xs sm:text-sm text-blue-800">
-                                                    <p className="font-semibold mb-1">Instruções de Pagamento</p>
-                                                    <ul className="list-disc list-inside space-y-0.5 sm:space-y-1 text-blue-700">
-                                                        <li>Abra seu app de banco</li>
-                                                        <li>Escolha pagar via PIX</li>
-                                                        <li>Escaneie o QR Code ou cole o código</li>
-                                                        <li>Confirme o pagamento</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div> */}
                                     </motion.div>
                                 )}
                             </AnimatePresence>

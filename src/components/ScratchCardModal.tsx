@@ -28,6 +28,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
     const [error, setError] = useState<string | null>(null);
     const [result, setResult] = useState<PlayRaspadinhaResult | null>(null);
     const [showDebug, setShowDebug] = useState(false);
+    const lastPositionRef = useRef<{ x: number; y: number } | null>(null);
 
     // Função para mapear texto para ícone e cor
     const getPrizeStyle = (text: string, isWinner: boolean) => {
@@ -84,6 +85,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
             setScratchPercentage(0);
             setResult(null);
             setPrizes([]);
+            lastPositionRef.current = null;
 
             try {
                 // Gera um seed único baseado no timestamp
@@ -236,19 +238,51 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        // Desenha círculo transparente para "raspar" - tamanho maior
         ctx.globalCompositeOperation = "destination-out";
+
+        // Raio maior para facilitar a raspagem (aumentado de 40 para 60)
+        const radius = 60;
+
+        // Desenha o círculo principal de raspagem
         ctx.beginPath();
-        ctx.arc(x, y, 40, 0, Math.PI * 2);
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Adiciona mais área de raspagem para ficar mais suave
+        // Desenha círculos adicionais para área mais suave e ampla
         ctx.beginPath();
-        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        ctx.arc(x, y, radius * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.4, 0, Math.PI * 2);
         ctx.fill();
     };
 
+    const scratchLine = (x1: number, y1: number, x2: number, y2: number) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        // Calcula a distância entre os pontos
+        const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+        // Define quantos círculos desenhar ao longo da linha (mais círculos = mais suave)
+        const steps = Math.ceil(distance / 10);
+
+        // Desenha círculos ao longo da linha
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const x = x1 + (x2 - x1) * t;
+            const y = y1 + (y2 - y1) * t;
+            scratch(x, y);
+        }
+    };
+
     const handleScratch = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        if (!isScratching) return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -272,7 +306,16 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
         const x = (clientX - rect.left) * scaleX;
         const y = (clientY - rect.top) * scaleY;
 
-        scratch(x, y);
+        // Se temos posição anterior, desenha linha entre os pontos
+        if (lastPositionRef.current) {
+            scratchLine(lastPositionRef.current.x, lastPositionRef.current.y, x, y);
+        } else {
+            // Primeira raspagem no ponto
+            scratch(x, y);
+        }
+
+        // Atualiza posição anterior
+        lastPositionRef.current = { x, y };
     };
 
     const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -286,7 +329,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
         const y = (e.clientY - rect.top) * scaleY;
 
         scratch(x, y);
-        calculateScratchPercentage();
+        lastPositionRef.current = { x, y };
     };
 
     const calculateScratchPercentage = () => {
@@ -330,6 +373,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
         // Limpa o canvas completamente
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         setScratchPercentage(100);
+        lastPositionRef.current = null;
     };
 
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -340,6 +384,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
 
     const handleMouseUp = () => {
         setIsScratching(false);
+        lastPositionRef.current = null;
         // Calcula porcentagem ao soltar
         setTimeout(() => {
             calculateScratchPercentage();
@@ -360,11 +405,13 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
             const y = (e.touches[0].clientY - rect.top) * scaleY;
 
             scratch(x, y);
+            lastPositionRef.current = { x, y };
         }
     };
 
     const handleTouchEnd = () => {
         setIsScratching(false);
+        lastPositionRef.current = null;
         // Calcula porcentagem ao soltar
         setTimeout(() => {
             calculateScratchPercentage();
@@ -377,6 +424,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({ isOpen, onCl
         setResult(null);
         setError(null);
         setShowDebug(false);
+        lastPositionRef.current = null;
         onClose();
     };
 

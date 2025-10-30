@@ -13,11 +13,15 @@ import {
     FaMedal,
     FaStar,
     FaInstagram,
-    FaWhatsapp
+    FaWhatsapp,
+    FaSearch,
+    FaChevronLeft,
+    FaChevronRight
 } from "react-icons/fa";
 import { dashboardService } from "@/services/dashboard.service";
 import type { DashboardStats, RifaRecente } from "@/services/dashboard.service";
 import type { TopClient, MinorTicketResponse } from "@/types";
+import { SearchNumberModal } from "@/components/admin/SearchNumberModal";
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -26,6 +30,14 @@ export default function AdminDashboard() {
     const [minorTicket, setMinorTicket] = useState<MinorTicketResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Estados para filtro e paginação dos top compradores
+    const [searchFilter, setSearchFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
+    // Estado para o modal de busca de número
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
     useEffect(() => {
         carregarDados();
@@ -61,6 +73,34 @@ export default function AdminDashboard() {
         }
 
         setLoading(false);
+    };
+
+    // Filtrar compradores
+    const filteredClients = topClients.filter((client) => {
+        const searchTerm = searchFilter.toLowerCase();
+        const instagram = client.instagram?.toLowerCase() || '';
+        const cpf = client.cpf?.toLowerCase() || '';
+
+        return (
+            instagram.includes(searchTerm) ||
+            cpf.includes(searchTerm)
+        );
+    });
+
+    // Paginação
+    const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedClients = filteredClients.slice(startIndex, endIndex);
+
+    // Resetar para primeira página quando filtro muda
+    const handleSearchChange = (value: string) => {
+        setSearchFilter(value);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     if (loading) {
@@ -101,8 +141,24 @@ export default function AdminDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-8"
             >
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-                <p className="text-gray-600">Bem-vindo ao painel administrativo</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+                        <p className="text-gray-600">Bem-vindo ao painel administrativo</p>
+                    </div>
+                    <motion.button
+                        onClick={() => setIsSearchModalOpen(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                        aria-label="Encontrar número"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === "Enter" && setIsSearchModalOpen(true)}
+                    >
+                        <FaSearch />
+                        Encontrar Número
+                    </motion.button>
+                </div>
             </motion.div>
 
             {/* Stats Grid */}
@@ -280,11 +336,30 @@ export default function AdminDashboard() {
                             <FaTrophy className="text-2xl text-yellow-500" />
                             <h2 className="text-xl font-bold text-gray-900">Top Compradores</h2>
                         </div>
+                        <span className="text-sm text-gray-500">
+                            {filteredClients.length} {filteredClients.length === 1 ? 'comprador' : 'compradores'}
+                        </span>
                     </div>
 
-                    <div className="space-y-3">
-                        {topClients.length > 0 ? (
-                            topClients.map((client, index) => {
+                    {/* Campo de Busca */}
+                    <div className="mb-4">
+                        <div className="relative">
+                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Buscar por instagram ou CPF..."
+                                value={searchFilter}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-3 min-h-[400px]">
+                        {paginatedClients.length > 0 ? (
+                            paginatedClients.map((client, index) => {
+                                const globalIndex = startIndex + index;
+
                                 const getMedalColor = (position: number): string => {
                                     if (position === 0) return "text-yellow-500";
                                     if (position === 1) return "text-gray-400";
@@ -301,26 +376,26 @@ export default function AdminDashboard() {
 
                                 return (
                                     <motion.div
-                                        key={`${client.cpf}-${index}`}
+                                        key={`${client.cpf}-${globalIndex}`}
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.05 }}
                                         whileHover={{ x: 5 }}
-                                        className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:border-red-300 ${getBgColor(index)}`}
+                                        className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:border-red-300 ${getBgColor(globalIndex)}`}
                                     >
                                         <div className="flex items-center gap-3 flex-1">
                                             <div className="flex items-center justify-center w-8 h-8">
-                                                {index < 3 ? (
-                                                    <FaMedal className={`text-2xl ${getMedalColor(index)}`} />
+                                                {globalIndex < 3 ? (
+                                                    <FaMedal className={`text-2xl ${getMedalColor(globalIndex)}`} />
                                                 ) : (
-                                                    <span className="font-bold text-gray-400 text-sm">#{index + 1}</span>
+                                                    <span className="font-bold text-gray-400 text-sm">#{globalIndex + 1}</span>
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-bold text-gray-900 text-sm truncate">
-                                                    {client.instagram}
+                                                    {client.instagram || 'Sem instagram'}
                                                 </h3>
-                                                <p className="text-xs text-gray-500">{client.cpf}</p>
+                                                <p className="text-xs text-gray-500">{client.cpf || 'CPF não informado'}</p>
                                             </div>
                                         </div>
 
@@ -339,13 +414,77 @@ export default function AdminDashboard() {
                         ) : (
                             <div className="p-8 text-center text-gray-500">
                                 <FaUsers className="text-4xl mx-auto mb-3 text-gray-300" />
-                                <p className="text-sm">Nenhum comprador encontrado</p>
-                                <p className="text-xs mt-2">Os top compradores aparecerão aqui</p>
+                                <p className="text-sm">
+                                    {searchFilter ? 'Nenhum comprador encontrado' : 'Nenhum comprador cadastrado'}
+                                </p>
+                                <p className="text-xs mt-2">
+                                    {searchFilter ? 'Tente outro termo de busca' : 'Os top compradores aparecerão aqui'}
+                                </p>
                             </div>
                         )}
                     </div>
+
+                    {/* Controles de Paginação */}
+                    {totalPages > 1 && (
+                        <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+                            <div className="text-sm text-gray-600">
+                                Mostrando {startIndex + 1} a {Math.min(endIndex, filteredClients.length)} de {filteredClients.length}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <motion.button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
+                                    whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
+                                    className={`p-2 rounded-lg transition-all ${currentPage === 1
+                                        ? 'text-gray-300 cursor-not-allowed'
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    <FaChevronLeft />
+                                </motion.button>
+
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <motion.button
+                                            key={page}
+                                            onClick={() => handlePageChange(page)}
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className={`w-8 h-8 rounded-lg font-semibold text-sm transition-all ${currentPage === page
+                                                ? 'bg-red-500 text-white'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                                }`}
+                                        >
+                                            {page}
+                                        </motion.button>
+                                    ))}
+                                </div>
+
+                                <motion.button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
+                                    whileTap={{ scale: currentPage === totalPages ? 1 : 0.95 }}
+                                    className={`p-2 rounded-lg transition-all ${currentPage === totalPages
+                                        ? 'text-gray-300 cursor-not-allowed'
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    <FaChevronRight />
+                                </motion.button>
+                            </div>
+                        </div>
+                    )}
                 </motion.div>
             </div>
+
+            {/* Search Number Modal */}
+            <SearchNumberModal
+                isOpen={isSearchModalOpen}
+                onClose={() => setIsSearchModalOpen(false)}
+            />
         </div>
     );
 }

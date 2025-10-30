@@ -64,6 +64,65 @@ export default function FinanceiroPage() {
         }
     };
 
+    const calcularEstatisticas = (salesData: SalesData[]): DashboardStats => {
+        // Calcular estatísticas baseado nos dados de vendas
+        const faturamentoTotalCentavos = salesData.reduce((acc, sale) => acc + sale.totalAmount, 0);
+        const totalVendas = salesData.reduce((acc, sale) => acc + sale.totalPurchases, 0);
+        const totalCotasVendidas = salesData.reduce((acc, sale) => acc + sale.totalTickets, 0);
+
+        // Converter de centavos para reais
+        const faturamentoTotal = faturamentoTotalCentavos / 100;
+
+        // Calcular faturamento do mês atual
+        const mesAtual = new Date().getMonth();
+        const anoAtual = new Date().getFullYear();
+
+        const faturamentoMesCentavos = salesData.reduce((acc, sale) => {
+            const vendasDoMes = sale.purchases.filter(purchase => {
+                const dataPurchase = new Date(purchase.createdAt);
+                return dataPurchase.getMonth() === mesAtual && dataPurchase.getFullYear() === anoAtual;
+            });
+
+            const totalMes = vendasDoMes.reduce((sum, p) => sum + p.amount, 0);
+            return acc + totalMes;
+        }, 0);
+
+        const faturamentoMes = faturamentoMesCentavos / 100;
+
+        // Calcular faturamento de hoje
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        const faturamentoHojeCentavos = salesData.reduce((acc, sale) => {
+            const vendasHoje = sale.purchases.filter(purchase => {
+                const dataPurchase = new Date(purchase.createdAt);
+                dataPurchase.setHours(0, 0, 0, 0);
+                return dataPurchase.getTime() === hoje.getTime();
+            });
+
+            const totalHoje = vendasHoje.reduce((sum, p) => sum + p.amount, 0);
+            return acc + totalHoje;
+        }, 0);
+
+        const faturamentoHoje = faturamentoHojeCentavos / 100;
+
+        // Calcular ticket médio
+        const ticketMedio = totalVendas > 0 ? faturamentoTotal / totalVendas : 0;
+
+        return {
+            faturamentoTotal,
+            faturamentoMes,
+            faturamentoHoje,
+            totalVendas,
+            totalCotasVendidas,
+            ticketMedio,
+            // Valores não calculados aqui
+            totalRifas: 0,
+            rifasAtivas: 0,
+            vendasHoje: 0
+        };
+    };
+
     const carregarVendas = async (actionId: number, page: number, isPageChange = false) => {
         if (isPageChange) {
             setLoadingPage(true);
@@ -72,24 +131,20 @@ export default function FinanceiroPage() {
         }
         setError(null);
 
-        const [statsResult, salesResult] = await Promise.all([
-            dashboardService.buscarEstatisticas(),
-            vendasService.obterVendas(actionId, page, limit)
-        ]);
-
-        if (statsResult.error || !statsResult.data) {
-            setError(statsResult.error || "Erro ao carregar estatísticas");
-        } else {
-            setStats(statsResult.data);
-        }
+        const salesResult = await vendasService.obterVendas(actionId, page, limit);
 
         if (salesResult.error || !salesResult.data) {
             setError(salesResult.error || "Erro ao carregar vendas");
             setSalesData([]);
             setTotalSales(0);
+            setStats(null);
         } else {
             setSalesData(salesResult.data.data);
             setTotalSales(salesResult.data.meta.total);
+
+            // Calcular estatísticas baseado nos dados de vendas
+            const calculatedStats = calcularEstatisticas(salesResult.data.data);
+            setStats(calculatedStats);
         }
 
         setLoading(false);
@@ -329,7 +384,7 @@ export default function FinanceiroPage() {
 
                                         <td className="px-6 py-4">
                                             <p className="font-bold text-gray-900">
-                                                R$ {sale.totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                R$ {(sale.totalAmount / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                             </p>
                                         </td>
 
@@ -481,7 +536,7 @@ export default function FinanceiroPage() {
                                 <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
                                     <p className="text-sm font-medium mb-1 opacity-90">Valor Total</p>
                                     <p className="text-3xl font-bold">
-                                        R$ {selectedSale.totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        R$ {(selectedSale.totalAmount / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                     </p>
                                 </div>
                             </div>
@@ -509,7 +564,7 @@ export default function FinanceiroPage() {
                                                 <div className="text-right">
                                                     <p className="text-sm text-gray-600">Valor</p>
                                                     <p className="text-xl font-bold text-green-600">
-                                                        R$ {purchase.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                        R$ {(purchase.amount / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                     </p>
                                                 </div>
                                             </div>
