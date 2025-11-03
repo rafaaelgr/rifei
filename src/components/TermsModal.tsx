@@ -295,8 +295,8 @@ export const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onClose }) => {
                                         </p>
                                         <p>
                                             <strong>WhatsApp:</strong>{" "}
-                                            <a href="https://wa.me/5541998800114" className="text-red-600 hover:text-red-700 underline" target="_blank" rel="noopener noreferrer">
-                                                +55 41 99880-0114
+                                            <a href="wa.me/5541998800114" className="text-red-600 hover:text-red-700 underline" target="_blank" rel="noopener noreferrer">
+                                                +55 41 998800114
                                             </a>
                                         </p>
                                     </div>
