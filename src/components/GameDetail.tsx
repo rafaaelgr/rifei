@@ -832,7 +832,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         </motion.div>
 
                         {/* Seção de Premiados */}
-                        <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
+                        {/* <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                             <div className="bg-white shadow-md rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden">
                                 <motion.div className="relative z-10">
                                     <motion.div className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
@@ -900,7 +900,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     )}
                                 </motion.div>
                             </div>
-                        </motion.div>
+                        </motion.div> */}
 
                         {/* Seção Encerra Em */}
                         {!rifa.closure && (
