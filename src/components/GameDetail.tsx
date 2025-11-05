@@ -214,23 +214,23 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
     }, []); // Executa apenas uma vez na montagem do componente
 
     // Buscar últimos premiados
-    useEffect(() => {
-        const fetchWinners = async () => {
-            setIsLoadingWinners(true);
-            try {
-                const response = await rifasService.obterPremiadosRecentes();
-                if (response.data) {
-                    setWinners(response.data);
-                }
-            } catch (error) {
-                console.error("Erro ao buscar premiados:", error);
-            } finally {
-                setIsLoadingWinners(false);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchWinners = async () => {
+    //         setIsLoadingWinners(true);
+    //         try {
+    //             const response = await rifasService.obterPremiadosRecentes();
+    //             if (response.data) {
+    //                 setWinners(response.data);
+    //             }
+    //         } catch (error) {
+    //             console.error("Erro ao buscar premiados:", error);
+    //         } finally {
+    //             setIsLoadingWinners(false);
+    //         }
+    //     };
 
-        fetchWinners();
-    }, []);
+    //     fetchWinners();
+    // }, []);
 
     // Calcular countdown regressivo de 48 horas
     useEffect(() => {
