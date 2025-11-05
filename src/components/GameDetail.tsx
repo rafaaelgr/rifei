@@ -985,7 +985,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </motion.div>
                                             </div>
                                         </div>
-                                        <motion.p className="text-center text-sm mt-2 text-[#2c0201] mb-2">valendo para compras acima de R$ 20,00</motion.p>
+                                        {/* <motion.p className="text-center text-sm mt-2 text-[#2c0201] mb-2">valendo para compras acima de R$ 20,00</motion.p> */}
 
                                         <motion.button
                                             onClick={handleScrollToCotas}
