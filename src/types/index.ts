@@ -202,3 +202,19 @@ export interface ScratchCardReward {
     isPaid: boolean;
     winner: ScratchCardWinner;
 }
+
+export interface PaidRewardUser {
+    id: string;
+    cpf: string;
+}
+
+export interface PaidReward {
+    id: number;
+    raffleId: number;
+    rewardId: string;
+    rewardType: "RASPADINHA" | "NUMBER";
+    name: string;
+    isPaid: boolean;
+    winnerId: string;
+    user: PaidRewardUser;
+}

@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/api";
-import type { Rifa, Reward } from "@/types";
+import type { Rifa, Reward, PaidReward } from "@/types";
 
 // Tipos da API
 interface ActionResponse {
@@ -240,6 +240,19 @@ export const rifasService = {
 
         if (response.error) {
             return { error: response.error || "Erro ao obter top clientes", data: [] };
+        }
+
+        return { data: response.data };
+    },
+
+    // GET /paid/rewards - Obter últimos 30 premiados
+    async obterPremiadosRecentes() {
+        const response = await apiRequest<PaidReward[]>("/paid/rewards", {
+            method: "GET",
+        });
+
+        if (response.error || !response.data) {
+            return { error: response.error || "Erro ao obter premiados", data: [] };
         }
 
         return { data: response.data };

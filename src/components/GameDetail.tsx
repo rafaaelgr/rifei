@@ -1,6 +1,6 @@
 "use client";
 
-import type { Rifa } from "@/types";
+import type { Rifa, PaidReward } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 
@@ -15,6 +15,8 @@ import { authService } from "@/services/auth.service";
 import { UserProfileModal } from "./UserProfileModal";
 import { CPFInputModal } from "./CPFInputModal";
 import { vendasService } from "@/services/vendas.service";
+import { rifasService } from "@/services/rifas.service";
+import { FaTrophy, FaAward, FaMoneyBill } from "react-icons/fa";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -79,6 +81,8 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         name: "",
         whatsapp: "",
     });
+    const [winners, setWinners] = useState<PaidReward[]>([]);
+    const [isLoadingWinners, setIsLoadingWinners] = useState(false);
 
     // Ref para a seção de cotas
     const cotasRef = useRef<HTMLDivElement>(null);
@@ -209,29 +213,47 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
         }
     }, []); // Executa apenas uma vez na montagem do componente
 
+    // Buscar últimos premiados
+    useEffect(() => {
+        const fetchWinners = async () => {
+            setIsLoadingWinners(true);
+            try {
+                const response = await rifasService.obterPremiadosRecentes();
+                if (response.data) {
+                    setWinners(response.data);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar premiados:", error);
+            } finally {
+                setIsLoadingWinners(false);
+            }
+        };
+
+        fetchWinners();
+    }, []);
+
     // Calcular countdown regressivo de 48 horas
     useEffect(() => {
-        // Define a data de término: amanhã às 14:00
+        // Define a data de término: hoje às 21:00
         const getOrSetEndTime = () => {
-            const storageKey = 'campaign_end_time';
+            const storageKey = 'campaign_end_time_today_21h';
             const storedEndTime = localStorage.getItem(storageKey);
 
             if (storedEndTime) {
                 return parseInt(storedEndTime, 10);
             }
 
-            // Se não existe, cria a data de término: amanhã às 14:00
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1); // Amanhã
-            tomorrow.setHours(14, 0, 0, 0); // 14:00
-            const endTime = tomorrow.getTime();
+            // Se não existe, cria a data de término: hoje às 21:00
+            const today = new Date();
+            today.setHours(21, 0, 0, 0); // 21:00
+            const endTime = today.getTime();
             localStorage.setItem(storageKey, endTime.toString());
             return endTime;
         };
 
         const endDate = getOrSetEndTime();
         const now = new Date().getTime();
-        const campaignDuration = endDate - now; // Tempo total até amanhã 14:00
+        const campaignDuration = endDate - now; // Tempo total até hoje 21:00
 
         const calculateTimeRemaining = () => {
             const currentTime = new Date().getTime();
@@ -809,8 +831,79 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                             </motion.div>
                         </motion.div>
 
+                        {/* Seção de Premiados */}
+                        <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
+                            <div className="bg-white shadow-md rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden">
+                                <motion.div className="relative z-10">
+                                    <motion.div className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
+                                        <FaTrophy className="text-yellow-500 text-2xl sm:text-3xl" />
+                                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#2c0201] uppercase">
+                                            Últimos Premiados
+                                        </h2>
+                                        <FaTrophy className="text-yellow-500 text-2xl sm:text-3xl" />
+                                    </motion.div>
+
+                                    {isLoadingWinners ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c0201]"></div>
+                                        </div>
+                                    ) : winners.length > 0 ? (
+                                        <div className="space-y-2 sm:space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                            {winners.map((winner, index) => (
+                                                <motion.div
+                                                    key={winner.id}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: index * 0.05 }}
+                                                    className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 sm:p-4 border-l-4 border-yellow-500 hover:shadow-md transition-all"
+                                                >
+                                                    <div className="flex items-center justify-between gap-3">
+                                                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                                                            <div className="flex-shrink-0">
+                                                                {winner.rewardType === "RASPADINHA" ? (
+                                                                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-full p-2 sm:p-2.5">
+                                                                        <FaAward className="text-white text-base sm:text-lg" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-full p-2 sm:p-2.5">
+                                                                        <FaMoneyBill className="text-white text-base sm:text-lg" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="font-bold text-[#2c0201] text-sm sm:text-base truncate">
+                                                                    {winner.name}
+                                                                </p>
+                                                                <p className="text-xs sm:text-sm text-gray-600">
+                                                                    CPF: {winner.user.cpf}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-shrink-0">
+                                                            <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap ${winner.rewardType === "RASPADINHA"
+                                                                ? "bg-purple-100 text-purple-800"
+                                                                : "bg-green-100 text-green-800"
+                                                                }`}>
+                                                                {winner.rewardType === "RASPADINHA" ? "Raspadinha" : "Número"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-500 text-sm sm:text-base">
+                                                Nenhum premiado ainda
+                                            </p>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            </div>
+                        </motion.div>
+
                         {/* Seção Encerra Em */}
-                        {/* {!rifa.closure && (
+                        {!rifa.closure && (
                             <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                                 <div
                                     className="bg-white shadow-md rounded-xl p-2 sm:rounded-2xl sm:p-6 relative overflow-hidden"
@@ -820,7 +913,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                         <motion.h2
                                             className="text-center flex items-center justify-center gap-1 uppercase p-2 text-base px-5 sm:text-2xl md:text-3xl font-bold text-[#2c0201] mb-4"
                                         >
-                                            menor cota valendo PS5 ou <br />R$ 3.000,00 no pix
+                                            Promoção metade do preço ate 21:00
                                         </motion.h2>
                                         <div className="bg-[#2c0201] backdrop-blur-sm rounded-xl p-3 sm:p-4 mb-4 uppercase">
                                             <p className="text-center text-white/90 text-xs sm:text-sm font-semibold uppercase tracking-wider">
@@ -917,7 +1010,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     </motion.div>
                                 </div>
                             </motion.div>
-                        )} */}
+                        )}
 
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
