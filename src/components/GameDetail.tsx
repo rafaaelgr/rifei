@@ -903,7 +903,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                         </motion.div> */}
 
                         {/* Seção Encerra Em */}
-                        {!rifa.closure && (
+                        {/* {!rifa.closure && (
                             <motion.div variants={itemVariants} className="mt-4 sm:mt-6 md:mt-8">
                                 <div
                                     className="bg-white shadow-md rounded-xl p-2 sm:rounded-2xl sm:p-6 relative overflow-hidden"
@@ -985,7 +985,6 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                                 </motion.div>
                                             </div>
                                         </div>
-                                        {/* <motion.p className="text-center text-sm mt-2 text-[#2c0201] mb-2">valendo para compras acima de R$ 20,00</motion.p> */}
 
                                         <motion.button
                                             onClick={handleScrollToCotas}
@@ -1010,7 +1009,7 @@ export const GameDetail = ({ rifa }: GameDetailProps) => {
                                     </motion.div>
                                 </div>
                             </motion.div>
-                        )}
+                        )} */}
 
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
