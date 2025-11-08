@@ -15,6 +15,8 @@ import {
     FaCalendarAlt,
     FaGift,
     FaSpinner,
+    FaEye,
+    FaEyeSlash,
 } from "react-icons/fa";
 import { apiRequest } from "@/lib/api";
 
@@ -58,6 +60,7 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [result, setResult] = useState<SearchNumberResponse | null>(null);
+    const [showSensitiveData, setShowSensitiveData] = useState(false);
 
     const handleSearch = async () => {
         if (!numberInput.trim()) {
@@ -90,7 +93,12 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
         setNumberInput("");
         setError(null);
         setResult(null);
+        setShowSensitiveData(false);
         onClose();
+    };
+
+    const handleToggleSensitiveData = () => {
+        setShowSensitiveData(!showSensitiveData);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -285,11 +293,28 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                 <div className="bg-white rounded-xl p-4 border border-green-200">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <FaTicketAlt className="text-green-500" />
-                                                        <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Quantidade de Cotas</span>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <FaTicketAlt className="text-green-500" />
+                                                            <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Quantidade de Cotas</span>
+                                                        </div>
+                                                        <button
+                                                            onClick={handleToggleSensitiveData}
+                                                            className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center"
+                                                            aria-label={showSensitiveData ? "Ocultar dados sensíveis" : "Mostrar dados sensíveis"}
+                                                            tabIndex={0}
+                                                            onKeyDown={(e) => e.key === "Enter" && handleToggleSensitiveData()}
+                                                        >
+                                                            {showSensitiveData ? (
+                                                                <FaEyeSlash className="text-gray-600" />
+                                                            ) : (
+                                                                <FaEye className="text-gray-600" />
+                                                            )}
+                                                        </button>
                                                     </div>
-                                                    <p className="text-3xl font-bold text-gray-900">{sale.tickets.length}</p>
+                                                    <p className="text-3xl font-bold text-gray-900">
+                                                        {showSensitiveData ? sale.tickets.length : "••••"}
+                                                    </p>
                                                 </div>
                                                 <div className="bg-white rounded-xl p-4 border border-green-200">
                                                     <div className="flex items-center gap-2 mb-2">
@@ -297,7 +322,7 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Valor Pago</span>
                                                     </div>
                                                     <p className="text-3xl font-bold text-gray-900">
-                                                        R$ {parseFloat(sale.paymentValue).toFixed(2)}
+                                                        {showSensitiveData ? `R$ ${parseFloat(sale.paymentValue).toFixed(2)}` : "R$ ••••••"}
                                                     </p>
                                                 </div>
                                                 <div className="bg-white rounded-xl p-4 border border-green-200">
@@ -305,16 +330,24 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
                                                         <FaCheckCircle className="text-green-500" />
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Status do Pagamento</span>
                                                     </div>
-                                                    <span className={`inline-block px-3 py-1 rounded-lg text-sm font-bold border ${getPaymentStatus(sale.payment).color}`}>
-                                                        {getPaymentStatus(sale.payment).text}
-                                                    </span>
+                                                    {showSensitiveData ? (
+                                                        <span className={`inline-block px-3 py-1 rounded-lg text-sm font-bold border ${getPaymentStatus(sale.payment).color}`}>
+                                                            {getPaymentStatus(sale.payment).text}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-block px-3 py-1 rounded-lg text-sm font-bold border bg-gray-100 text-gray-700 border-gray-200">
+                                                            ••••••
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <div className="bg-white rounded-xl p-4 border border-green-200">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <FaClock className="text-green-500" />
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">ID da Transação</span>
                                                     </div>
-                                                    <p className="text-gray-900 font-semibold">#{sale.txId}</p>
+                                                    <p className="text-gray-900 font-semibold">
+                                                        {showSensitiveData ? `#${sale.txId}` : "#••••••••"}
+                                                    </p>
                                                 </div>
                                             </div>
 
@@ -327,12 +360,25 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
                                                             <span className="text-sm font-semibold text-gray-700">Raspadinha</span>
                                                         </div>
                                                         <div className="flex items-center gap-3">
-                                                            <span className={`px-3 py-1 rounded-lg text-xs font-bold ${sale.raspadinhaUsed ? 'bg-gray-100 text-gray-600' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                                {sale.raspadinhaUsed ? 'Já Utilizada' : 'Disponível'}
-                                                            </span>
-                                                            <span className="text-lg font-bold text-green-600">
-                                                                R$ {sale.raspadinhaValue.toFixed(2)}
-                                                            </span>
+                                                            {showSensitiveData ? (
+                                                                <>
+                                                                    <span className={`px-3 py-1 rounded-lg text-xs font-bold ${sale.raspadinhaUsed ? 'bg-gray-100 text-gray-600' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                                        {sale.raspadinhaUsed ? 'Já Utilizada' : 'Disponível'}
+                                                                    </span>
+                                                                    <span className="text-lg font-bold text-green-600">
+                                                                        R$ {sale.raspadinhaValue.toFixed(2)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <span className="px-3 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-600">
+                                                                        ••••••
+                                                                    </span>
+                                                                    <span className="text-lg font-bold text-gray-600">
+                                                                        R$ ••••
+                                                                    </span>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -345,14 +391,18 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
                                                         <FaCalendarAlt className="text-green-500" />
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Data da Compra</span>
                                                     </div>
-                                                    <p className="text-gray-900 font-semibold">{formatDate(sale.createdAt)}</p>
+                                                    <p className="text-gray-900 font-semibold">
+                                                        {showSensitiveData ? formatDate(sale.createdAt) : "••/••/•••• ••:••"}
+                                                    </p>
                                                 </div>
                                                 <div className="bg-white rounded-xl p-4 border border-green-200">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <FaCalendarAlt className="text-green-500" />
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Última Atualização</span>
                                                     </div>
-                                                    <p className="text-gray-900 font-semibold">{formatDate(sale.updatedAt)}</p>
+                                                    <p className="text-gray-900 font-semibold">
+                                                        {showSensitiveData ? formatDate(sale.updatedAt) : "••/••/•••• ••:••"}
+                                                    </p>
                                                 </div>
                                             </div>
 
@@ -362,8 +412,12 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
                                                     <FaTicketAlt className="text-green-500" />
                                                     <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Rifa</span>
                                                 </div>
-                                                <p className="text-gray-900 font-semibold">{sale.raffleName}</p>
-                                                <p className="text-sm text-gray-600 mt-1">Preço por cota: R$ {sale.rafflePrice.toFixed(2)}</p>
+                                                <p className="text-gray-900 font-semibold">
+                                                    {showSensitiveData ? sale.raffleName : "••••••••••"}
+                                                </p>
+                                                <p className="text-sm text-gray-600 mt-1">
+                                                    Preço por cota: {showSensitiveData ? `R$ ${sale.rafflePrice.toFixed(2)}` : "R$ ••••"}
+                                                </p>
                                             </div>
 
                                             {/* Tickets List */}
@@ -371,24 +425,41 @@ export const SearchNumberModal: React.FC<SearchNumberModalProps> = ({ isOpen, on
                                                 <div className="flex items-center gap-2 mb-3">
                                                     <FaTicketAlt className="text-green-500" />
                                                     <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
-                                                        Números Comprados ({sale.tickets.length})
+                                                        Números Comprados ({showSensitiveData ? sale.tickets.length : '••'})
                                                     </span>
                                                 </div>
                                                 <div className="max-h-40 overflow-y-auto">
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {sale.tickets.map((ticket, index) => (
-                                                            <span
-                                                                key={index}
-                                                                className={`px-3 py-1 rounded-lg text-sm font-bold border ${
-                                                                    ticket === parseInt(numberInput, 10)
+                                                    {showSensitiveData ? (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {sale.tickets.map((ticket, index) => (
+                                                                <span
+                                                                    key={index}
+                                                                    className={`px-3 py-1 rounded-lg text-sm font-bold border ${ticket === parseInt(numberInput, 10)
                                                                         ? 'bg-red-500 text-white border-red-600'
                                                                         : 'bg-gray-50 text-gray-700 border-gray-200'
-                                                                }`}
-                                                            >
-                                                                {ticket.toString().padStart(6, '0')}
-                                                            </span>
-                                                        ))}
-                                                    </div>
+                                                                        }`}
+                                                                >
+                                                                    {ticket.toString().padStart(6, '0')}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {Array.from({ length: Math.min(sale.tickets.length, 10) }).map((_, index) => (
+                                                                <span
+                                                                    key={index}
+                                                                    className="px-3 py-1 rounded-lg text-sm font-bold border bg-gray-50 text-gray-700 border-gray-200"
+                                                                >
+                                                                    ••••••
+                                                                </span>
+                                                            ))}
+                                                            {sale.tickets.length > 10 && (
+                                                                <span className="px-3 py-1 rounded-lg text-sm font-bold text-gray-500">
+                                                                    ...
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
