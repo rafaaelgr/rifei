@@ -33,21 +33,18 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const pathname = usePathname();
 
     useEffect(() => {
-        // Verificar se há admin salvo no localStorage e token nos cookies
         const savedAdmin = localStorage.getItem("admin");
         const token = authToken.get();
 
         if (savedAdmin && token) {
             setAdmin(JSON.parse(savedAdmin));
         } else if (savedAdmin && !token) {
-            // Se tem admin mas não tem token, limpa o localStorage
             localStorage.removeItem("admin");
         }
 
         setIsLoading(false);
     }, []);
 
-    // Redirecionar se não estiver autenticado e não estiver na página de login
     useEffect(() => {
         if (!isLoading && !admin && pathname?.startsWith("/admin") && pathname !== "/admin/login") {
             router.push("/admin/login");
@@ -71,7 +68,6 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             let adminData: AdminUser;
 
             if (responseData.properties) {
-                // Formato com properties (resposta real da API)
                 adminData = {
                     id: responseData.distinctId || responseData.properties.cpf || cpf,
                     name: responseData.properties.name,
@@ -80,7 +76,6 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                     role: "admin",
                 };
             } else if (responseData.user) {
-                // Formato padrão documentado
                 adminData = {
                     id: responseData.user.id,
                     name: responseData.user.name,
@@ -94,10 +89,6 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
             setAdmin(adminData);
             localStorage.setItem("admin", JSON.stringify(adminData));
-
-            // Token já foi salvo nos cookies pelo authService.login()
-
-            // Redirecionar para o dashboard admin
             router.push("/admin");
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Erro ao fazer login";

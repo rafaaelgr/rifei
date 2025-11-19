@@ -23,7 +23,6 @@ interface AuthContextType {
     isLoading: boolean;
     error: string | null;
     login: (cpf: string, password: string) => Promise<void>;
-    register: (name: string, email: string, cpf: string, whatsapp: string, password: string) => Promise<void>;
     logout: () => void;
     updateUser: (userData: Partial<User>) => void;
     clearError: () => void;
@@ -42,15 +41,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Verificar se há usuário salvo no localStorage e token nos cookies
         const savedUser = localStorage.getItem("user");
         const token = authToken.get();
 
-        // Só restaura o usuário se houver token válido nos cookies
         if (savedUser && token) {
             setUser(JSON.parse(savedUser));
         } else if (savedUser && !token) {
-            // Se tem usuário mas não tem token, limpa o localStorage
             localStorage.removeItem("user");
         }
     }, []);
@@ -68,12 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 throw new Error(result.error || "Erro ao fazer login");
             }
 
-            // A API pode retornar em dois formatos diferentes
             const responseData = result.data as any;
             let userData: User;
 
             if (responseData.properties) {
-                // Formato com properties (resposta real da API)
                 userData = {
                     id: responseData.distinctId || responseData.properties.cpf || cpf,
                     name: responseData.properties.name,
@@ -85,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     wonPrizes: 0,
                 };
             } else if (responseData.user) {
-                // Formato padrão documentado
                 userData = {
                     id: responseData.user.id,
                     name: responseData.user.name,
@@ -102,8 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             setUser(userData);
             localStorage.setItem("user", JSON.stringify(userData));
-
-            // Token já foi salvo nos cookies pelo authService.login()
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Erro ao fazer login";
             setError(errorMessage);
@@ -113,20 +104,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const register = async (
-        name: string,
-        email: string,
-        cpf: string,
-        whatsapp: string,
-    ) => {
-        setIsLoading(true);
-        setError(null);
-    };
-
     const logout = () => {
         setUser(null);
         localStorage.removeItem("user");
-        // Remove o token dos cookies
         authService.logout();
     };
 
@@ -163,7 +143,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 isLoading,
                 error,
                 login,
-                register,
                 logout,
                 updateUser,
                 clearError,

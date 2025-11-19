@@ -10,14 +10,13 @@ const AdminLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children 
     const { isAuthenticated, isLoading } = useAdminAuth();
     const pathname = usePathname();
 
-    // Permitir acesso à página de login sem autenticação
     if (pathname === "/admin/login") {
         return <>{children}</>;
     }
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <motion.div
                         animate={{ rotate: 360 }}
@@ -34,7 +33,7 @@ const AdminLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!isAuthenticated) return null;
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen">
             <Sidebar />
             <main className="flex-1 ml-64">
                 {children}
