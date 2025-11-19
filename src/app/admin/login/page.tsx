@@ -97,42 +97,44 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-[#1c1d1f]">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ type: "spring", duration: 0.5 }}
-                className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+                className="bg-[#25282c] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-[#313238]"
             >
                 {/* Header */}
-                <div className="bg-gradient-to-br from-red-500 to-red-600 p-8 text-white text-center">
+                <div className="p-8 text-center border-b border-[#313238]">
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2, type: "spring" }}
-                        className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"
+                        className="w-20 h-20 bg-orange-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"
                     >
-                        <FaLock className="text-4xl" />
+                        <FaLock className="text-4xl text-orange-500" />
                     </motion.div>
-                    <h1 className="text-3xl font-bold mb-2">Painel Administrativo</h1>
-                    <p className="text-red-100 text-sm">Entre com suas credenciais para acessar</p>
+                    <h1 className="text-2xl font-bold text-white mb-2 tracking-wide">PAINEL ADMINISTRATIVO</h1>
+                    <p className="text-gray-400 text-sm">Entre com suas credenciais para acessar</p>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     {/* CPF Field */}
                     <div>
-                        <label htmlFor="cpf" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="cpf" className="block text-sm font-medium text-gray-400 mb-2">
                             CPF
                         </label>
-                        <div className="relative">
-                            <FaIdCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <div className="relative group">
+                            <FaIdCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-orange-500 transition-colors" />
                             <input
                                 type="text"
                                 id="cpf"
                                 value={cpf}
                                 onChange={handleCpfChange}
-                                className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all ${validationErrors.cpf ? "border-red-500" : "border-gray-300"
+                                className={`w-full bg-[#1c1d1f] pl-12 pr-4 py-3.5 border rounded-xl outline-none transition-all text-white placeholder-gray-600 ${validationErrors.cpf
+                                    ? "border-red-500 focus:border-red-500"
+                                    : "border-[#313238] focus:border-orange-500"
                                     }`}
                                 placeholder="000.000.000-00"
                                 maxLength={14}
@@ -144,7 +146,7 @@ export default function AdminLoginPage() {
                             <motion.div
                                 initial={{ opacity: 0, y: -5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="flex items-center gap-2 mt-2 text-red-600 text-xs"
+                                className="flex items-center gap-2 mt-2 text-red-500 text-xs"
                             >
                                 <FaExclamationCircle />
                                 <span>{validationErrors.cpf}</span>
@@ -154,17 +156,17 @@ export default function AdminLoginPage() {
 
                     {/* Password Field */}
                     <div>
-                        <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-2">
                             Senha
                         </label>
-                        <div className="relative">
-                            <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <div className="relative group">
+                            <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-orange-500 transition-colors" />
                             <input
                                 type="password"
                                 id="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-[#1c1d1f] pl-12 pr-4 py-3.5 border border-[#313238] rounded-xl focus:border-orange-500 outline-none transition-all text-white placeholder-gray-600"
                                 placeholder="••••••••"
                                 required
                                 disabled={isLoading}
@@ -177,7 +179,7 @@ export default function AdminLoginPage() {
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
+                            className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
                         >
                             <FaExclamationCircle className="flex-shrink-0" />
                             <span>{error}</span>
@@ -190,7 +192,7 @@ export default function AdminLoginPage() {
                         whileTap={{ scale: isLoading ? 1 : 0.98 }}
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                        className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 uppercase tracking-wide text-sm"
                     >
                         {isLoading ? (
                             <>
@@ -200,14 +202,14 @@ export default function AdminLoginPage() {
                         ) : (
                             <>
                                 <FaLock />
-                                Entrar no Painel
+                                Acessar Painel
                             </>
                         )}
                     </motion.button>
                 </form>
 
                 {/* Footer */}
-                <div className="px-8 pb-8 text-center">
+                <div className="px-8 pb-8 text-center border-t border-[#313238] pt-6">
                     <p className="text-xs text-gray-500">
                         Acesso restrito apenas para administradores
                     </p>
@@ -216,4 +218,3 @@ export default function AdminLoginPage() {
         </div>
     );
 }
-

@@ -2,12 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { StatCard } from "@/components/admin/StatCard";
 import {
     FaTicketAlt,
-    FaMoneyBillWave,
     FaUsers,
-    FaChartLine,
     FaSpinner,
     FaTrophy,
     FaMedal,
@@ -42,7 +39,7 @@ export default function AdminDashboard() {
 
     // Estados para paginação das premiações
     const [rewardsCurrentPage, setRewardsCurrentPage] = useState(1);
-    const rewardsPerPage = 5;
+    const rewardsPerPage = 3;
 
     // Estado para filtro de tempo dos top compradores
     type TimeFilter = '1h' | '1d' | '1w' | '1m' | 'all';
@@ -70,6 +67,21 @@ export default function AdminDashboard() {
             case 'all': return undefined;
             default: return undefined;
         }
+    };
+
+    // Função para gerar paginação com "..."
+    const generatePagination = (current: number, total: number) => {
+        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+        if (current <= 4) {
+            return [1, 2, 3, 4, 5, "...", total];
+        }
+
+        if (current >= total - 3) {
+            return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
+        }
+
+        return [1, "...", current - 1, current, current + 1, "...", total];
     };
 
     useEffect(() => {
@@ -196,10 +208,10 @@ export default function AdminDashboard() {
 
     if (loading) {
         return (
-            <div className="p-8 flex items-center justify-center min-h-screen">
+            <div className="p-8 flex items-center justify-center min-h-screen bg-[#1c1d1f]">
                 <div className="text-center">
-                    <FaSpinner className="text-5xl text-red-500 animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600">Carregando dashboard...</p>
+                    <FaSpinner className="text-5xl text-orange-500 animate-spin mx-auto mb-4" />
+                    <p className="text-gray-400">Carregando dashboard...</p>
                 </div>
             </div>
         );
@@ -207,15 +219,15 @@ export default function AdminDashboard() {
 
     if (error) {
         return (
-            <div className="p-8">
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
-                    <h2 className="text-xl font-bold text-red-700 mb-2">Erro ao carregar dashboard</h2>
-                    <p className="text-red-600 mb-4">{error || "Dados não disponíveis"}</p>
+            <div className="p-8 min-h-screen bg-[#1c1d1f]">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
+                    <h2 className="text-xl font-bold text-red-500 mb-2">Erro ao carregar dashboard</h2>
+                    <p className="text-red-400 mb-4">{error || "Dados não disponíveis"}</p>
                     <motion.button
                         onClick={carregarDados}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="bg-red-600 text-white px-6 py-3 rounded-xl font-bold"
+                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-colors"
                     >
                         Tentar novamente
                     </motion.button>
@@ -225,24 +237,24 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="p-8">
+        <div className="p-8 min-h-screen bg-[#1c1d1f]">
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-8"
             >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-                        <p className="text-gray-600">Bem-vindo ao painel administrativo</p>
+                        <h1 className="text-3xl font-bold text-white mb-2 tracking-wide">DASHBOARD</h1>
+                        <p className="text-gray-400">Bem-vindo ao painel administrativo</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <motion.button
                             onClick={() => setIsSearchModalOpen(true)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all"
                             aria-label="Encontrar número"
                             tabIndex={0}
                             onKeyDown={(e) => e.key === "Enter" && setIsSearchModalOpen(true)}
@@ -254,12 +266,12 @@ export default function AdminDashboard() {
                             onClick={() => setIsUnlockModalOpen(true)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                            className="flex items-center gap-2 px-6 py-3 bg-[#25282c] border border-[#313238] text-white hover:bg-[#313238] rounded-xl font-bold transition-all"
                             aria-label="Desbloquear número"
                             tabIndex={0}
                             onKeyDown={(e) => e.key === "Enter" && setIsUnlockModalOpen(true)}
                         >
-                            <FaUnlock />
+                            <FaUnlock className="text-green-500" />
                             Desbloquear Número
                         </motion.button>
                     </div>
@@ -274,21 +286,21 @@ export default function AdminDashboard() {
                     transition={{ delay: 0.4 }}
                     className="mb-8"
                 >
-                    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                    <div className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]">
                         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                                    <FaStar className="text-xl text-gray-600" />
+                                <div className="w-10 h-10 bg-[#313238] rounded-xl flex items-center justify-center">
+                                    <FaStar className="text-xl text-orange-500" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900">Menores Cotas</h2>
-                                    <p className="text-sm text-gray-500">Compradores com menores números</p>
+                                    <h2 className="text-xl font-bold text-white">Menores Cotas</h2>
+                                    <p className="text-sm text-gray-400">Compradores com menores números</p>
                                 </div>
                             </div>
 
                             {/* Filtro de quantidade */}
                             <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-gray-600">Exibir:</span>
+                                <span className="text-sm font-medium text-gray-400">Exibir:</span>
                                 <div className="flex items-center gap-1">
                                     {[1, 2, 3, 5, 10].map((limit) => (
                                         <motion.button
@@ -296,9 +308,9 @@ export default function AdminDashboard() {
                                             onClick={() => setMinorTicketLimit(limit)}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all ${minorTicketLimit === limit
-                                                ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-md'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${minorTicketLimit === limit
+                                                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                                                : 'bg-[#313238] text-gray-400 hover:bg-[#3a3c45] hover:text-white'
                                                 }`}
                                             aria-label={`Exibir ${limit} ${limit === 1 ? 'cota' : 'cotas'}`}
                                             tabIndex={0}
@@ -313,7 +325,6 @@ export default function AdminDashboard() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                             {minorTicket.return.numbers.map((ticketNumber, index) => {
-                                // Encontrar o owner correspondente usando ownerId
                                 const owner = minorTicket.return.owners.find(
                                     (o) => o.id === ticketNumber.ownerId
                                 );
@@ -326,12 +337,12 @@ export default function AdminDashboard() {
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-all hover:shadow-md"
+                                        className="bg-[#1c1d1f] rounded-xl p-4 border border-[#313238] hover:border-orange-500/50 transition-all group"
                                     >
                                         {/* Número da Cota - Destaque */}
-                                        <div className="bg-white rounded-lg p-3 border border-gray-200 flex flex-col items-center justify-center mb-3">
+                                        <div className="bg-[#25282c] rounded-lg p-3 border border-[#313238] flex flex-col items-center justify-center mb-3 group-hover:border-orange-500/30 transition-colors">
                                             <span className="text-xs text-gray-500 mb-1">Número</span>
-                                            <span className="text-4xl font-bold text-gray-900">
+                                            <span className="text-4xl font-bold text-white">
                                                 {ticketNumber.number.toString().padStart(2, '0')}
                                             </span>
                                         </div>
@@ -340,13 +351,13 @@ export default function AdminDashboard() {
                                         <div className="space-y-2">
                                             <div>
                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">Cliente</span>
-                                                <p className="font-semibold text-gray-900 text-sm mt-1 truncate" title={owner.name}>
+                                                <p className="font-semibold text-gray-200 text-sm mt-1 truncate" title={owner.name}>
                                                     {owner.name}
                                                 </p>
                                             </div>
                                             <div>
                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">Rifa</span>
-                                                <p className="font-semibold text-gray-900 text-sm mt-1">
+                                                <p className="font-semibold text-gray-200 text-sm mt-1">
                                                     #{ticketNumber.raffleId}
                                                 </p>
                                             </div>
@@ -355,7 +366,7 @@ export default function AdminDashboard() {
                                                     <span className="text-xs text-gray-500 uppercase tracking-wide block">Instagram</span>
                                                     <div className="flex items-center gap-1 mt-1">
                                                         <FaInstagram className="text-gray-400 text-xs flex-shrink-0" />
-                                                        <p className="text-xs text-gray-700 truncate" title={`@${owner.instagram}`}>
+                                                        <p className="text-xs text-gray-400 truncate" title={`@${owner.instagram}`}>
                                                             @{owner.instagram}
                                                         </p>
                                                     </div>
@@ -365,7 +376,7 @@ export default function AdminDashboard() {
                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">WhatsApp</span>
                                                 <div className="flex items-center gap-1 mt-1">
                                                     <FaWhatsapp className="text-gray-400 text-xs flex-shrink-0" />
-                                                    <p className="text-xs text-gray-700 truncate">{owner.whatsapp}</p>
+                                                    <p className="text-xs text-gray-400 truncate">{owner.whatsapp}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -385,21 +396,21 @@ export default function AdminDashboard() {
                     transition={{ delay: 0.5 }}
                     className="mb-8"
                 >
-                    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                    <div className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]">
                         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
-                                    <FaTrophy className="text-xl text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl flex items-center justify-center border border-yellow-500/20">
+                                    <FaTrophy className="text-xl text-yellow-500" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900">Maiores Cotas</h2>
-                                    <p className="text-sm text-gray-500">Compradores com maiores números</p>
+                                    <h2 className="text-xl font-bold text-white">Maiores Cotas</h2>
+                                    <p className="text-sm text-gray-400">Compradores com maiores números</p>
                                 </div>
                             </div>
 
                             {/* Filtro de quantidade */}
                             <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-gray-600">Exibir:</span>
+                                <span className="text-sm font-medium text-gray-400">Exibir:</span>
                                 <div className="flex items-center gap-1">
                                     {[1, 2, 3, 5, 10].map((limit) => (
                                         <motion.button
@@ -407,9 +418,9 @@ export default function AdminDashboard() {
                                             onClick={() => setMajorTicketLimit(limit)}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all ${majorTicketLimit === limit
-                                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${majorTicketLimit === limit
+                                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg shadow-orange-500/20'
+                                                : 'bg-[#313238] text-gray-400 hover:bg-[#3a3c45] hover:text-white'
                                                 }`}
                                             aria-label={`Exibir ${limit} ${limit === 1 ? 'cota' : 'cotas'}`}
                                             tabIndex={0}
@@ -424,7 +435,6 @@ export default function AdminDashboard() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                             {majorTicket.return.numbers.map((ticketNumber, index) => {
-                                // Encontrar o owner correspondente usando ownerId
                                 const owner = majorTicket.return.owners.find(
                                     (o) => o.id === ticketNumber.ownerId
                                 );
@@ -437,12 +447,12 @@ export default function AdminDashboard() {
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200 hover:border-orange-300 transition-all hover:shadow-md"
+                                        className="bg-gradient-to-br from-yellow-500/5 to-orange-500/5 rounded-xl p-4 border border-yellow-500/20 hover:border-orange-500/40 transition-all hover:shadow-lg hover:shadow-orange-500/5 group"
                                     >
                                         {/* Número da Cota - Destaque */}
-                                        <div className="bg-white rounded-lg p-3 border border-yellow-200 flex flex-col items-center justify-center mb-3">
+                                        <div className="bg-[#1c1d1f] rounded-lg p-3 border border-yellow-500/20 flex flex-col items-center justify-center mb-3 group-hover:border-orange-500/30">
                                             <span className="text-xs text-gray-500 mb-1">Número</span>
-                                            <span className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                                            <span className="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
                                                 {ticketNumber.number.toString().padStart(2, '0')}
                                             </span>
                                         </div>
@@ -451,13 +461,13 @@ export default function AdminDashboard() {
                                         <div className="space-y-2">
                                             <div>
                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">Cliente</span>
-                                                <p className="font-semibold text-gray-900 text-sm mt-1 truncate" title={owner.name}>
+                                                <p className="font-semibold text-gray-200 text-sm mt-1 truncate" title={owner.name}>
                                                     {owner.name}
                                                 </p>
                                             </div>
                                             <div>
                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">Rifa</span>
-                                                <p className="font-semibold text-gray-900 text-sm mt-1">
+                                                <p className="font-semibold text-gray-200 text-sm mt-1">
                                                     #{ticketNumber.raffleId}
                                                 </p>
                                             </div>
@@ -466,7 +476,7 @@ export default function AdminDashboard() {
                                                     <span className="text-xs text-gray-500 uppercase tracking-wide block">Instagram</span>
                                                     <div className="flex items-center gap-1 mt-1">
                                                         <FaInstagram className="text-gray-400 text-xs flex-shrink-0" />
-                                                        <p className="text-xs text-gray-700 truncate" title={`@${owner.instagram}`}>
+                                                        <p className="text-xs text-gray-400 truncate" title={`@${owner.instagram}`}>
                                                             @{owner.instagram}
                                                         </p>
                                                     </div>
@@ -476,7 +486,7 @@ export default function AdminDashboard() {
                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">WhatsApp</span>
                                                 <div className="flex items-center gap-1 mt-1">
                                                     <FaWhatsapp className="text-gray-400 text-xs flex-shrink-0" />
-                                                    <p className="text-xs text-gray-700 truncate">{owner.whatsapp}</p>
+                                                    <p className="text-xs text-gray-400 truncate">{owner.whatsapp}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -495,12 +505,12 @@ export default function AdminDashboard() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-2xl shadow-lg p-6"
+                    className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                 >
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                             <FaTrophy className="text-2xl text-yellow-500" />
-                            <h2 className="text-xl font-bold text-gray-900">Premiações Recentes</h2>
+                            <h2 className="text-xl font-bold text-white">Premiações Recentes</h2>
                         </div>
                         <span className="text-sm text-gray-500">
                             {scratchCardRewards.length} {scratchCardRewards.length === 1 ? 'prêmio' : 'prêmios'}
@@ -523,12 +533,12 @@ export default function AdminDashboard() {
                                         };
 
                                         const getRewardBorder = (rewardName: string): string => {
-                                            if (rewardName.includes("500")) return "border-purple-200";
-                                            if (rewardName.includes("200")) return "border-blue-200";
-                                            if (rewardName.includes("100")) return "border-green-200";
-                                            if (rewardName.includes("50")) return "border-orange-200";
-                                            if (rewardName.includes("20")) return "border-yellow-200";
-                                            return "border-red-200";
+                                            if (rewardName.includes("500")) return "border-purple-500/30";
+                                            if (rewardName.includes("200")) return "border-blue-500/30";
+                                            if (rewardName.includes("100")) return "border-green-500/30";
+                                            if (rewardName.includes("50")) return "border-orange-500/30";
+                                            if (rewardName.includes("20")) return "border-yellow-500/30";
+                                            return "border-red-500/30";
                                         };
 
                                         return (
@@ -538,17 +548,17 @@ export default function AdminDashboard() {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: index * 0.05 }}
                                                 whileHover={{ x: 5 }}
-                                                className={`p-4 bg-gray-50 rounded-xl border ${getRewardBorder(reward.name)} hover:border-red-300 transition-all`}
+                                                className={`p-4 bg-[#1c1d1f] rounded-xl border ${getRewardBorder(reward.name)} hover:border-white/20 transition-all`}
                                             >
                                                 <div className="flex items-center justify-between mb-3">
                                                     <div className="flex items-center gap-2">
-                                                        <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getRewardColor(reward.name)} text-white text-xs font-bold`}>
+                                                        <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getRewardColor(reward.name)} text-white text-xs font-bold shadow-lg`}>
                                                             {reward.name}
                                                         </div>
                                                         <span
                                                             className={`px-2 py-1 rounded-full text-xs font-bold ${reward.isPaid
-                                                                ? "bg-green-100 text-green-700"
-                                                                : "bg-red-100 text-red-700"
+                                                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                                                : "bg-red-500/20 text-red-400 border border-red-500/30"
                                                                 }`}
                                                         >
                                                             {reward.isPaid ? "Pago" : "Pendente"}
@@ -559,7 +569,7 @@ export default function AdminDashboard() {
                                                 <div className="space-y-2">
                                                     <div>
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide block">Ganhador</span>
-                                                        <p className="font-semibold text-gray-900 text-sm mt-1 truncate" title={reward.winner.name}>
+                                                        <p className="font-semibold text-gray-200 text-sm mt-1 truncate" title={reward.winner.name}>
                                                             {reward.winner.name}
                                                         </p>
                                                     </div>
@@ -569,7 +579,7 @@ export default function AdminDashboard() {
                                                             <span className="text-xs text-gray-500 uppercase tracking-wide block">WhatsApp</span>
                                                             <div className="flex items-center gap-1 mt-1">
                                                                 <FaWhatsapp className="text-green-500 text-xs flex-shrink-0" />
-                                                                <p className="text-xs text-gray-700 truncate">{reward.winner.whatsapp}</p>
+                                                                <p className="text-xs text-gray-400 truncate">{reward.winner.whatsapp}</p>
                                                             </div>
                                                         </div>
 
@@ -578,7 +588,7 @@ export default function AdminDashboard() {
                                                                 <span className="text-xs text-gray-500 uppercase tracking-wide block">Instagram</span>
                                                                 <div className="flex items-center gap-1 mt-1">
                                                                     <FaInstagram className="text-pink-500 text-xs flex-shrink-0" />
-                                                                    <p className="text-xs text-gray-700 truncate" title={`@${reward.winner.instagram}`}>
+                                                                    <p className="text-xs text-gray-400 truncate" title={`@${reward.winner.instagram}`}>
                                                                         @{reward.winner.instagram}
                                                                     </p>
                                                                 </div>
@@ -592,17 +602,17 @@ export default function AdminDashboard() {
                             </>
                         ) : (
                             <div className="p-8 text-center text-gray-500">
-                                <FaTrophy className="text-4xl mx-auto mb-3 text-gray-300" />
+                                <FaTrophy className="text-4xl mx-auto mb-3 text-gray-600" />
                                 <p className="text-sm">Nenhuma premiação encontrada</p>
-                                <p className="text-xs mt-2">As premiações recentes aparecerão aqui</p>
+                                <p className="text-xs mt-2 text-gray-600">As premiações recentes aparecerão aqui</p>
                             </div>
                         )}
                     </div>
 
                     {/* Controles de Paginação */}
                     {Math.ceil(scratchCardRewards.length / rewardsPerPage) > 1 && (
-                        <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
-                            <div className="text-sm text-gray-600">
+                        <div className="mt-6 flex items-center justify-between border-t border-[#313238] pt-4">
+                            <div className="text-sm text-gray-500">
                                 Mostrando {((rewardsCurrentPage - 1) * rewardsPerPage) + 1} a {Math.min(rewardsCurrentPage * rewardsPerPage, scratchCardRewards.length)} de {scratchCardRewards.length}
                             </div>
 
@@ -613,8 +623,8 @@ export default function AdminDashboard() {
                                     whileHover={{ scale: rewardsCurrentPage === 1 ? 1 : 1.05 }}
                                     whileTap={{ scale: rewardsCurrentPage === 1 ? 1 : 0.95 }}
                                     className={`p-2 rounded-lg transition-all ${rewardsCurrentPage === 1
-                                        ? 'text-gray-300 cursor-not-allowed'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'text-gray-600 cursor-not-allowed'
+                                        : 'text-gray-400 hover:bg-[#313238] hover:text-white'
                                         }`}
                                     aria-label="Página anterior"
                                     tabIndex={0}
@@ -624,22 +634,27 @@ export default function AdminDashboard() {
                                 </motion.button>
 
                                 <div className="flex items-center gap-1">
-                                    {Array.from({ length: Math.ceil(scratchCardRewards.length / rewardsPerPage) }, (_, i) => i + 1).map((page) => (
-                                        <motion.button
-                                            key={page}
-                                            onClick={() => setRewardsCurrentPage(page)}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className={`w-8 h-8 rounded-lg font-semibold text-sm transition-all ${rewardsCurrentPage === page
-                                                ? 'bg-red-500 text-white'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                                }`}
-                                            aria-label={`Página ${page}`}
-                                            tabIndex={0}
-                                            onKeyDown={(e) => e.key === 'Enter' && setRewardsCurrentPage(page)}
-                                        >
-                                            {page}
-                                        </motion.button>
+                                    {generatePagination(rewardsCurrentPage, Math.ceil(scratchCardRewards.length / rewardsPerPage)).map((page, index) => (
+                                        <React.Fragment key={index}>
+                                            {page === "..." ? (
+                                                <span className="text-gray-500 px-2">...</span>
+                                            ) : (
+                                                <motion.button
+                                                    onClick={() => setRewardsCurrentPage(Number(page))}
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className={`w-8 h-8 rounded-lg font-semibold text-sm transition-all ${rewardsCurrentPage === page
+                                                        ? 'bg-orange-500 text-white'
+                                                        : 'text-gray-400 hover:bg-[#313238] hover:text-white'
+                                                        }`}
+                                                    aria-label={`Página ${page}`}
+                                                    tabIndex={0}
+                                                    onKeyDown={(e) => e.key === 'Enter' && setRewardsCurrentPage(Number(page))}
+                                                >
+                                                    {page}
+                                                </motion.button>
+                                            )}
+                                        </React.Fragment>
                                     ))}
                                 </div>
 
@@ -649,8 +664,8 @@ export default function AdminDashboard() {
                                     whileHover={{ scale: rewardsCurrentPage === Math.ceil(scratchCardRewards.length / rewardsPerPage) ? 1 : 1.05 }}
                                     whileTap={{ scale: rewardsCurrentPage === Math.ceil(scratchCardRewards.length / rewardsPerPage) ? 1 : 0.95 }}
                                     className={`p-2 rounded-lg transition-all ${rewardsCurrentPage === Math.ceil(scratchCardRewards.length / rewardsPerPage)
-                                        ? 'text-gray-300 cursor-not-allowed'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'text-gray-600 cursor-not-allowed'
+                                        : 'text-gray-400 hover:bg-[#313238] hover:text-white'
                                         }`}
                                     aria-label="Próxima página"
                                     tabIndex={0}
@@ -668,12 +683,12 @@ export default function AdminDashboard() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white rounded-2xl shadow-lg p-6"
+                    className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                 >
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                             <FaTrophy className="text-2xl text-yellow-500" />
-                            <h2 className="text-xl font-bold text-gray-900">Top Compradores</h2>
+                            <h2 className="text-xl font-bold text-white">Top Compradores</h2>
                         </div>
                         <span className="text-sm text-gray-500">
                             {filteredClients.length} {filteredClients.length === 1 ? 'comprador' : 'compradores'}
@@ -683,8 +698,8 @@ export default function AdminDashboard() {
                     {/* Filtros de Tempo */}
                     <div className="mb-4">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-2 text-gray-600">
-                                <FaClock className="text-gray-400" />
+                            <div className="flex items-center gap-2 text-gray-400">
+                                <FaClock className="text-gray-500" />
                                 <span className="text-sm font-medium">Período:</span>
                             </div>
                             {(['1h', '1d', '1w', '1m', 'all'] as TimeFilter[]).map((filter) => (
@@ -694,8 +709,8 @@ export default function AdminDashboard() {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${timeFilter === filter
-                                        ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                                        : 'bg-[#313238] text-gray-400 hover:bg-[#3a3c45] hover:text-white'
                                         }`}
                                     aria-label={`Filtrar por ${getTimeFilterLabel(filter)}`}
                                     tabIndex={0}
@@ -710,13 +725,13 @@ export default function AdminDashboard() {
                     {/* Campo de Busca */}
                     <div className="mb-4">
                         <div className="relative">
-                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="Buscar por nome ou CPF..."
                                 value={searchFilter}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                className="w-full pl-10 pr-4 py-2 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-white placeholder-gray-600"
                             />
                         </div>
                     </div>
@@ -730,14 +745,14 @@ export default function AdminDashboard() {
                                     if (position === 0) return "text-yellow-500";
                                     if (position === 1) return "text-gray-400";
                                     if (position === 2) return "text-amber-600";
-                                    return "text-gray-300";
+                                    return "text-gray-600";
                                 };
 
                                 const getBgColor = (position: number): string => {
-                                    if (position === 0) return "bg-yellow-50 border-yellow-200";
-                                    if (position === 1) return "bg-gray-50 border-gray-200";
-                                    if (position === 2) return "bg-amber-50 border-amber-200";
-                                    return "bg-gray-50 border-gray-200";
+                                    if (position === 0) return "bg-yellow-500/10 border-yellow-500/20";
+                                    if (position === 1) return "bg-gray-500/10 border-gray-500/20";
+                                    if (position === 2) return "bg-amber-500/10 border-amber-500/20";
+                                    return "bg-[#1c1d1f] border-[#313238]";
                                 };
 
                                 return (
@@ -747,18 +762,18 @@ export default function AdminDashboard() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.05 }}
                                         whileHover={{ x: 5 }}
-                                        className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:border-red-300 ${getBgColor(globalIndex)}`}
+                                        className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:border-orange-500/30 ${getBgColor(globalIndex)}`}
                                     >
                                         <div className="flex items-center gap-3 flex-1">
                                             <div className="flex items-center justify-center w-8 h-8">
                                                 {globalIndex < 3 ? (
                                                     <FaMedal className={`text-2xl ${getMedalColor(globalIndex)}`} />
                                                 ) : (
-                                                    <span className="font-bold text-gray-400 text-sm">#{globalIndex + 1}</span>
+                                                    <span className="font-bold text-gray-500 text-sm">#{globalIndex + 1}</span>
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="font-bold text-gray-900 text-sm truncate">
+                                                <h3 className="font-bold text-white text-sm truncate">
                                                     {client.name || 'Sem nome'}
                                                 </h3>
                                                 <p className="text-xs text-gray-500">{client.cpf || 'CPF não informado'}</p>
@@ -767,8 +782,8 @@ export default function AdminDashboard() {
 
                                         <div className="text-right">
                                             <div className="flex items-center gap-2">
-                                                <FaTicketAlt className="text-red-500" />
-                                                <span className="font-bold text-gray-900 text-lg">
+                                                <FaTicketAlt className="text-orange-500" />
+                                                <span className="font-bold text-white text-lg">
                                                     {client.ticketCount}
                                                 </span>
                                             </div>
@@ -779,11 +794,11 @@ export default function AdminDashboard() {
                             })
                         ) : (
                             <div className="p-8 text-center text-gray-500">
-                                <FaUsers className="text-4xl mx-auto mb-3 text-gray-300" />
+                                <FaUsers className="text-4xl mx-auto mb-3 text-gray-600" />
                                 <p className="text-sm">
                                     {searchFilter ? 'Nenhum comprador encontrado' : 'Nenhum comprador cadastrado'}
                                 </p>
-                                <p className="text-xs mt-2">
+                                <p className="text-xs mt-2 text-gray-600">
                                     {searchFilter ? 'Tente outro termo de busca' : 'Os top compradores aparecerão aqui'}
                                 </p>
                             </div>
@@ -792,39 +807,44 @@ export default function AdminDashboard() {
 
                     {/* Controles de Paginação */}
                     {totalPages > 1 && (
-                        <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
-                            <div className="text-sm text-gray-600">
+                        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#313238] pt-4">
+                            <div className="text-sm text-gray-500 order-2 sm:order-1">
                                 Mostrando {startIndex + 1} a {Math.min(endIndex, filteredClients.length)} de {filteredClients.length}
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto justify-center">
                                 <motion.button
                                     onClick={() => handlePageChange(currentPage - 1)}
                                     disabled={currentPage === 1}
                                     whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
                                     whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
                                     className={`p-2 rounded-lg transition-all ${currentPage === 1
-                                        ? 'text-gray-300 cursor-not-allowed'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'text-gray-600 cursor-not-allowed'
+                                        : 'text-gray-400 hover:bg-[#313238] hover:text-white'
                                         }`}
                                 >
                                     <FaChevronLeft />
                                 </motion.button>
 
-                                <div className="flex items-center gap-1">
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                        <motion.button
-                                            key={page}
-                                            onClick={() => handlePageChange(page)}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className={`w-8 h-8 rounded-lg font-semibold text-sm transition-all ${currentPage === page
-                                                ? 'bg-red-500 text-white'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                                }`}
-                                        >
-                                            {page}
-                                        </motion.button>
+                                <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none px-2 no-scrollbar">
+                                    {generatePagination(currentPage, totalPages).map((page, index) => (
+                                        <React.Fragment key={index}>
+                                            {page === "..." ? (
+                                                <span className="text-gray-500 px-2">...</span>
+                                            ) : (
+                                                <motion.button
+                                                    onClick={() => handlePageChange(Number(page))}
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className={`min-w-[2rem] h-8 rounded-lg font-semibold text-sm transition-all flex items-center justify-center ${currentPage === page
+                                                        ? 'bg-orange-500 text-white'
+                                                        : 'text-gray-400 hover:bg-[#313238] hover:text-white'
+                                                        }`}
+                                                >
+                                                    {page}
+                                                </motion.button>
+                                            )}
+                                        </React.Fragment>
                                     ))}
                                 </div>
 
@@ -834,8 +854,8 @@ export default function AdminDashboard() {
                                     whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
                                     whileTap={{ scale: currentPage === totalPages ? 1 : 0.95 }}
                                     className={`p-2 rounded-lg transition-all ${currentPage === totalPages
-                                        ? 'text-gray-300 cursor-not-allowed'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'text-gray-600 cursor-not-allowed'
+                                        : 'text-gray-400 hover:bg-[#313238] hover:text-white'
                                         }`}
                                 >
                                     <FaChevronRight />

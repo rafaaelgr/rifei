@@ -47,7 +47,7 @@ export const Sidebar = () => {
             initial={{ x: -280, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700 flex flex-col z-50"
+            className="fixed left-0 top-0 h-screen w-64 bg-secondary flex flex-col z-50"
         >
             {/* Logo */}
             <div className="p-6 border-b border-gray-700">
@@ -55,7 +55,7 @@ export const Sidebar = () => {
                     <motion.div
                         whileHover={{ rotate: 360, scale: 1.1 }}
                         transition={{ duration: 0.5 }}
-                        className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg"
+                        className="w-10 h-10 bg-main rounded-xl flex items-center justify-center shadow-lg"
                     >
                         <span className="text-white text-2xl font-bold">R</span>
                     </motion.div>
@@ -82,7 +82,7 @@ export const Sidebar = () => {
                             <Link
                                 href={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${active
-                                    ? "bg-red-500 text-white shadow-lg"
+                                    ? "bg-main text-white shadow-lg"
                                     : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                                     }`}
                             >
@@ -98,7 +98,7 @@ export const Sidebar = () => {
                 {admin && (
                     <div className="px-4 py-3 bg-gray-700/50 rounded-xl">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 bg-main rounded-full flex items-center justify-center flex-shrink-0">
                                 <FaUserShield className="text-white text-lg" />
                             </div>
                             <div className="flex-1 min-w-0">

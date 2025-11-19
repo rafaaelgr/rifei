@@ -33,6 +33,9 @@ export default function EditarRifaPage() {
         { quantidade: "", preco: "" },
     ]);
 
+    const [rewardsCurrentPage, setRewardsCurrentPage] = useState(1);
+    const rewardsPerPage = 4;
+
     const [premios, setPremios] = useState<Array<{
         id?: string;
         numero: string;
@@ -333,14 +336,14 @@ export default function EditarRifaPage() {
     // Loading state
     if (loading) {
         return (
-            <div className="p-8 flex items-center justify-center min-h-screen">
+            <div className="p-8 flex items-center justify-center min-h-screen bg-[#1c1d1f]">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center"
                 >
-                    <FaSpinner className="text-6xl text-red-500 animate-spin mx-auto mb-4" />
-                    <p className="text-xl font-semibold text-gray-700">Carregando dados da rifa...</p>
+                    <FaSpinner className="text-6xl text-orange-500 animate-spin mx-auto mb-4" />
+                    <p className="text-xl font-semibold text-gray-400">Carregando dados da rifa...</p>
                 </motion.div>
             </div>
         );
@@ -349,7 +352,7 @@ export default function EditarRifaPage() {
     // Error state
     if (error) {
         return (
-            <div className="p-8">
+            <div className="p-8 min-h-screen bg-[#1c1d1f]">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -357,7 +360,7 @@ export default function EditarRifaPage() {
                 >
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+                        className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors"
                     >
                         <FaArrowLeft />
                         <span>Voltar</span>
@@ -367,14 +370,14 @@ export default function EditarRifaPage() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-red-50 border-2 border-red-500 rounded-2xl p-8 text-center"
+                    className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 text-center"
                 >
                     <div className="text-6xl mb-4">❌</div>
-                    <h2 className="text-2xl font-bold text-red-700 mb-2">Erro ao Carregar Rifa</h2>
-                    <p className="text-red-600 mb-6">{error}</p>
+                    <h2 className="text-2xl font-bold text-red-500 mb-2">Erro ao Carregar Rifa</h2>
+                    <p className="text-red-400 mb-6">{error}</p>
                     <button
                         onClick={() => router.push("/admin/rifas")}
-                        className="bg-red-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors"
+                        className="bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-700 transition-colors"
                     >
                         Voltar para Rifas
                     </button>
@@ -384,7 +387,7 @@ export default function EditarRifaPage() {
     }
 
     return (
-        <div className="p-8">
+        <div className="p-8 min-h-screen bg-[#1c1d1f]">
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -393,15 +396,15 @@ export default function EditarRifaPage() {
             >
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+                    className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors"
                     disabled={submitting}
                 >
                     <FaArrowLeft />
                     <span>Voltar</span>
                 </button>
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Editar Rifa</h1>
-                <p className="text-gray-600">Atualize os dados da rifa #{rifaId}</p>
+                <h1 className="text-3xl font-bold text-white mb-2 tracking-wide">EDITAR RIFA</h1>
+                <p className="text-gray-400">Atualize os dados da rifa #{rifaId}</p>
             </motion.div>
 
             <form onSubmit={handleSubmit}>
@@ -412,13 +415,13 @@ export default function EditarRifaPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-2xl shadow-lg p-6"
+                            className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                         >
-                            <h2 className="text-xl font-bold text-gray-900 mb-6">Informações Básicas</h2>
+                            <h2 className="text-xl font-bold text-white mb-6">Informações Básicas</h2>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label htmlFor="titulo" className="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label htmlFor="titulo" className="block text-sm font-semibold text-gray-400 mb-2">
                                         Título da Rifa *
                                     </label>
                                     <input
@@ -428,13 +431,13 @@ export default function EditarRifaPage() {
                                         value={formData.titulo}
                                         onChange={handleInputChange}
                                         required
-                                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                                        className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white placeholder-gray-600"
                                         placeholder="Ex: iPhone 17 Pro Max"
                                     />
                                 </div>
 
                                 <div>
-                                    <label htmlFor="descricao" className="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label htmlFor="descricao" className="block text-sm font-semibold text-gray-400 mb-2">
                                         Descrição *
                                     </label>
                                     <textarea
@@ -444,14 +447,14 @@ export default function EditarRifaPage() {
                                         onChange={handleInputChange}
                                         required
                                         rows={4}
-                                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors resize-none"
+                                        className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors resize-none text-white placeholder-gray-600"
                                         placeholder="Descreva os detalhes da rifa..."
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="preco" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        <label htmlFor="preco" className="block text-sm font-semibold text-gray-400 mb-2">
                                             Preço por Cota (R$) *
                                         </label>
                                         <input
@@ -463,13 +466,13 @@ export default function EditarRifaPage() {
                                             required
                                             step="0.01"
                                             min="0"
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white placeholder-gray-600"
                                             placeholder="5.00"
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="totalCotas" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        <label htmlFor="totalCotas" className="block text-sm font-semibold text-gray-400 mb-2">
                                             Total de Cotas *
                                         </label>
                                         <input
@@ -480,7 +483,7 @@ export default function EditarRifaPage() {
                                             onChange={handleInputChange}
                                             required
                                             min="1"
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white placeholder-gray-600"
                                             placeholder="5000"
                                         />
                                     </div>
@@ -488,7 +491,7 @@ export default function EditarRifaPage() {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="dataInicio" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        <label htmlFor="dataInicio" className="block text-sm font-semibold text-gray-400 mb-2">
                                             Data de Início *
                                         </label>
                                         <input
@@ -498,12 +501,12 @@ export default function EditarRifaPage() {
                                             value={formData.dataInicio}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white placeholder-gray-600 [color-scheme:dark]"
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="dataFim" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        <label htmlFor="dataFim" className="block text-sm font-semibold text-gray-400 mb-2">
                                             Data de Término *
                                         </label>
                                         <input
@@ -513,94 +516,28 @@ export default function EditarRifaPage() {
                                             value={formData.dataFim}
                                             onChange={handleInputChange}
                                             required
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                                            className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white placeholder-gray-600 [color-scheme:dark]"
                                         />
                                     </div>
                                 </div>
                             </div>
                         </motion.div>
 
-                        {/* Promoções */}
-                        {/* <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="bg-white rounded-2xl shadow-lg p-6"
-                        >
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-gray-900">Promoções</h2>
-                                <motion.button
-                                    type="button"
-                                    onClick={handleAddPromocao}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl font-semibold text-sm"
-                                >
-                                    <FaPlus /> Adicionar
-                                </motion.button>
-                            </div>
-
-                            <div className="space-y-3">
-                                {promocoes.map((promocao, index) => (
-                                    <div key={index} className="flex items-end gap-3">
-                                        <div className="flex-1">
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                Quantidade de Cotas
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={promocao.quantidade}
-                                                onChange={(e) => handlePromocaoChange(index, "quantidade", e.target.value)}
-                                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
-                                                placeholder="100"
-                                            />
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                Preço (R$)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={promocao.preco}
-                                                onChange={(e) => handlePromocaoChange(index, "preco", e.target.value)}
-                                                step="0.01"
-                                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
-                                                placeholder="10.00"
-                                            />
-                                        </div>
-
-                                        {promocoes.length > 1 && (
-                                            <motion.button
-                                                type="button"
-                                                onClick={() => handleRemovePromocao(index)}
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.9 }}
-                                                className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-                                            >
-                                                <FaTrash />
-                                            </motion.button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </motion.div> */}
-
                         {/* Prêmios */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white rounded-2xl shadow-lg p-6"
+                            className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-gray-900">Prêmios</h2>
+                                <h2 className="text-xl font-bold text-white">Prêmios</h2>
                                 <motion.button
                                     type="button"
                                     onClick={handleAddPremio}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-xl font-semibold text-sm"
+                                    className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:bg-orange-600 transition-colors"
                                 >
                                     <FaPlus /> Adicionar
                                 </motion.button>
@@ -613,107 +550,140 @@ export default function EditarRifaPage() {
                                         <p className="text-sm">Clique em "Adicionar" para criar um prêmio</p>
                                     </div>
                                 ) : (
-                                    premios.map((premio, index) => (
-                                        <div
-                                            key={index}
-                                            className={`p-4 rounded-xl border-2 ${premio.saved
-                                                ? "bg-green-50 border-green-300"
-                                                : "bg-gray-50 border-gray-200"
-                                                }`}
-                                        >
-                                            <div className="flex items-start gap-3">
-                                                <div className="flex-1 space-y-3">
-                                                    {premio.saved && (
-                                                        <div className="flex items-center gap-2 text-green-600 text-sm font-semibold mb-2">
-                                                            <span>✓</span>
-                                                            <span>Prêmio Salvo</span>
-                                                        </div>
-                                                    )}
+                                    <>
+                                        {/* Lista Paginada */}
+                                        {premios
+                                            .slice((rewardsCurrentPage - 1) * rewardsPerPage, rewardsCurrentPage * rewardsPerPage)
+                                            .map((premio, index) => {
+                                                const globalIndex = (rewardsCurrentPage - 1) * rewardsPerPage + index;
+                                                return (
+                                                    <div
+                                                        key={globalIndex}
+                                                        className={`p-4 rounded-xl border ${premio.saved
+                                                            ? "bg-green-500/10 border-green-500/30"
+                                                            : "bg-[#1c1d1f] border-[#313238]"
+                                                            }`}
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="flex-1 space-y-3">
+                                                                {premio.saved && (
+                                                                    <div className="flex items-center gap-2 text-green-500 text-sm font-semibold mb-2">
+                                                                        <span>✓</span>
+                                                                        <span>Prêmio Salvo</span>
+                                                                    </div>
+                                                                )}
 
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <div>
-                                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                                Número *
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                value={premio.numero}
-                                                                onChange={(e) => handlePremioChange(index, "numero", e.target.value)}
-                                                                disabled={premio.saved}
-                                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                                placeholder="5"
-                                                            />
-                                                        </div>
+                                                                <div className="grid grid-cols-2 gap-3">
+                                                                    <div>
+                                                                        <label className="block text-sm font-semibold text-gray-400 mb-2">
+                                                                            Número *
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={premio.numero}
+                                                                            onChange={(e) => handlePremioChange(globalIndex, "numero", e.target.value)}
+                                                                            disabled={premio.saved}
+                                                                            className="w-full px-4 py-2 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                            placeholder="5"
+                                                                        />
+                                                                    </div>
 
-                                                        <div>
-                                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                                Tipo de Prêmio *
-                                                            </label>
-                                                            <select
-                                                                value={premio.rewardType}
-                                                                onChange={(e) => handlePremioChange(index, "rewardType", e.target.value)}
-                                                                disabled={premio.saved}
-                                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                                                    <div>
+                                                                        <label className="block text-sm font-semibold text-gray-400 mb-2">
+                                                                            Tipo de Prêmio *
+                                                                        </label>
+                                                                        <select
+                                                                            value={premio.rewardType}
+                                                                            onChange={(e) => handlePremioChange(globalIndex, "rewardType", e.target.value)}
+                                                                            disabled={premio.saved}
+                                                                            className="w-full px-4 py-2 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                        >
+                                                                            <option value="NUMBER">Número</option>
+                                                                            <option value="RASPADINHA">Raspadinha</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div>
+                                                                    <label className="block text-sm font-semibold text-gray-400 mb-2">
+                                                                        Nome do Prêmio *
+                                                                    </label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={premio.name}
+                                                                        onChange={(e) => handlePremioChange(globalIndex, "name", e.target.value)}
+                                                                        disabled={premio.saved}
+                                                                        className="w-full px-4 py-2 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed placeholder-gray-600"
+                                                                        placeholder="TESTE REWARD"
+                                                                    />
+                                                                </div>
+
+                                                                <div>
+                                                                    <label className="block text-sm font-semibold text-gray-400 mb-2">
+                                                                        Descrição *
+                                                                    </label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={premio.descricao}
+                                                                        onChange={(e) => handlePremioChange(globalIndex, "descricao", e.target.value)}
+                                                                        disabled={premio.saved}
+                                                                        className="w-full px-4 py-2 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed placeholder-gray-600"
+                                                                        placeholder="TEST DESC"
+                                                                    />
+                                                                </div>
+
+                                                                {!premio.saved && (
+                                                                    <motion.button
+                                                                        type="button"
+                                                                        onClick={() => handleSavePremio(globalIndex)}
+                                                                        whileHover={{ scale: 1.02 }}
+                                                                        whileTap={{ scale: 0.98 }}
+                                                                        className="w-full flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-700 transition-colors"
+                                                                    >
+                                                                        <FaSave /> Salvar Prêmio
+                                                                    </motion.button>
+                                                                )}
+                                                            </div>
+
+                                                            <motion.button
+                                                                type="button"
+                                                                onClick={() => handleRemovePremio(globalIndex)}
+                                                                whileHover={{ scale: 1.1 }}
+                                                                whileTap={{ scale: 0.9 }}
+                                                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
                                                             >
-                                                                <option value="NUMBER">Número</option>
-                                                                <option value="RASPADINHA">Raspadinha</option>
-                                                            </select>
+                                                                <FaTrash />
+                                                            </motion.button>
                                                         </div>
                                                     </div>
+                                                );
+                                            })}
 
-                                                    <div>
-                                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                            Nome do Prêmio *
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            value={premio.name}
-                                                            onChange={(e) => handlePremioChange(index, "name", e.target.value)}
-                                                            disabled={premio.saved}
-                                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                            placeholder="TESTE REWARD"
-                                                        />
-                                                    </div>
-
-                                                    <div>
-                                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                            Descrição *
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            value={premio.descricao}
-                                                            onChange={(e) => handlePremioChange(index, "descricao", e.target.value)}
-                                                            disabled={premio.saved}
-                                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                            placeholder="TEST DESC"
-                                                        />
-                                                    </div>
-
-                                                    {!premio.saved && (
-                                                        <motion.button
-                                                            type="button"
-                                                            onClick={() => handleSavePremio(index)}
-                                                            whileHover={{ scale: 1.02 }}
-                                                            whileTap={{ scale: 0.98 }}
-                                                            className="w-full flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-600 transition-colors"
-                                                        >
-                                                            <FaSave /> Salvar Prêmio
-                                                        </motion.button>
-                                                    )}
+                                        {/* Controles de Paginação */}
+                                        {Math.ceil(premios.length / rewardsPerPage) > 1 && (
+                                            <div className="mt-6 flex items-center justify-between border-t border-[#313238] pt-4">
+                                                <div className="text-sm text-gray-500">
+                                                    Mostrando {((rewardsCurrentPage - 1) * rewardsPerPage) + 1} a {Math.min(rewardsCurrentPage * rewardsPerPage, premios.length)} de {premios.length}
                                                 </div>
 
-                                                <motion.button
-                                                    type="button"
-                                                    onClick={() => handleRemovePremio(index)}
-                                                    whileHover={{ scale: 1.1 }}
-                                                    whileTap={{ scale: 0.9 }}
-                                                    className="p-2 text-red-600 hover:bg-red-100 rounded-xl transition-colors"
-                                                >
-                                                    <FaTrash />
-                                                </motion.button>
+                                                <div className="flex items-center gap-2">
+                                                    {Array.from({ length: Math.ceil(premios.length / rewardsPerPage) }, (_, i) => i + 1).map((page) => (
+                                                        <button
+                                                            key={page}
+                                                            type="button"
+                                                            onClick={() => setRewardsCurrentPage(page)}
+                                                            className={`w-8 h-8 rounded-lg font-semibold text-sm transition-all ${rewardsCurrentPage === page
+                                                                ? 'bg-orange-500 text-white'
+                                                                : 'text-gray-400 hover:bg-[#313238] hover:text-white'
+                                                                }`}
+                                                        >
+                                                            {page}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </motion.div>
@@ -723,15 +693,15 @@ export default function EditarRifaPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-white rounded-2xl shadow-lg p-6"
+                            className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                         >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Números Bloqueados</h2>
-                            <p className="text-sm text-gray-600 mb-4">
+                            <h2 className="text-xl font-bold text-white mb-4">Números Bloqueados</h2>
+                            <p className="text-sm text-gray-400 mb-4">
                                 Digite os números que não poderão ser escolhidos pelos clientes, separados por vírgula.
                             </p>
 
                             <div>
-                                <label htmlFor="numerosBloqueados" className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label htmlFor="numerosBloqueados" className="block text-sm font-semibold text-gray-400 mb-2">
                                     Números (separados por vírgula)
                                 </label>
                                 <textarea
@@ -739,11 +709,11 @@ export default function EditarRifaPage() {
                                     value={numerosBloqueados}
                                     onChange={(e) => setNumerosBloqueados(e.target.value)}
                                     rows={3}
-                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors resize-none"
+                                    className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors resize-none text-white placeholder-gray-600"
                                     placeholder="Ex: 13, 7, 666, 1313"
                                 />
                                 {numerosBloqueados && (
-                                    <p className="text-xs text-gray-600 mt-2">
+                                    <p className="text-xs text-gray-500 mt-2">
                                         Total de números bloqueados: {numerosBloqueados.split(",").filter(n => n.trim() !== "").length}
                                     </p>
                                 )}
@@ -758,12 +728,12 @@ export default function EditarRifaPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white rounded-2xl shadow-lg p-6"
+                            className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                         >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Imagem Principal</h2>
+                            <h2 className="text-xl font-bold text-white mb-4">Imagem Principal</h2>
 
                             <div className="mb-4">
-                                <div className="relative w-full h-64 bg-gray-100 rounded-xl overflow-hidden border-2 border-gray-300">
+                                <div className="relative w-full h-64 bg-[#1c1d1f] rounded-xl overflow-hidden border border-[#313238]">
                                     <AnimatePresence mode="wait">
                                         {/* Estado: Sem imagem */}
                                         {!formData.imagemPrincipal && !imageLoading && (
@@ -772,11 +742,11 @@ export default function EditarRifaPage() {
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className="absolute inset-0 flex items-center justify-center border-2 border-dashed border-gray-300 hover:border-red-400 transition-colors cursor-pointer"
+                                                className="absolute inset-0 flex items-center justify-center border border-dashed border-[#313238] hover:border-orange-500/50 transition-colors cursor-pointer"
                                             >
                                                 <div className="text-center p-6">
-                                                    <FaImage className="text-5xl text-gray-400 mx-auto mb-3" />
-                                                    <p className="text-sm font-semibold text-gray-600 mb-1">
+                                                    <FaImage className="text-5xl text-gray-500 mx-auto mb-3" />
+                                                    <p className="text-sm font-semibold text-gray-400 mb-1">
                                                         Cole a URL da imagem abaixo
                                                     </p>
                                                     <p className="text-xs text-gray-500">
@@ -793,16 +763,16 @@ export default function EditarRifaPage() {
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className="absolute inset-0 flex items-center justify-center bg-gray-50"
+                                                className="absolute inset-0 flex items-center justify-center bg-[#1c1d1f]"
                                             >
                                                 <div className="text-center">
                                                     <motion.div
                                                         animate={{ rotate: 360 }}
                                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                                     >
-                                                        <FaSpinner className="text-5xl text-red-500 mx-auto mb-3" />
+                                                        <FaSpinner className="text-5xl text-orange-500 mx-auto mb-3" />
                                                     </motion.div>
-                                                    <p className="text-sm font-semibold text-gray-700 mb-1">
+                                                    <p className="text-sm font-semibold text-gray-400 mb-1">
                                                         Carregando imagem...
                                                     </p>
                                                     <p className="text-xs text-gray-500">
@@ -819,20 +789,20 @@ export default function EditarRifaPage() {
                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className="absolute inset-0 flex items-center justify-center bg-red-50 border-2 border-red-300"
+                                                className="absolute inset-0 flex items-center justify-center bg-red-500/10 border border-red-500/20"
                                             >
                                                 <div className="text-center p-6">
                                                     <FaExclamationTriangle className="text-5xl text-red-500 mx-auto mb-3" />
-                                                    <p className="text-sm font-semibold text-red-700 mb-1">
+                                                    <p className="text-sm font-semibold text-red-500 mb-1">
                                                         Erro ao carregar imagem
                                                     </p>
-                                                    <p className="text-xs text-red-600 mb-3">
+                                                    <p className="text-xs text-red-400 mb-3">
                                                         Verifique se a URL está correta
                                                     </p>
                                                     <button
                                                         type="button"
                                                         onClick={() => setFormData(prev => ({ ...prev, imagemPrincipal: "" }))}
-                                                        className="text-xs text-red-600 hover:text-red-800 underline font-semibold"
+                                                        className="text-xs text-red-500 hover:text-red-400 underline font-semibold"
                                                     >
                                                         Limpar URL
                                                     </button>
@@ -850,7 +820,7 @@ export default function EditarRifaPage() {
                                                 className="absolute inset-0"
                                             >
                                                 <img
-                                                    src="https://casadocelular.com.br/media/catalog/product/cache/b9e728eb2ff7164906b484594fdb9213/c/d/cdc-iphone-12-roxo-camera-dupla-v1.jpg"
+                                                    src={formData.imagemPrincipal}
                                                     alt="Preview"
                                                     className="w-full h-full object-cover z-[999]"
                                                 />
@@ -873,8 +843,8 @@ export default function EditarRifaPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="imagemPrincipal" className="block text-sm font-semibold text-gray-700 mb-2">
-                                    URL da Imagem {formData.imagemPrincipal && !imageError && <span className="text-green-600">✓</span>}
+                                <label htmlFor="imagemPrincipal" className="block text-sm font-semibold text-gray-400 mb-2">
+                                    URL da Imagem {formData.imagemPrincipal && !imageError && <span className="text-green-500">✓</span>}
                                 </label>
                                 <input
                                     type="url"
@@ -882,28 +852,28 @@ export default function EditarRifaPage() {
                                     name="imagemPrincipal"
                                     value={formData.imagemPrincipal}
                                     onChange={handleInputChange}
-                                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${imageError
-                                        ? "border-red-400 focus:border-red-500 bg-red-50"
+                                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none transition-colors text-white placeholder-gray-600 bg-[#1c1d1f] ${imageError
+                                        ? "border-red-500 focus:border-red-500"
                                         : imageLoaded
-                                            ? "border-green-400 focus:border-green-500 bg-green-50"
-                                            : "border-gray-300 focus:border-red-500"
+                                            ? "border-green-500 focus:border-green-500"
+                                            : "border-[#313238] focus:border-orange-500"
                                         }`}
                                     placeholder="https://exemplo.com/imagem.jpg"
                                 />
                                 {imageError && (
-                                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
                                         <FaExclamationTriangle className="text-xs" />
                                         URL inválida ou imagem não encontrada
                                     </p>
                                 )}
                                 {imageLoading && (
-                                    <p className="text-xs text-gray-600 mt-1 flex items-center gap-1">
+                                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                                         <FaSpinner className="text-xs animate-spin" />
                                         Verificando imagem...
                                     </p>
                                 )}
                                 {imageLoaded && !imageError && (
-                                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                                    <p className="text-xs text-green-500 mt-1 flex items-center gap-1">
                                         ✓ Imagem válida e carregada
                                     </p>
                                 )}
@@ -915,15 +885,15 @@ export default function EditarRifaPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white rounded-2xl shadow-lg p-6"
+                            className="bg-[#25282c] rounded-2xl shadow-xl p-6 border border-[#313238]"
                         >
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Status</h2>
+                            <h2 className="text-xl font-bold text-white mb-4">Status</h2>
 
                             <select
                                 name="status"
                                 value={formData.status}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none transition-colors"
+                                className="w-full px-4 py-3 bg-[#1c1d1f] border border-[#313238] rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-white"
                             >
                                 <option value="ativa">Ativa</option>
                                 <option value="pausada">Pausada</option>
@@ -963,7 +933,7 @@ export default function EditarRifaPage() {
                                 type="button"
                                 onClick={() => router.back()}
                                 disabled={submitting}
-                                className={`w-full px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all ${submitting ? "opacity-50 cursor-not-allowed" : ""
+                                className={`w-full px-6 py-4 border border-[#313238] text-gray-400 rounded-xl font-bold hover:bg-[#313238] hover:text-white transition-all ${submitting ? "opacity-50 cursor-not-allowed" : ""
                                     }`}
                             >
                                 Cancelar

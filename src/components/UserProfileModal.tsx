@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTicketAlt, FaSignOutAlt, FaEnvelope, FaIdCard, FaInstagram, FaReceipt, FaUser, FaGift } from "react-icons/fa";
-import { useAuth } from "@/contexts/AuthContext";
-import { vendasService } from "@/services/vendas.service";
 import { Order } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
+import React, { useState, useEffect } from "react";
 import { ScratchCardModal } from "./ScratchCardModal";
+import { motion, AnimatePresence } from "framer-motion";
+import { vendasService } from "@/services/vendas.service";
+import { FaTimes, FaTicketAlt, FaIdCard, FaReceipt, FaGift } from "react-icons/fa";
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -14,13 +14,10 @@ interface UserProfileModalProps {
     cpf?: string;
 }
 
-type TabType = "profile" | "orders";
-
 export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose, cpf }) => {
     const { user, logout } = useAuth();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
-    const [activeTab, setActiveTab] = useState<TabType>("orders");
     const [showScratchCard, setShowScratchCard] = useState(false);
     const [selectedSaleId, setSelectedSaleId] = useState<number | null>(null);
 
@@ -97,7 +94,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
         return "bg-red-50 text-red-700 border border-red-200";
     };
 
-    // Se não tem user e não tem cpf, não exibe nada
     if (!user && !cpf) return null;
 
     return (
